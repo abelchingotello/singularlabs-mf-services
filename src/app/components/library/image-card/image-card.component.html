@@ -1,0 +1,13 @@
+<mat-card class="card shadow custom-border-radius-1-25" style="--back-image: url({{ backImage }}); --back-size: {{ backSize }}">
+    <mat-card-content>
+        <div class="row d-flex align-content-center">
+            <div class="col-auto">
+                <h1 class="mctitle custom-title-responsive-1">{{title}}</h1>
+            </div>
+            <div class="col d-flex flex-grow-1 image-card-content" style="--position-content: {{ positionContent }}">
+                <ng-content>
+                </ng-content>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

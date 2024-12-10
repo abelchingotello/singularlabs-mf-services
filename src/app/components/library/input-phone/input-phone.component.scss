@@ -1,0 +1,18 @@
+// .phone_number {
+//     padding-left: 1em;
+//   }
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:0
+}
+
+/* Hacer que el select de país ocupe más columnas */
+.phone_country {
+  grid-column: span 1;
+}
+
+.phone_number {
+  grid-column: span 3;
+}

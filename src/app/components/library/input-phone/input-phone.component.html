@@ -1,0 +1,33 @@
+<form [formGroup]="profileForm">
+    <div formGroupName="phone" class="row h4">
+        <mat-form-field appearance="outline" class="phone_country pe-0 col-4">
+            <mat-label>País</mat-label>
+            <mat-select formControlName="country" (selectionChange)="formatNumber()">
+                <!-- Personalizar el valor mostrado cuando está cerrado -->
+                <mat-select-trigger>
+                    {{ phoneCountryControl.value }}
+                </mat-select-trigger>
+                <!-- Opciones del país -->
+                <mat-option *ngFor="let countryCode of countyCodes" [value]="countryCode.code">
+                    {{countryCode.country}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="phone_number ps-0 col-8">
+            <mat-label>Número de celular</mat-label>
+            <input formControlName="number" [maxLength]="9" type="tel" placeholder="Celular" (input)="formatNumber()"
+                [errorStateMatcher]="phoneErrorMatcher" matInput [readonly]="disabled">
+            <button mat-icon-button *ngIf="viewButton" matSuffix (click)="onSuffixButtonClick()" type="button"
+                class="btn-sm">
+                <ng-content></ng-content>
+            </button>
+            <mat-error *ngIf="!phoneGroup.valid">
+                Formato no válido. Ejemplo: {{phoneHint}}
+            </mat-error>
+            <mat-hint>Ejemplo: {{phoneHint}}</mat-hint>
+        </mat-form-field>
+    </div>
+</form>
+<!-- <p class="json-output"><code>PhoneNumber('{{phoneNumberDigits}}', '{{phoneCountryControl.value}}
+            ').toJSON()</code></p>
+<pre>{{phoneNumber | json}}</pre> -->

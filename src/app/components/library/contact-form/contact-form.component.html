@@ -1,0 +1,66 @@
+<form [formGroup]="contactForm">
+    <!-- Tipo de Documento -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Tipo de Documento</mat-label>
+        <mat-select formControlName="person_docType">
+            <mat-option value="DNI">DNI</mat-option>
+            <mat-option value="Pasaporte">Pasaporte</mat-option>
+            <mat-option value="Licencia">Licencia</mat-option>
+        </mat-select>
+        <mat-error *ngIf="contactForm.get('person_docType')?.hasError('required')">
+            El tipo de documento es obligatorio.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Número de Documento -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Número de Documento</mat-label>
+        <input matInput formControlName="person_docNumber" placeholder="Ingresa el número de documento" />
+        <mat-error *ngIf="contactForm.get('person_docNumber')?.hasError('required')">
+            El número de documento es obligatorio.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Nombre -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="person_firstName" placeholder="Ingresa tu nombre" />
+        <mat-error *ngIf="contactForm.get('person_firstName')?.hasError('required')">
+            El nombre es obligatorio.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Apellido -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="person_lastName" placeholder="Ingresa tu apellido" />
+        <mat-error *ngIf="contactForm.get('person_lastName')?.hasError('required')">
+            El apellido es obligatorio.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Correo Electrónico -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Correo Electrónico</mat-label>
+        <input matInput type="email" formControlName="person_email" placeholder="Ingresa tu correo electrónico" />
+        <mat-error *ngIf="contactForm.get('email')?.hasError('required')">
+            El correo electrónico es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="contactForm.get('email')?.hasError('pattern')">
+            Ingresa un correo válido.
+        </mat-error>
+    </mat-form-field>
+
+    <!-- Teléfono -->
+    <mat-form-field appearance="outline" class="col-12 col-lg-6">
+        <mat-label>Teléfono</mat-label>
+        <input matInput type="tel" formControlName="person_phone" placeholder="Ingresa tu teléfono" />
+    </mat-form-field>
+
+    <!-- Botón para enviar -->
+    <div class="col-12 mt-3">
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="contactForm.invalid">
+            Añadir
+        </button>
+    </div>
+</form>

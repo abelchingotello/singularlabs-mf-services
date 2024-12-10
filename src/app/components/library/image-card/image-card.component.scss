@@ -1,0 +1,24 @@
+.mat-card{
+    overflow: hidden;
+    margin-bottom: 1.25rem !important;
+}
+
+.mat-card::before{
+    content: "";
+    height: 100%;
+    width: 100%;
+    transform: unset;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: right 10px top 11px;
+    background-size: var(--back-size);
+    background-image: var(--back-image);
+}
+
+.mat-card-content{
+    padding: 30px 24px;
+}
+
+.image-card-content{
+    justify-content: var(--position-content);
+}

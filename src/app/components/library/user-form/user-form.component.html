@@ -1,0 +1,119 @@
+<form [formGroup]="formUser" style="padding: 18px;">
+    <mat-form-field appearance="outline" fxFlex="25%" formGroupName="person_docType" class="col-md-4">
+        <mat-label>Tipo de documento(*)</mat-label>
+        <mat-select formControlName="nametype" (selectionChange)="onSelectDocumentType($event)">
+            <mat-option value="DNI">
+                DNI
+            </mat-option>
+            <mat-option value="RUC">
+                RUC
+            </mat-option>
+        </mat-select>
+        <mat-error *ngIf="typeDoc?.hasError('required') && typeDoc?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" fxFlex="25%" class="col-md-4">
+        <mat-label>Número de Documento</mat-label>
+        <input formControlName="person_docNumber" type="text" (keypress)="validateOnlyNumber1($event)"
+            (paste)="onPasteOnlyNumber($event)" (focusout)="getUserByTypeDocAndDoc()" matInput
+            [maxlength]="documentMaxLenght" matImput />
+        <mat-error *ngIf="numDoc?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+        <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="formTrue" appearance="outline" fxFlex="75%" class="col-md-4 ">
+        <mat-label>Nombre(s)</mat-label>
+        <input formControlName="person_firstName" type="text" matInput placeholder="Ingresa nombre" [maxlength]="150"
+            (input)="nameMayusName($event)" (keypress)="validateOnlyLetter($event)"
+            (paste)="onPasteOnlyLetterAndSpecial($event)">
+        <mat-error *ngIf="name?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+        <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+        <mat-label>{{docName}} </mat-label>
+        <input formControlName="person_lastName" type="text" matInput placeholder="Ingresa nombre" [maxlength]="150"
+            (input)="nameMayus($event)" (keypress)="validateOnlyLetter($event)"
+            (paste)="onPasteOnlyLetterAndSpecial($event)">
+        <mat-error *ngIf="person_lastName?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+        <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-4">
+        <mat-label>Email</mat-label>
+        <input formControlName="email" type="email" matInput placeholder="Ejmpl@gmail.com" [maxlength]="70"
+            (blur)="onChangeEmailMasterAdmin()">
+        <mat-error *ngIf="email?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+        <mat-hint align="end">{{email.value?.length || 0}}/70</mat-hint>
+    </mat-form-field>
+    <mat-checkbox class="col-md-4" formControlName="verify_email">Email Verificado</mat-checkbox>
+    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+        <mat-label>Usuario</mat-label>
+        <input formControlName="name" type="text" matInput placeholder="Usuario" [maxlength]="30"
+            (keypress)="onKeyPress($event)">
+        <mat-error *ngIf="user?.hasError('required')">
+            Este campo es requerido
+        </mat-error>
+        <mat-hint align="end">{{user?.value?.length ?? 0}} / 30</mat-hint>
+    </mat-form-field>
+
+    <uni-input-phone class="col-md-4 d-inline-block" [acceptMobileOnly]="true" (phoneChanged)="onPhoneChange($event)"
+        [value]="phone.value"></uni-input-phone>
+
+    <mat-checkbox class="col-md-4" formControlName="verify_phone">Celular Verificado</mat-checkbox>
+
+
+    <!-- <mat-form-field appearance="outline" fxFlex="25%"  class="col-md-4">
+            <mat-label>Celular</mat-label>
+            <input formControlName="person_phone" matInput placeholder="Número Cel." [maxlength]="9" (keypress)="validateOnlyNumber1($event)" (paste)="onPasteOnlyNumber($event)">
+            <mat-error *ngIf="phone?.hasError('required')">
+                Este campo es requerido
+            </mat-error>
+            <mat-hint align="end">{{phone?.value?.length ?? 0}} / 9</mat-hint>
+        </mat-form-field> -->
+
+    <mat-form-field *ngIf="formTrue" formGroupName="gender" appearance="outline" fxFlex="25%" class="col-md-4">
+        <mat-label>Género</mat-label>
+        <mat-select formControlName="type_gen">
+            <mat-option value="MASCULINO">
+                MASCULINO
+            </mat-option>
+            <mat-option value="FEMENINO">
+                FEMENINO
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="formTrue" appearance="outline" fxFlex="25%" class="col-md-4">
+        <mat-label>Ubigeo</mat-label>
+        <input type="text" formControlName="ubigeo" [maxlength]="6" (keypress)="validateOnlyNumber1($event)"
+            (paste)="onPasteOnlyNumber($event)" matInput>
+        <mat-hint align="end">{{ubigeo.value?.length || 0}}/6</mat-hint>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col-md-4 ">
+        <mat-label>Rol</mat-label>
+        <mat-select formControlName="role" multiple>
+            <!-- Itera sobre la lista de toppings -->
+            <mat-option (onSelectionChange)="valueRole($event,role)" *ngFor="let role of roleMaster" [value]="role.SK">
+                {{ role.master_name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="col-md-4 ">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="user_status">
+            <mat-option *ngFor="let name of stateMaster" [value]="name?.master_name">
+                {{ name.master_name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>

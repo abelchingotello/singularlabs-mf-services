@@ -1,0 +1,16 @@
+.example-form{
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn-guardar{
+    display: grid;
+    justify-items: end;
+    padding: 0px 30px 20px 0px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Este valor separa los botones en los extremos */
+    padding: 10px;
+  }

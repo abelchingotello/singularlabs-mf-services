@@ -1,0 +1,223 @@
+.container-view {
+    max-width: 100%;
+    overflow: auto;
+    height: auto;
+}
+
+table {
+    width: 100%; // Cambié `min-width` a `width` para asegurar que la tabla ocupe el 100% del contenedor.
+    border-collapse: separate; // Mantén las celdas de la tabla unidas para evitar bordes dobles.
+    // border-radius: 1.25rem; // Mantiene el borde redondeado.
+    // overflow: hidden; // Asegura que el contenido de la tabla respete los bordes redondeados.
+    // border: 1px solid black; 
+}
+
+td.mat-cell {
+    min-width: 100px;
+    padding-right: 8px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    @media (max-width: 720px) {
+        min-width: 150px;
+    }
+}
+
+td.cdk-column-select {
+    min-width: 20px !important;
+}
+
+th.mat-cell,
+td.mat-cell {
+    padding-left: 8px;
+}
+
+th.mat-header-cell {
+    padding-inline: 8px;
+}
+
+::ng-deep .groupTableCard .mat-tab-header {
+    visibility: hidden;
+    height: 0px;
+}
+
+
+.table-custom .mat-row:hover .mat-cell {
+    background-color: #c5c5c5;
+}
+
+.link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+// .mat-paginator{
+//     width: auto;
+//     min-width: 100%;
+// }
+
+// .mat-header-cell,
+// .mat-cell {
+//     // padding: 8px;
+//     word-wrap: break-word;
+//     white-space: nowrap;
+//     text-overflow: ellipsis;
+// }
+
+// // .mat-header-cell {
+// //     font-weight: bold;
+// // }
+
+// // .mat-row,
+// // .mat-header-row {
+// //     display: table-row;
+// // }
+
+// @media screen and (max-width: 768px) {
+
+//     .mat-header-cell,
+//     .mat-cell {
+//         white-space: normal;
+//     }
+// }
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    max-width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    height: auto;
+}
+
+.card-item {
+    position: relative;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    min-height: 250px;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-bottom: 15px !important;
+    box-shadow: none !important;
+}
+
+.cart-item.bg-info{
+    border-radius: 8px;
+}
+
+.mat-card-media{
+    position: relative;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.card-item.icon-card{
+    margin-top: -45px;
+    z-index: 1;
+    position: relative;
+}
+
+.checked-class {
+    background-color: #0099cc29;
+}
+
+.card-item-header {
+    padding: 12px 12px 0px 12px !important;
+}
+
+.card-item-content {
+    padding: 0px 12px 12px 12px !important;
+}
+
+::ng-deep .card-item-header .mat-card-header-text {
+    margin: 0 !important;
+    flex-grow: 1;
+}
+
+.card-text-title {
+    font-size: .80rem;
+    font-weight: 700;
+    text-align: start;
+}
+
+.card-text {
+    font-size: .75rem;
+    color: #3a3a3a;
+}
+
+.card-item:hover {
+    border: 1px solid hsl(0, 0%, 69%) !important;
+    box-shadow: 0 4px 8px rgba(100, 100, 100, 0.2) !important;
+}
+
+::ng-deep .buttons .mat-form-field .mat-form-field-wrapper {
+    padding-bottom: 0px;
+}
+
+::ng-deep .view-field .mat-form-field-flex>.mat-form-field-infix {
+    width: auto !important;
+}
+
+::ng-deep .view-field .mat-form-field-flex>.mat-form-field-infix > .mat-select > .mat-select-trigger> .mat-select-value {
+    width: 0px !important;
+}
+
+::ng-deep .viewOptions .mat-form-field .mat-form-field-wrapper .mat-form-field-underline {
+    visibility: hidden;
+}
+
+::ng-deep .custom-header-row-dynamic-table .mat-sort-header .mat-sort-header-container .mat-sort-header-content {
+    color: #333;
+    /* Color del texto */
+    font-weight: bold;
+    /* Negrita para el texto */
+    // overflow-wrap: break-word;
+    // word-break: break-word;
+}
+
+.custom-header-row-dynamic-table {
+    /* Mantener la fila fija en la parte superior */
+    top: 0;
+    /* Pegado a la parte superior */
+    // z-index: 10;
+    /* Asegurarse de que esté por encima de otras filas */
+}
+
+.custom-headercell-dynamictable {
+    background: #f5f5f5;
+    color: #333;
+    font-weight: bold;
+    top: 0;
+    // z-index: 1;
+}
+
+.checkbox-container {
+    position: absolute;
+    margin-top: -15px;
+    margin-left: -15px;
+}
+
+@media print {
+    mat-paginator {
+        display: none;
+    }
+
+    @page {
+        size: auto;
+        margin: 55px;
+    }
+
+    .mat-column-select {
+        display: none;
+    }
+}
+
+::ng-deep .mat-checkbox .mat-checkbox-layout {
+    margin-bottom: 0 !important;
+}
