@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: 'services',loadChildren: () => import('./services/services.module').then(x => x.ServicesModule)}, 
+  { path: 'service',loadChildren: () => import('./services/services.module').then(x => x.ServicesModule)}, 
 ];
 
 
