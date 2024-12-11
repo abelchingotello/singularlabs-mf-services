@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { interceptorSpringProvider } from './interceptors/app.interceptor';
 import { ToastrModule } from 'ngx-toastr';
 import { LibraryModule } from './components/library/library.module';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { LibraryModule } from './components/library/library.module';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
+    HttpClientModule,
     LibraryModule,
     ToastrModule.forRoot()
   ],
