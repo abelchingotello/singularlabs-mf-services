@@ -61,7 +61,7 @@ export class UserFormComponent implements OnInit {
   constructor(
     private form: FormBuilder,
     private mytoastr: MytoastrService,
-    private userService: UserService,
+    // private userService: UserService,
     private spinner: SpinnerService,
     private companyService: CompanyService,
     private authService: AuthService,
@@ -75,7 +75,7 @@ export class UserFormComponent implements OnInit {
     this.phone_verif.disable();
     if (this.idUser) {
       this.title = 'Editar Usuario';
-      this.getUserId();
+      // this.getUserId();
       // this.saveEdit = true;  
       console.log(this.typeDoc.value)
 
@@ -282,23 +282,23 @@ export class UserFormComponent implements OnInit {
 
     // return
 
-    this.userService.updateUser(dataUser, this.idUser).subscribe({
-      next: (response) => {
-        this.mytoastr.showSuccess(response, '')
-        this.userService.updatePerson(dataPerson, this.dataUserID.person_id).subscribe({
-          next: (response) => {
-            console.log(response)
-          }
-        })
-      },
-      error: (error) => {
-        console.error(error)
-        this.spinner.spinnerOnOff();
-      },
-      complete: () => {
-        this.spinner.spinnerOnOff();
-      }
-    })
+    // this.userService.updateUser(dataUser, this.idUser).subscribe({
+    //   next: (response) => {
+    //     this.mytoastr.showSuccess(response, '')
+    //     this.userService.updatePerson(dataPerson, this.dataUserID.person_id).subscribe({
+    //       next: (response) => {
+    //         console.log(response)
+    //       }
+    //     })
+    //   },
+    //   error: (error) => {
+    //     console.error(error)
+    //     this.spinner.spinnerOnOff();
+    //   },
+    //   complete: () => {
+    //     this.spinner.spinnerOnOff();
+    //   }
+    // })
   }
 
   saveUser() {
@@ -371,100 +371,100 @@ export class UserFormComponent implements OnInit {
 
       let respuesta: any;
       // return
-      this.userService.postUser(payload).subscribe(
-        {
-          next: (response) => {
-            respuesta = response
-            console.log('Registro exitoso:', response);
-            if (response.statusCode == 409) {
-              this.mytoastr.showWarning(response.message, '')
-              return;
-            }
-            this.mytoastr.showSuccess('Registro exitoso', '')
-            // this.router.navigate(["/users"])
-          },
-          error: (error) => {
-            this.mytoastr.showError('Intente nuevamente en unos momentos', '')
-            console.error('Otro error ocurrió:', error);
-          },
-          complete: () => {
-            console.log("ingreso")
-            this.spinner.spinnerOnOff();
-          }
-        }
+      // this.userService.postUser(payload).subscribe(
+      //   {
+      //     next: (response) => {
+      //       respuesta = response
+      //       console.log('Registro exitoso:', response);
+      //       if (response.statusCode == 409) {
+      //         this.mytoastr.showWarning(response.message, '')
+      //         return;
+      //       }
+      //       this.mytoastr.showSuccess('Registro exitoso', '')
+      //       // this.router.navigate(["/users"])
+      //     },
+      //     error: (error) => {
+      //       this.mytoastr.showError('Intente nuevamente en unos momentos', '')
+      //       console.error('Otro error ocurrió:', error);
+      //     },
+      //     complete: () => {
+      //       console.log("ingreso")
+      //       this.spinner.spinnerOnOff();
+      //     }
+      //   }
 
-      )
+      // )
     } else {
       this.update();
       console.log("ingreso actualizar")
     }
   }
 
-  getUserId() {
+  // getUserId() {
 
-    this.spinner.spinnerOnOff();
-    this.userService.getUsersId(this.idUser).subscribe({
-      next: (res) => {
-        this.dataUserID = res;
-        console.log("data", res)
-        this.email.setValue(res.user_email);
-        this.user.setValue(res.user_nickname);
-        this.user_status.setValue(res.user_status);
-        this.phone.setValue(res.user_phone)
-        if(this.phone.value) this.phone_verif.enable();
-        this.email_verif.setValue(res.user_email_verified);
-        if(this.email_verif.value) this.email_verif.enable();
-        this.phone_verif.setValue(res.user_phone_verified);
-        // if(this.phone_verif.value) this.phone_verif.enable();
-        if (this.user_status.value == 'BLOCKED') {
-          this.user_status.disable();
-        }
-        this.listRole = res.user_roles.map((role: any) => role.role_id);
-        this.formUser.patchValue({
-          role: this.listRole
-        })
-        this.userService.getPersonId(res.person_id).subscribe({
-          next: (person) => {
-            console.log("dataPersona", person)
-            if (person.contact.person_docType == 'RUC') {
-              this.formTrue = false;
-              this.docName = 'Razón Social';
-              this.numDoc.setValue(person.contact.person_docNumber)
-              this.typeDoc.setValue(person.contact.person_docType)
-              if (this.typeDoc.value == 'RUC') {
-                this.typeDocRuc();
-                console.log("tipoDOC", this.typeDoc.value)
-              }
-              // this.phone.setValue(person.contact.person_phone);
-              this.person_lastName.setValue(person.contact.person_lastName)
-            } else {
-              this.name.setValue(person.contact.person_firstName)
-              this.person_lastName.setValue(person.contact.person_lastName)
-              // this.phone.setValue(person.contact.person_phone)
+  //   this.spinner.spinnerOnOff();
+  //   this.userService.getUsersId(this.idUser).subscribe({
+  //     next: (res) => {
+  //       this.dataUserID = res;
+  //       console.log("data", res)
+  //       this.email.setValue(res.user_email);
+  //       this.user.setValue(res.user_nickname);
+  //       this.user_status.setValue(res.user_status);
+  //       this.phone.setValue(res.user_phone)
+  //       if(this.phone.value) this.phone_verif.enable();
+  //       this.email_verif.setValue(res.user_email_verified);
+  //       if(this.email_verif.value) this.email_verif.enable();
+  //       this.phone_verif.setValue(res.user_phone_verified);
+  //       // if(this.phone_verif.value) this.phone_verif.enable();
+  //       if (this.user_status.value == 'BLOCKED') {
+  //         this.user_status.disable();
+  //       }
+  //       this.listRole = res.user_roles.map((role: any) => role.role_id);
+  //       this.formUser.patchValue({
+  //         role: this.listRole
+  //       })
+  //       // this.userService.getPersonId(res.person_id).subscribe({
+  //       //   next: (person) => {
+  //       //     console.log("dataPersona", person)
+  //       //     if (person.contact.person_docType == 'RUC') {
+  //       //       this.formTrue = false;
+  //       //       this.docName = 'Razón Social';
+  //       //       this.numDoc.setValue(person.contact.person_docNumber)
+  //       //       this.typeDoc.setValue(person.contact.person_docType)
+  //       //       if (this.typeDoc.value == 'RUC') {
+  //       //         this.typeDocRuc();
+  //       //         console.log("tipoDOC", this.typeDoc.value)
+  //       //       }
+  //       //       // this.phone.setValue(person.contact.person_phone);
+  //       //       this.person_lastName.setValue(person.contact.person_lastName)
+  //       //     } else {
+  //       //       this.name.setValue(person.contact.person_firstName)
+  //       //       this.person_lastName.setValue(person.contact.person_lastName)
+  //       //       // this.phone.setValue(person.contact.person_phone)
               
-              console.log("CELULAR--",this.phone.value)
-              this.numDoc.setValue(person.contact.person_docNumber)
-              this.ubigeo.setValue(person.contact.person_ubigeo)
-              this.gender.setValue(person.contact.person_gender)
-            }
-          },
-          error: (error) => {
-            console.error('Ocurrió un error:', error);
-          },
-          complete: () => {
-            this.spinner.spinnerOnOff();
-          }
-        })
+  //       //       console.log("CELULAR--",this.phone.value)
+  //       //       this.numDoc.setValue(person.contact.person_docNumber)
+  //       //       this.ubigeo.setValue(person.contact.person_ubigeo)
+  //       //       this.gender.setValue(person.contact.person_gender)
+  //       //     }
+  //       //   },
+  //       //   error: (error) => {
+  //       //     console.error('Ocurrió un error:', error);
+  //       //   },
+  //       //   complete: () => {
+  //       //     this.spinner.spinnerOnOff();
+  //       //   }
+  //       // })
 
-      },
-      error: (err) => {
-        console.log("error", err)
-      },
-      complete: () => {
-        // this.spinner.spinnerOnOff();
-      }
-    })
-  }
+  //     },
+  //     error: (err) => {
+  //       console.log("error", err)
+  //     },
+  //     complete: () => {
+  //       // this.spinner.spinnerOnOff();
+  //     }
+  //   })
+  // }
 
   onPhoneChange(phoneData: any) {
     if (phoneData.valid && phoneData.typeIsMobile) {

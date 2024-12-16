@@ -15,15 +15,15 @@ export class AppGuard implements CanActivate {
 
 
   async canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean> {
-    var isAuth = await this.authService.isAuth();
-    if (!isAuth) {
-      this.router.navigate(['/sign-in'])
-      return false;
+      route: ActivatedRouteSnapshot,
+      state: RouterStateSnapshot): Promise<boolean> {
+      var isAuth = await this.authService.isAuth();
+      if (!isAuth) {
+        this.router.navigate(['/sign-in'])
+        return false;
+      }
+      return true;
     }
-    return true;
-  }
 
   
 }

@@ -1,0 +1,140 @@
+<div class="content bg-gray-3">
+    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+        <uni-image-card title="Añadir Servicios"
+        externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
+    
+    </uni-image-card>
+
+    <mat-card>
+        <form [formGroup]="serviceForm" style="padding: 18px;">
+
+            <mat-form-field appearance="outline" fxFlex="25%" class="col-md-4">
+                <mat-label>Nombre de Servicio</mat-label>
+                <input formControlName="service_name" type="text" matInput/>
+                    <!-- <mat-select formControlName="nametype">
+                        <mat-option value="DNI" >
+                            DNI
+                        </mat-option>
+                        <mat-option value="RUC">
+                            RUC
+                        </mat-option>
+                    </mat-select> -->
+                    <!-- <mat-error *ngIf="typeDoc?.hasError('required') && typeDoc?.hasError('required')">
+                        Este campo es requerido
+                    </mat-error> -->
+            </mat-form-field>
+    
+            <mat-form-field appearance="outline" fxFlex="25%"  class="col-md-4">
+                <mat-label>Seleccionar Categoria</mat-label>
+                <!-- <input formControlName="service_category" type="text" matInput  /> -->
+                 <mat-select formControlName="service_category">  
+                    <mat-option value="value"> OTROS RECAUDOS     </mat-option>
+                </mat-select>
+                <!-- <mat-error *ngIf="numDoc?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+                <mat-label>Seleccionar Tipo</mat-label>
+                <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
+                <mat-select formControlName="service_type">
+                    <mat-option value="Servicio de Recaudos">COLEGIOS</mat-option>
+                </mat-select>
+                <!-- <mat-error *ngIf="name?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+                <mat-label>Negocio</mat-label>
+                <input formControlName="service_type_business" type="text"  matInput placeholder="Ingresa nombre" >
+                <!-- <mat-error *ngIf="name?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+                <mat-label>Estado</mat-label>
+                <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
+                <mat-select formControlName="service_state">
+                    <mat-option value="Servicio de Recaudos">HABILITADO</mat-option>
+                </mat-select>
+                <!-- <mat-error *ngIf="name?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+    
+            
+            <mat-form-field appearance="outline" fxFlex="75%"  class="col-md-4 ">
+                <mat-label>Seleccionar Zona </mat-label>
+                <!-- <input formControlName="service_zone" type="text"  matInput placeholder="Ingresa nombre" > -->
+                <mat-select formControlName="service_zone">
+                    <mat-option value="Servicio de Recaudos">CHICLAYO</mat-option>
+                </mat-select>
+                <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+                <mat-label>Tipo de comisión </mat-label>
+                <!-- <input formControlName="service_comision" type="text"  matInput placeholder="Ingresa nombre" > -->
+                <mat-select formControlName="service_type_comision">
+                    <mat-option value="Servicio de Recaudos">MULTIPLE</mat-option>
+                </mat-select>
+                <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+                <mat-label>Comisión </mat-label>
+                <input formControlName="service_comision" type="text"  matInput placeholder="monto" >
+                <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
+                    Este campo es requerido
+                </mat-error> -->
+                <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
+            </mat-form-field>
+
+        <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+            <mat-label>Indicadores</mat-label>
+            <mat-select multiple (selectionChange)="indicatorValue($event)">
+                <mat-option *ngFor="let indicators1 of indicators" [value]="indicators1" [disabled]="indicators1.isActive">{{indicators1.name}}</mat-option>
+                <!-- <mat-option value="option2" disabled>Option 2 (disabled)</mat-option>
+                <mat-option value="option3">Option 3</mat-option> -->
+            </mat-select>
+        </mat-form-field>
+
+            </form>
+            <div class="btn-guardar button-container">
+                <button  routerLink="/service" class="btn btn-primary">CANCELAR</button>
+                <button  (click)="saveService()" class="btn btn-primary">GUARDAR</button>
+            </div>
+    </mat-card>
+
+
+    <!-- <div class="bill-holder">
+        <h3 class="bill-title">Titular de la factura</h3>
+        <p class="bill-name">{{ data1.billHolder }}</p>
+      </div>
+      
+      <div class="amounts-container">
+        <div *ngFor="let amounts of data1.amounts" class="amount-item">
+          <span class="amount-type">{{ amounts.amountType.name }}</span>
+          <div class="amount-value">
+            <span class="value">{{ amounts.amountValue.amount }}</span>
+            <span class="currency">{{ amounts.amountValue.currency }}</span>
+          </div>
+        </div>
+      </div> -->
+      
+
+    </div>
+</div>

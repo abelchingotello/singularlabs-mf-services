@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
 export class UserService {
 
   private url = `${environment.URL_API_GATEWAY}`;
-  private urlIframe = `${environment.URL_IFRAME}`;
+  // private urlIframe = `${environment.URL_IFRAME}`;
   public data = new BehaviorSubject<any | null>(null);
   public user = new BehaviorSubject<any | null>(null);
   public config = new BehaviorSubject<{route?, refresh?, method?} | null>(null);
@@ -143,12 +143,12 @@ export class UserService {
   }
 
   
-  iframe(data: any): Observable<any>{
-    const params = new HttpParams()
-    .set('route', data.route)
-    .set('token', data.token);
-    return this.httpClient.get(`${this.urlIframe}/auth-iframe`,{params});
-  }
+  // iframe(data: any): Observable<any>{
+  //   const params = new HttpParams()
+  //   .set('route', data.route)
+  //   .set('token', data.token);
+  //   return this.httpClient.get(`${this.urlIframe}/auth-iframe`,{params});
+  // }
 
 
 

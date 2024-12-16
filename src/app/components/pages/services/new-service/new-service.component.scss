@@ -1,0 +1,76 @@
+.example-form{
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn-guardar{
+    display: grid;
+    justify-items: end;
+    padding: 0px 30px 20px 0px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Este valor separa los botones en los extremos */
+    padding: 10px;
+  }
+
+
+
+  .bill-holder {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .bill-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .bill-name {
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
+  .amounts-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .amount-item {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .amount-type {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #444;
+  }
+  
+  .amount-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .value {
+    font-weight: bold;
+  }
+  
+  .currency {
+    font-size: 0.9rem;
+    color: #888;
+  }
+  

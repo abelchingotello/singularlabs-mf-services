@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LibraryModule } from '../library.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
+// import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { MasterService } from 'src/app/services/master.service';
 import { forkJoin } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';

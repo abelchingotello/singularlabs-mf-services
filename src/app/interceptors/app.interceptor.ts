@@ -18,7 +18,7 @@ export class AppInterceptor implements HttpInterceptor {
 
   constructor(
     private authService: AuthService,
-    private companyService: CompanyService,
+    // private companyService: CompanyService,
     private router: Router,
     private myToastr : MytoastrService
   ) { }
@@ -26,7 +26,7 @@ export class AppInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let intReq = request;
     const token = this.authService.getToken();
-    const companyId = this.companyService.getCompanyId();
+    // const companyId = this.companyService.getCompanyId();
 
     // if ((request.method === 'POST' || request.method === 'PUT') && (!company_id || company_id === 'null' || company_id === 'undefined' )) {
     //   // Create an error response for invalid company_id
@@ -40,7 +40,7 @@ export class AppInterceptor implements HttpInterceptor {
     if (token) {
       intReq = request.clone({
         headers: request.headers.set('Authorization','Bearer ' + token),
-        params: request.params.set('companyId', companyId)
+        // params: request.params.set('companyId', companyId)
       });
     }
     return next.handle(intReq).pipe(

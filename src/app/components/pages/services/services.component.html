@@ -1,0 +1,52 @@
+<div class="content bg-gray-3">
+    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+        <uni-image-card title="Servicios"
+        externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
+    
+        <div class="align-content-center">
+            <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="addService()">
+              <mat-icon>add</mat-icon>
+              <span class="custom-span-icon-responsive">Añadir</span>
+              
+            </button>
+          </div>
+    </uni-image-card>
+
+    <mat-card class="custom-border-radius-1-25">
+        <mat-card-content>
+          <div class="template-container custom-border-radius-1-25 bg-white p-3">
+            <mat-form-field appearance="outline" class="search w-100">
+              <mat-label>Buscar</mat-label>
+              <input matInput placeholder="Por nombre" (keydown.enter)="searchData()" >
+              <button *ngIf="close" mat-icon-button matSuffix (click)="cleanSearch()">
+                <mat-icon>close</mat-icon>
+              </button>
+              <button mat-icon-button matSuffix (click)="searchData()">
+                <mat-icon>search</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+
+    <mat-card class="custom-border-radius-1-25">
+        <mat-card-content>
+          <div >
+            <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
+            (selectedIdsChange)="handleSelectedIds($event)">
+  
+              <div class="action-buttons d-inline-block">
+                <button [disabled]="disabledEditOption" mat-icon-button (click)="editElement()">
+                  <mat-icon matTooltip="Editar">edit</mat-icon>
+                </button>
+              </div>
+            </uni-dynamic-table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+
+
+    </div>
+</div>

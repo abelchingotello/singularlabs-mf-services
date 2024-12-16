@@ -18,7 +18,7 @@ export class ImageCardComponent implements OnInit {
   positionContent: string;
 
   defaultImage: string = 'https://i.pinimg.com/236x/1d/b2/c4/1db2c495b9cc3155944828306faa61d7.jpg';
-  defaultSize: string = '210px'
+  defaultSize: string = '140px'
   defaultPositionContent: string = 'start'
   constructor() { }
 

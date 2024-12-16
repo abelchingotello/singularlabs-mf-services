@@ -8,7 +8,7 @@ const routes: Routes = [
   { path: '',
     loadChildren: () => import('./components/pages/pages.module').then(x => x.PagesModule), 
     canActivate: [AppGuard]},
-  { path: "**", component: EmptyRouteComponent }
+  // { path: "**", component: EmptyRouteComponent }
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: false})],

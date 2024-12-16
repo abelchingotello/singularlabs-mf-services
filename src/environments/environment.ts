@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  HOST:'http://localhost:8082',
+  // URL_API_GATEWAY:'https://butdn2x1g7.execute-api.us-east-1.amazonaws.com/stage'
+  URL_API_GATEWAY:'https://dqcql0o4y6.execute-api.us-east-1.amazonaws.com/etapa',
+  URL_API_HUB:'https://apihub-dev.singularlabs.co/etapa0'
 };
 
 /*
