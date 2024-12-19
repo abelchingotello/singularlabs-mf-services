@@ -11,13 +11,13 @@
             </button>
           </div>
     </uni-image-card>
-
     <mat-card class="custom-border-radius-1-25">
+      <form [formGroup]="serviceForm">
         <mat-card-content>
           <div class="template-container custom-border-radius-1-25 bg-white p-3">
-            <mat-form-field appearance="outline" class="search w-100">
+            <mat-form-field  appearance="outline" class="search w-100">
               <mat-label>Buscar</mat-label>
-              <input matInput placeholder="Por nombre" (keydown.enter)="searchData()" >
+              <input matInput placeholder="Por nombre" formControlName="service_name">
               <button *ngIf="close" mat-icon-button matSuffix (click)="cleanSearch()">
                 <mat-icon>close</mat-icon>
               </button>
@@ -27,8 +27,8 @@
             </mat-form-field>
           </div>
         </mat-card-content>
+      </form> 
       </mat-card>
-      
 
     <mat-card class="custom-border-radius-1-25">
         <mat-card-content>

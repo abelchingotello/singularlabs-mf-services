@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class ServicesService {
 
-  private url = `${environment.URL_API_HUB}/servicios`;
+  private url = `${environment.URL_API_HUB}`;
 
   constructor(
     private httpClient: HttpClient
@@ -18,6 +18,10 @@ export class ServicesService {
   getServices(name:string): Observable<any>{
     let params = new HttpParams()
     .set('nombre', name);
-    return this.httpClient.get<any>(`${this.url}`,{params: params});
+    return this.httpClient.get<any>(`${this.url}/servicios`,{params: params});
+  }
+
+  getIdServices(id:string): Observable<any>{
+    return this.httpClient.post<any>(`${this.url}/servicios/${id}`,null);
   }
 }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MytoastrService } from 'src/app/services/mytoastr';
+import { ServicesService } from 'src/app/services/services.service';
 
 @Component({
     selector: 'uni-new-service',
@@ -10,18 +11,26 @@ import { MytoastrService } from 'src/app/services/mytoastr';
 })
 export class NewServiceComponent implements OnInit {
     public serviceForm!: FormGroup;
-    public idService: string
+    public idService: string;
+    public typeService:any ;
+    public titlle : string = 'Nuevo Servicio';
+
     constructor(
         private router: Router,
         private fb: FormBuilder,
         private readonly activeRouter: ActivatedRoute,
-        private mytoastr: MytoastrService
+        private mytoastr: MytoastrService,
+        private service : ServicesService
     ) { }
 
     ngOnInit(): void {
         this.idService = this.activeRouter.snapshot.params['id'];
-        console.log("ID: ", this.idService)
         this.initializeFormGroup();
+        if(this.idService){
+            this.titlle = 'Editar Servicio'
+            this.getIdService(this.idService);
+        }
+        console.log("ID: ", this.idService)
     }
 
     initializeFormGroup() {
@@ -35,6 +44,7 @@ export class NewServiceComponent implements OnInit {
             service_type_comision: ['', Validators.required],
             service_comision: ['', Validators.required],
             service_zone: ['', Validators.required],
+            // service_indicators: this.fb.array([])
         });
 
     }
@@ -44,8 +54,6 @@ export class NewServiceComponent implements OnInit {
 
             console.log("FORMULARIO : ",this.serviceForm.value)
             return
-
-
 
             this.mytoastr.showSuccess('Guardado correctamente', '')
             this.router.navigate(['/service'])
@@ -63,81 +71,34 @@ export class NewServiceComponent implements OnInit {
         console.log("EVENTO SELECCIONADO : ",event.value)
     }
 
+    getIdService(idService){
+        this.service.getIdServices(idService).subscribe({
+            next:(response)=>{
+                this.service_name.setValue(response.data[0].name)
+                this.service_category.setValue(response.data[0].serviceProvider)
+                this.typeService = response.data[0].serviceType
+                console.log("typeServicio",this.typeService)
+                this.service_type_business.setValue(response.data[0].description)
+                // console.log("respuesta de id: ",response)
+            }
+        })
+    }
 
+    get service_name(){
+        return this.serviceForm.get('service_name')
+    }
 
-    indicators = [
-        {
-            "id": "PAY_BILL",
-            "name": "BASE DE DATOS",
-            "isActive": true
-        },
-        {
-            "id": "PAY_PARTIAL",
-            "name": "PAGO PARCIAL",
-            "isActive": false
-        },
-        {
-            "id": "PAY_CARD",
-            "name": "PAGO CON TARJETA",
-            "isActive": true
-        },
-        {
-            "id": "FREQUENT_OPERATION",
-            "name": "OPERACION FRECUENTE",
-            "isActive": true
-        },
-        {
-            "id": "PAY_DEBT_OLDEST",
-            "name": "DEUDA MAS ANTIGUA",
-            "isActive": false
-        },
-        {
-            "id": "PAY_ONLINE",
-            "name": "INTERCONECTADO, PAGO EN LINEA",
-            "isActive": false
-        },
-        {
-            "id": "PAY_ACCOUNT",
-            "name": "PAGO CON CARGO EN CUENTA",
-            "isActive": true
-        },
-        {
-            "id": "PAY_REFLECTED",
-            "name": "REFLEJO DE PAGO",
-            "isActive": false
-        },
-        {
-            "id": "PAY_AUTOMATIC",
-            "name": "DEBITO AUTOMATICO",
-            "isActive": true
-        },
-        {
-            "id": "PAY_FIXED_RATE",
-            "name": "TASAS FIJAS",
-            "isActive": false
-        },
-        {
-            "id": "PAY_CASH",
-            "name": "PAGO EN EFECTIVO",
-            "isActive": true
-        },
-        {
-            "id": "PAY_CHECK_INTERNAL",
-            "name": "PAGO CON CHEQUE PROPIO BANCO",
-            "isActive": true
-        },
-        {
-            "id": "PAY_CHECK_EXTERNAL",
-            "name": "PAGO CON CHEQUE OTRO BANCO",
-            "isActive": true
-        },
-        {
-            "id": "PAY_MULTIPLE_PAYMENTS",
-            "name": "ACTUALIZACION MASIVA DE DEUDAS",
-            "isActive": false
-        }
-    ]
+    get service_type(){
+        return this.serviceForm.get('service_type')
+    }
 
+    get service_category(){
+        return this.serviceForm.get('service_category')
+    }
+
+    get service_type_business(){
+        return this.serviceForm.get('service_type_business')
+    }
 
 
 

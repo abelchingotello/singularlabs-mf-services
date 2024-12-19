@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ServicesService } from 'src/app/services/services.service';
 
@@ -17,20 +18,26 @@ export class ServicesComponent implements OnInit {
   public dataUser = [];
   public pageSize: any = 5;
   public pageKey: any[];
-  public close : boolean = false
+  public close : boolean = false;
+  public serviceForm!: FormGroup;
+  public dataFilter : any;
+  public dataService : any[]
 
   constructor(
     private router : Router,
-    private services : ServicesService
+    private services : ServicesService,
+    private fb: FormBuilder,
   ) { }
 
   ngOnInit(): void {
-    this.services.getServices('COLEGIO').subscribe({
-      next : (data) => {
-        console.log(data);
-      }
+    this.formService();
+  }
+
+
+  formService(){
+    this.serviceForm = this.fb.group({
+      service_name : ['']
     })
-    this.data();
   }
 
   addService(){
@@ -38,6 +45,17 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData(){
+    const input = this.service_name.value.toUpperCase();
+    console.log("busqueda_ 0",input)
+    
+    // return
+    this.services.getServices(input).subscribe({
+      next : (data) => {
+        this.dataFilter = data
+        this.data();
+        console.log(data);
+      }
+    })
     console.log("BUSCANDO....")
   }
 
@@ -61,60 +79,18 @@ export class ServicesComponent implements OnInit {
     console.log("Id--s: ", selectedIds)
   }
 
-  dataService
 
-  data(){
-    this.dataService = this.data1.map(item => ({
+  data() {
+    this.dataService = this.dataFilter.data.map(item => ({
       ...item,
       serviceTypeName: item.serviceType?.name || ''
-  }));
-  console.log("DATA",this.dataService)
-
+    }));
   }
 
 
-
-
-
-
-    data1= [
-      {
-          "id": "SAC0000015",
-          "name": "ENTEL POSTPAGO",
-          "description": "ENTEL POSTPAGO",
-          "serviceType": {
-              "id": "5",
-              "name": "TELEFONIAS"
-          }
-      },
-      {
-          "id": "SAC0000004",
-          "name": "SEDAPAL",
-          "description": "SEDAPAL",
-          "serviceType": {
-              "id": "4",
-              "name": "SERV. PUBLICOS"
-          }
-      },
-      {
-          "id": "SAC0000002",
-          "name": "PASVELA",
-          "description": "PASVELA",
-          "serviceType": {
-              "id": "2",
-              "name": "EMPRESAS"
-          }
-      },
-      {
-          "id": "SAC0000022",
-          "name": "SEDAPAR",
-          "description": "SEDAPAR",
-          "serviceType": {
-              "id": "4",
-              "name": "SERV. PUBLICOS"
-          }
-      }
-  ]
+  get service_name(){
+    return this.serviceForm.get('service_name')
+  }
 
 
 }

@@ -38,8 +38,12 @@ export class AppInterceptor implements HttpInterceptor {
     // }
 
     if (token) {
+
+      const apiKey = '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm'; 
       intReq = request.clone({
-        headers: request.headers.set('Authorization','Bearer ' + token),
+        headers: request.headers
+        .set('Authorization','Bearer ' + token)
+        .set('x-api-key', apiKey),
         // params: request.params.set('companyId', companyId)
       });
     }
