@@ -7,10 +7,12 @@ import { interceptorSpringProvider } from './interceptors/app.interceptor';
 import { ToastrModule } from 'ngx-toastr';
 import { LibraryModule } from './components/library/library.module';
 import { HttpClientModule } from '@angular/common/http';
+import { DialogServiceStatusComponent } from './dialogs/dialog-service-status/dialog-service-status.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DialogServiceStatusComponent
   ],
   imports: [
     BrowserModule,

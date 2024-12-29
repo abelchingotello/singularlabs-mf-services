@@ -20,12 +20,14 @@ export class AppInterceptor implements HttpInterceptor {
     private authService: AuthService,
     // private companyService: CompanyService,
     private router: Router,
-    private myToastr : MytoastrService
+    private myToastr : MytoastrService,
+    private companyService: CompanyService,
   ) { }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let intReq = request;
     const token = this.authService.getToken();
+    const companyId = this.companyService.getCompanyId();
     // const companyId = this.companyService.getCompanyId();
 
     // if ((request.method === 'POST' || request.method === 'PUT') && (!company_id || company_id === 'null' || company_id === 'undefined' )) {
