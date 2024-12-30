@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PagesRoutingModule } from './pages.routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { LibraryModule } from '../library/library.module';
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 
@@ -13,6 +14,7 @@ import { LibraryModule } from '../library/library.module';
     PagesRoutingModule,
     HttpClientModule,
     LibraryModule,
+    MatDialogModule
   ]
 })
 export class PagesModule { }

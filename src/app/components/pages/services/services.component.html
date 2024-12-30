@@ -36,11 +36,19 @@
             <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
             (selectedIdsChange)="handleSelectedIds($event)">
   
-              <div class="action-buttons d-inline-block">
-                <button [disabled]="disabledEditOption" mat-icon-button (click)="editElement()">
+              <!-- <div class="action-buttons d-inline-block"> -->
+                <!-- <button [disabled]="disabledEditOption" mat-icon-button (click)="openDialogType()">
                   <mat-icon matTooltip="Editar">edit</mat-icon>
-                </button>
-              </div>
+                </button> -->
+                <mat-form-field appearance="outline" style="width: 80%; margin-left: 15px;" >
+                  <mat-label>Seleccionar</mat-label>
+                
+                <mat-select (selectionChange)="selectOption($event)">
+                  <!-- <mat-option>Ninguno</mat-option> -->
+                  <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <!-- </div> --> 
             </uni-dynamic-table>
           </div>
         </mat-card-content>

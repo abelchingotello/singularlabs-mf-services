@@ -8,6 +8,11 @@ import { ToastrModule } from 'ngx-toastr';
 import { LibraryModule } from './components/library/library.module';
 import { HttpClientModule } from '@angular/common/http';
 import { DialogServiceStatusComponent } from './dialogs/dialog-service-status/dialog-service-status.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -20,7 +25,13 @@ import { DialogServiceStatusComponent } from './dialogs/dialog-service-status/di
     AppRoutingModule,
     LibraryModule,
     ToastrModule.forRoot(),
-    HttpClientModule 
+    HttpClientModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatIconModule
   ],
   providers: [interceptorSpringProvider],
   bootstrap: [AppComponent]

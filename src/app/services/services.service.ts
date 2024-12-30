@@ -21,12 +21,12 @@ export class ServicesService {
 
   getServices(name:string): Observable<any>{
     let params = new HttpParams()
-    .set('nombre', name);
-    return this.httpClient.get<any>(`${this.url}/servicios`,{params: params});
+    .set('name', name);
+    return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   }
 
   getIdServices(id:string): Observable<any>{
-    return this.httpClient.post<any>(`${this.url}/servicios/${id}`,null);
+    return this.httpClient.post<any>(`${this.url}/services/${id}`,null);
   }
 
   getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {
@@ -36,6 +36,18 @@ export class ServicesService {
     if(nameAlias) params = params.set('nameAlias', nameAlias);
 
     return this.httpClient.get(`${this.url}/person/entity`, {params:params});
+  }
+
+  updateService(data:any):Observable<any>{
+    return this.httpClient.patch(`${this.url}/services/status`,data);
+  }
+
+  updateServiceEntity(data:any):Observable<any>{
+    return this.httpClient.patch(`${this.url}/services/status/entity`,data);
+  }
+  
+  updateServiceClient(data:any):Observable<any>{
+    return this.httpClient.patch(`${this.url}/services/status/one`,data);
   }
 }
 

@@ -1,1 +1,55 @@
-<p>dialog-service-status works!</p>
+<div class="header-box">
+    <h3 style="margin: 0;">ACTUALIZACION DE DATOS</h3>
+</div>
+<form [formGroup]="formEntity">
+    <!-- <div style="background:red;">
+        <label>First Name</label>
+    </div> -->
+    <mat-form-field *ngIf="stateIdEntity" appearance="outline" class="col-md-4 ">
+        <mat-label>Entidad</mat-label>
+        <input formControlName="entity"  type="text" matInput>
+    </mat-form-field> 
+
+    <mat-form-field *ngIf="stateIdClient" appearance="outline" class="col-md-4 ">
+        <mat-label>Cliente</mat-label>
+        <input formControlName="client"  type="text" matInput>
+    </mat-form-field> 
+
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>ID</mat-label>
+        <input formControlName="id"  type="text" matInput>
+    </mat-form-field>
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>Negocio</mat-label>
+        <input formControlName="business" type="text" matInput>
+    </mat-form-field>
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>Descripción</mat-label>
+        <input formControlName="description" type="text" matInput>
+    </mat-form-field>
+
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>Tipo de servicio</mat-label>
+        <input formControlName="serviceType" type="text" matInput >
+    </mat-form-field>
+
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>Entidad recaudadora</mat-label>
+        <input formControlName="collectingEntity" type="text" matInput >
+    </mat-form-field>
+
+    <mat-form-field  appearance="outline" class="col-md-4 ">
+        <mat-label>Estado</mat-label>
+        <mat-select (selectionChange)="stateSelect($event)">
+            <mat-option *ngFor="let state of stateMaster" [value]="state">{{state.master_name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>
+
+<div class="d-flex justify-content-end" >
+    <button class="btn btn-primary" (click)="updateServic()">
+        Guardar
+        <!-- <mat-icon>save</mat-icon> -->
+    </button>
+</div>
