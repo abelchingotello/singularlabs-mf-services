@@ -49,6 +49,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
+  @Output() selectedChange = new EventEmitter<any[]>();
   @Output() cellClick: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -209,6 +210,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
 
     // Emitir los IDs seleccionados
     this.selectedIdsChange.emit(this.selectedIds);
+    this.selectedChange.emit(this.selection.selected);
 }
 
   onSelectionChange() {

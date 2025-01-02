@@ -15,7 +15,11 @@ export class PersonService {
   ) { }
 
   postPerson(data:any):Observable<any> {
-    return this.httpClient.post(`${this.url}/persons`, data);
+    return this.httpClient.post(`${this.url}/person`, data);
+  }
+
+  postIdPerson(id:string):Observable<any> {
+    return this.httpClient.post(`${this.url}/person/${id}`,null);
   }
   
 }

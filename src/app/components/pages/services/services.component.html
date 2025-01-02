@@ -34,13 +34,13 @@
         <mat-card-content>
           <div >
             <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
-            (selectedIdsChange)="handleSelectedIds($event)">
+            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)">
   
               <!-- <div class="action-buttons d-inline-block"> -->
                 <!-- <button [disabled]="disabledEditOption" mat-icon-button (click)="openDialogType()">
                   <mat-icon matTooltip="Editar">edit</mat-icon>
                 </button> -->
-                <mat-form-field appearance="outline" style="width: 80%; margin-left: 15px;" >
+                <mat-form-field *ngIf="disabledEditOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
                   <mat-label>Seleccionar</mat-label>
                 
                 <mat-select (selectionChange)="selectOption($event)">

@@ -2,7 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MasterService } from 'src/app/services/master.service';
+import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'uni-dialog-service-status',
@@ -21,41 +23,37 @@ export class DialogServiceStatusComponent implements OnInit {
     public dialogRef: MatDialogRef<DialogServiceStatusComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: DialogData,
-    private master: MasterService,
-    private service : ServicesService
+    private service : ServicesService,
+    private mytoastr :  MytoastrService
   ) { }
 
-  ngOnInit(): void {
+   ngOnInit(): void {
     console.log("respuesta de servicio",this.data)
     this.initializaForms();
 
     if(this.data.id=='2') this.stateIdEntity = true
-    if(this.data.id=='3') this.stateIdClient = true
-    
-    this.master.getItemsMasterTable(1).subscribe({
-      next: (data) => {
-        this.stateMaster = data;
-        console.log("DATAMASTER", data)
-      }
-    });
+    if(this.data.id=='3') {
+      this.stateIdClient = true
+      this.stateIdEntity = true
+    }
 
+
+    this.service_entity.setValue(this.data.idProvider.person.name)
+    this.service_client.setValue(this.data.idClient.person.name)
     this.service_id.setValue(this.data.resp.data[0].id)
     this.service_business.setValue(this.data.resp.data[0].business)
     this.service_description.setValue(this.data.resp.data[0].description)
     this.service_collectingEntity.setValue(this.data.resp.collectingEntity)
-    this.service_serviceType.setValue(this.data.resp.data[0].serviceType.name)
+    this.service_serviceType.setValue(this.data.resp.data[0].serviceType.name);
+    this.stateMaster = this.data.state;
     this.formEntity.disable();
-
-  }
-
-  dataIdService(){
 
   }
 
   initializaForms() {
     this.formEntity = this.form.group({
-      entity : ['BBVA'],
-      client : ['BANCO'],
+      entity : [''],
+      client : [''],
       id: [''],
       business: [''],
       serviceType: [''],
@@ -64,45 +62,81 @@ export class DialogServiceStatusComponent implements OnInit {
     })
   }
 
+  caseOptionIdService(){
+   switch (this.data.id){
+    case '1':
+      this.updateServic();
+      console.log("INGRESO AL 1")
+      break;
+    case '2':
+      console.log("INGRESO AL 2")
+      this.updateServicEntity();
+      break;
+    case '3':
+      console.log("INGRESO AL 3")
+      this.updateServicClient();
+      break;
+   }
+  }
+
   updateServic(){
     const data = {
       idService: this.service_id.value,
       status: this.status.master_name
     }
-    console.log("UPDATE:",data)
+    console.log("UPDATE1:",data)
     // return
     this.service.updateService(data).subscribe(
       (data) => {
-        console.log("servicio actualizado", data)
-      }
+        console.log("respuesta del servicio", data)
+        if(data?.statusCode !==200){
+          this.mytoastr.showError('Error al actualizar','')
+          return
+        }
+        this.onNoClick();
+        this.mytoastr.showSuccess('Actualización correcta','')
+      },
+
     )
   }
   updateServicEntity(){
     const data = {
-      idProvider: this.service_entity.value ,
+      idProvider: this.data.idProvider.id ,
       idService: this.service_id.value,
       status: this.status.master_name
     }
-    console.log("UPDATE:",data)
+    console.log("UPDATE2:",data)
     // return
     this.service.updateServiceEntity(data).subscribe(
       (data) => {
-        console.log("servicio actualizado", data)
+        console.log("Respuesta del servicio ", data)
+        if(data?.statusCode !==200){
+          this.mytoastr.showError('Error al actualizar','')
+          return
+        }
+        this.onNoClick();
+        this.mytoastr.showSuccess('Actualización correcta','')
       }
     )
   }
   updateServicClient(){
     const data = {
-      idProvider: this.service_entity.value,
-      idClient: this.service_client.value,
+      idProvider: this.data.idProvider.id,
+      idClient: this.data.idClient.id,
       idService: this.service_id.value,
       status: this.status.master_name
     }
-    console.log("UPDATE:",data)
+    console.log("UPDATE3:",data)
     // return
     this.service.updateServiceClient(data).subscribe(
       (data) => {
-        console.log("servicio actualizado", data)
+        console.log("Respuesta del servicio", data)
+        if(data?.statusCode !==200){
+          this.mytoastr.showError('Error al actualizar','')
+          return
+        }
+        this.onNoClick();
+        this.mytoastr.showSuccess('Actualización correcta','')
       }
     )
   }
@@ -144,5 +178,8 @@ export class DialogServiceStatusComponent implements OnInit {
 
 export interface DialogData {
   resp: any;
-  id: string
+  id: string;
+  state: any;
+  idClient:any;
+  idProvider:any
 }

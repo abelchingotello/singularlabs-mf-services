@@ -246,6 +246,10 @@ export class NewServiceComponent implements OnInit {
         console.log("DATApayment: ", this.dataPayment)
     }
 
+    cancel(){
+        this.router.navigate(['/service'])
+    }
+
     get service_name(){
         return this.serviceForm.get('service_name')
     }
