@@ -116,12 +116,13 @@ export class ServicesComponent implements OnInit {
   }
   
   public disabledEditOption: any
+  public editOption: any
   public selectedIds: any
 
   handleSelectedIds(selectedIds: any[]) {
     // console.log("Id's: ", selectedIds)
-    // this.disabledDeletOption = selectedIds.length !== 1;
-    this.disabledEditOption = selectedIds.length == 1;
+    this.disabledEditOption = selectedIds.length !== 1;
+    this.editOption = selectedIds.length == 1;
     console.log("DESAHIBILITR: ",this.disabledEditOption)
     this.selectedIds = selectedIds;
     if(this.selectedIds.length ===1){
@@ -234,6 +235,10 @@ export class ServicesComponent implements OnInit {
       console.log('The dialog was closed',result);
       this.searchData();
     });
+  }
+
+  asignationService(){
+    this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
 
 

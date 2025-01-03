@@ -37,10 +37,10 @@
             (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)">
   
               <!-- <div class="action-buttons d-inline-block"> -->
-                <!-- <button [disabled]="disabledEditOption" mat-icon-button (click)="openDialogType()">
+                <button [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()" >
                   <mat-icon matTooltip="Editar">edit</mat-icon>
-                </button> -->
-                <mat-form-field *ngIf="disabledEditOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
+                </button>
+                <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
                   <mat-label>Seleccionar</mat-label>
                 
                 <mat-select (selectionChange)="selectOption($event)">

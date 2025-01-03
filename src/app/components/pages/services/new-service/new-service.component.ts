@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
 import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'uni-new-service',
@@ -40,7 +42,11 @@ export class NewServiceComponent implements OnInit {
     public pageKey: any[];
     public dataPayment = [];
     public functionDataCurrent: (pageSize: any) => any;
-
+    public editAsigService : boolean = true
+    public editClient : boolean = false
+    public comissionFixed : boolean = true
+    public comissionCriterio : boolean = true
+    public comissionPercentage : boolean = true
 
     
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
@@ -53,50 +59,14 @@ export class NewServiceComponent implements OnInit {
         private mytoastr: MytoastrService,
         private service : ServicesService,
         private masterService: MasterService,
+        private spinner : SpinnerService
     ) { }
 
     ngOnInit(): void {
         this.idService = this.activeRouter.snapshot.params['id'];
         this.initializeFormGroup();
-        if(this.idService){
-            this.titlle = 'Editar Servicio'
-            this.getIdService(this.idService);
-        }
+        this.listData();
 
-        this.masterService.getItemsMasterTable('12').subscribe(
-            (response: any) => {
-                console.log("DEPARTMN",response)
-                this.depart = response;
-            }
-        ),
-        
-        this.masterService.getItemsMasterTable('14').subscribe(
-            (response: any) => {
-                console.log("typeservice",response)
-                this.typeService = response;
-            }
-        ),
-        
-        this.masterService.getItemsMasterTable('11').subscribe(
-            (response: any) => {
-                console.log("typeClient",response)
-                this.typeClient = response;
-            }
-        ),
-        
-        this.masterService.getItemsMasterTable('1').subscribe(
-            (response: any) => {
-                console.log("typeClient",response)
-                this.typeStatus = response;
-            }
-        ),
-        
-        this.masterService.getItemsMasterTable('15').subscribe(
-            (response: any) => {
-                console.log("comission",response)
-                this.typeComission = response;
-            }
-        ),
         this.service.getPerson('RECAUDADORA DE SERVICIOS',null).subscribe(
             (response: any) => {
                 console.log("recaudadora",response)
@@ -108,8 +78,48 @@ export class NewServiceComponent implements OnInit {
                 console.log("proveedor",response)
                 this.typePro = response.data;
             }
-        ),
-        console.log("ID: ", this.idService)
+        );
+
+        if(this.idService){
+            this.titlle = 'Asignar Servicio'
+            this.editAsigService = false
+            this.editClient = true
+            setTimeout(() => { 
+                this.getIdService(this.idService)
+            },1500);
+        }
+        
+
+
+    }
+
+    listData() {
+        forkJoin([
+            this.masterService.getItemsMasterTable('12'), // depar
+            this.masterService.getItemsMasterTable('14'), // tipoServic
+            this.masterService.getItemsMasterTable('11'),  // tipoClient
+            this.masterService.getItemsMasterTable('1'), // tipoStatus
+            this.masterService.getItemsMasterTable('15'), // tipoComission
+        ]).subscribe({
+            next: ([depart, typeService, typeClient, typeStatus, typeComission]) => {
+                this.depart = depart.sort((a, b) => a.master_order - b.master_order);
+                this.typeService = typeService.sort((a, b) => a.master_order - b.master_order);
+                this.typeClient = typeClient.sort((a, b) => a.master_order - b.master_order);
+                this.typeStatus = typeStatus.sort((a, b) => a.master_order - b.master_order);
+                this.typeComission = typeComission.sort((a, b) => a.master_order - b.master_order);
+                console.log("TIPO SERIVICIO:",this.typeService)
+                console.log("DEPART: ", this.depart)
+                if (!this.idService) {
+                    this.service_zone.setValue(
+                        this.depart.find(zone => zone.master_department === 'MULTIDEPARTAMENTAL')
+                    )
+                    this.service_zone.disable();
+                }
+            },
+            error: (error) => {
+                console.error("Error loading master table data:", error);
+            }
+        });
     }
 
     initializeFormGroup() {
@@ -164,7 +174,7 @@ export class NewServiceComponent implements OnInit {
             // return
             const data = {
                 idProvider: this.serviceForm.value.service_prov,// ID ´PROVEEDOR 
-                idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
+                idClient: '00000100', //ID DE RECAUDADORA
                 idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
                 serviceName: this.serviceForm.value.service_name, //nnomb de servicio
                 userRegistration: "DEYNER",
@@ -172,41 +182,87 @@ export class NewServiceComponent implements OnInit {
                 typeService: this.serviceForm.value.service_type.master_name,//master
                 business: this.serviceForm.value.service_type_business, //nombre de negocio
                 status: this.serviceForm.value.service_state.master_name,
-                zone: this.serviceForm.value.service_zone.master_department,
+                zone: this.service_zone.value.master_department,
                 collectorName: "",//vacio cuando son clientes // somos proveedores
-                commission: { //proveedor
-                    fixed: this.comissionForm.value.comission_fixed, //number
-                    criterion: this.comissionForm.value.comission_criterion, //number
-                    percentage: this.comissionForm.value.comission_percentage, //number decimal
-                    type: this.comissionForm.value.comission_type.master_name // fija multiple porcentual
-                },
-                ownCommission: { //cliente
-                    fixed: this.ownCommissionForm.value.ownCommission_fixed, //numeber
-                    criterion: this.ownCommissionForm.value.ownCommission_criterion, //number
-                    percentage: this.ownCommissionForm.value.ownCommission_percentage, //number
-                    type: this.ownCommissionForm.value.ownCommission_type.master_name
-                },
+                comissionFixed:this.comissionForm.value.comission_fixe,
+                comissionCriterion:this.comissionForm.value.comission_criterion,
+                comissionPCT:this.comissionForm.value.comission_percentag,
+                typeComission:this.comissionForm.value.comission_type.master_name,
+                ownFixedComission:this.ownCommissionForm.value.ownCommission_fixed,
+                ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion,
+                ownPCTComission:this.ownCommissionForm.value.ownCommission_percentage,
+                ownComissionType:this.ownCommissionForm.value.ownCommission_type.master_name,
                 indicators:this.indicatrs,
                 additionalPaymentFields: this.dataPayment
             }
             console.log("DATA para registro : ",data)
             // return
-            this.service.registerService(data).subscribe({
-                next: (response: any) => {
-                    console.log("RESPUESTA: ", response)
-                }
-            })
+            this.updateAddService(data,'Guardado correctamente');
 
-            this.mytoastr.showSuccess('Guardado correctamente', '')
+            
             // this.router.navigate(['/service'])
         } else {
             this.updateService();
         }
     }
+
+    updateAddService(data:any,resp:string){
+        this.service.registerService(data).subscribe({
+            next: (response: any) => {
+                console.log("RESPUESTA: ", response)
+                if (response.statusCode !== 200) {
+                    this.mytoastr.showSuccess(response.messages, '')
+                    return
+                }
+                this.mytoastr.showSuccess(resp, '')
+            }
+        })
+    }
     
     updateService() {
-        this.mytoastr.showSuccess('Actualizado correctamente', '')
-        this.router.navigate(['/service'])
+        console.log("NAME DEL SERVICIO: ",this.service_name.value)
+        const data = {
+                idProvider: '00000100',// ID ´PROVEEDOR 
+                idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
+                idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
+                serviceName: this.service_name.value, //nnomb de servicio
+                userRegistration: "DEYNER",
+                idTypeService: this.service_type.value.master_idTypeService,
+                typeService: this.service_type.value.master_name,//master
+                business: this.service_type_business.value, //nombre de negocio
+                status: this.service_state.value.master_name,
+                zone: this.serviceForm.value.service_zone.master_department,
+                collectorName: "",//vacio cuando son clientes // somos proveedores
+                ownFixedComission: this.ownCommissionForm.value.ownCommission_fixed, //numeber
+                ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion, //number
+                ownPCTComission: this.ownCommissionForm.value.ownCommission_percentage, //number
+                ownComissionType: this.ownCommissionForm.value.ownCommission_type.master_name,
+                indicators:this.indicatrs,
+                additionalPaymentFields: this.dataPayment
+        }
+        
+        console.log("DATA PARA ACRTUALIZAR :",data)
+        // return
+        this.updateAddService(data,'Asignado correctamente');
+        // this.mytoastr.showSuccess('Actualizado correctamente', '')
+        // this.router.navigate(['/service'])
+    }
+
+    selectionComission(event){
+        console.log("EVENTO DE SELÑECCION: ",event.value)
+        if(event.value.master_name == 'FIJO'){
+            this.comissionPercentage = false
+            this.comissionCriterio = false
+            this.comissionFixed = true
+        } else if(event.value.master_name == 'PORCENTUAL'){
+            this.comissionFixed = false
+            this.comissionCriterio = true
+            this.comissionPercentage = true
+        } else if (event.value.master_name == 'MULTIPLE'){
+            this.comissionCriterio = true
+            this.comissionFixed = true
+            this.comissionPercentage = true
+        }
     }
 
     indicatorValue(event){
@@ -214,15 +270,34 @@ export class NewServiceComponent implements OnInit {
     }
 
     getIdService(idService){
+        this.spinner.spinnerOnOff();
         this.service.getIdServices(idService).subscribe({
             next:(response)=>{
                 this.service_name.setValue(response.data[0].name)
-                this.service_category.setValue(response.data[0].serviceProvider)
-                this.typeService = response.data[0].serviceType
-                console.log("typeServicio",this.typeService)
-                this.service_type_business.setValue(response.data[0].description)
-                // console.log("respuesta de id: ",response)
-            }
+                this.service_name.disable();
+                this.service_type.setValue(
+                    this.typeService.find(type => type.master_name === response.data[0].serviceType.name)
+                );
+                console.log("typeService: ",this.service_type.value)
+                this.typeService.some((value)=>{
+                    value.master_name === response.data[0].serviceType.name
+                })
+                
+                console.log("service_type: ",this.service_type.value)
+                this.service_type.disable();
+                this.service_type_business.setValue(response.data[0].business)
+                this.service_type_business.disable();
+                this.service_state.setValue(
+                    this.typeStatus.find(status => status.master_name === response.data[0].status)
+                );
+                this.dataPayment = response.data[0]["additional-payment-fields"]
+            },
+            error(err) {
+                console.error("ERROR: ",err)
+            },
+            complete:()=> {
+                this.spinner.spinnerOnOff();
+            },
         })
     }
     register = []
@@ -232,7 +307,7 @@ export class NewServiceComponent implements OnInit {
             id: this.paymentFieldsForm.value.paymentFields_id,
             name: this.paymentFieldsForm.value.paymentFields_name,
             fieldType: {
-                id: "N",
+                id: this.paymentFieldsForm.value.paymentFields_fieldType.charAt(0),
                 name: this.paymentFieldsForm.value.paymentFields_fieldType
             },
             fieldMask: this.paymentFieldsForm.value.paymentFields_fieldMask,
@@ -262,8 +337,20 @@ export class NewServiceComponent implements OnInit {
         return this.serviceForm.get('service_category')
     }
 
+    get service_state(){
+        return this.serviceForm.get('service_state')
+    }
+
+    get service_zone(){
+        return this.serviceForm.get('service_zone')
+    }
+
     get service_type_business(){
         return this.serviceForm.get('service_type_business')
+    }
+
+    get ownCommission_fixed(){
+        return this.ownCommissionForm.get('ownCommission_fixed')
     }
 
     indicatrs = [{
