@@ -15,6 +15,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 })
 export class NewServiceComponent implements OnInit {
 
+
     public columns: any[] = [
         { 'name': 'ID', 'attribute': 'id' },
         { 'name': 'Nombre', 'attribute': 'name' },
@@ -44,9 +45,17 @@ export class NewServiceComponent implements OnInit {
     public functionDataCurrent: (pageSize: any) => any;
     public editAsigService : boolean = true
     public editClient : boolean = false
+    public owncomissionFixed : boolean = true
+    public owncomissionCriterio : boolean = true
+    public owncomissionPercentage : boolean = true
     public comissionFixed : boolean = true
     public comissionCriterio : boolean = true
     public comissionPercentage : boolean = true
+    public currentStep : number = 0;
+    public steps: string[] = ['datos-servicio', 'datos-comisiones', 'datos-pagos'];
+    public disableTab3: boolean = true
+    public tab2: boolean = true
+    public tab3: boolean = true
 
     
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
@@ -66,31 +75,47 @@ export class NewServiceComponent implements OnInit {
         this.idService = this.activeRouter.snapshot.params['id'];
         this.initializeFormGroup();
         this.listData();
-
-        this.service.getPerson('RECAUDADORA DE SERVICIOS',null).subscribe(
-            (response: any) => {
-                console.log("recaudadora",response)
-                this.typeProClient = response.data;
-            }
-        ),
-        this.service.getPerson('PROVEEDOR',null).subscribe(
-            (response: any) => {
-                console.log("proveedor",response)
-                this.typePro = response.data;
-            }
-        );
+        this.dataProvRecaud();
 
         if(this.idService){
+            this.serviceForm.removeControl('service_prov');
+            this.disableTab3 = false
             this.titlle = 'Asignar Servicio'
             this.editAsigService = false
             this.editClient = true
             setTimeout(() => { 
                 this.getIdService(this.idService)
             },1500);
+        } else {
+            this.serviceForm.removeControl('service_client');
         }
         
 
 
+    }
+
+    dataProvRecaud(){
+        
+        this.service.getPerson('RECAUDADORA DE SERVICIOS',null).subscribe({
+            next: (data) => {
+                // this.spinner.spinnerOnOff();
+                this.typeProClient = data.data
+            },
+            error: (error) => {
+                this.mytoastr.showError('Error al obtener datos de Recaudadora','')
+                console.error('ERROR',error)
+            }
+        })
+        this.service.getPerson('PROVEEDOR',null).subscribe({
+            next: (data) => {
+                // this.spinner.spinnerOnOff();
+                this.typePro = data.data;
+            },
+            error: (error) => {
+                this.mytoastr.showError('Error al obtener datos de proveedor','')
+                console.error('ERROR',error)
+            },
+        })
     }
 
     listData() {
@@ -127,7 +152,7 @@ export class NewServiceComponent implements OnInit {
             //   service_id: ['', Validators.required],
             service_name: ['',Validators.required],
             service_prov: ['',Validators.required],
-            service_client: ['',Validators.required],
+            service_client: ['', Validators.required],
             service_convenio: ['', Validators.required],
             service_type: ['', Validators.required],
             service_type_business: ['', Validators.required],
@@ -184,19 +209,20 @@ export class NewServiceComponent implements OnInit {
                 status: this.serviceForm.value.service_state.master_name,
                 zone: this.service_zone.value.master_department,
                 collectorName: "",//vacio cuando son clientes // somos proveedores
-                comissionFixed:this.comissionForm.value.comission_fixe,
-                comissionCriterion:this.comissionForm.value.comission_criterion,
-                comissionPCT:this.comissionForm.value.comission_percentag,
                 typeComission:this.comissionForm.value.comission_type.master_name,
+                comissionFixed:this.comissionForm.value.comission_fixed,
+                comissionCriterion:this.comissionForm.value.comission_criterion,
+                comissionPCT:this.comissionForm.value.comission_percentage,
+                ownComissionType:this.ownCommissionForm.value.ownCommission_type.master_name,
                 ownFixedComission:this.ownCommissionForm.value.ownCommission_fixed,
                 ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion,
                 ownPCTComission:this.ownCommissionForm.value.ownCommission_percentage,
-                ownComissionType:this.ownCommissionForm.value.ownCommission_type.master_name,
                 indicators:this.indicatrs,
                 additionalPaymentFields: this.dataPayment
             }
             console.log("DATA para registro : ",data)
-            // return
+            console.log("DATA DE PAGOS : ",this.dataPayment)
+            return
             this.updateAddService(data,'Guardado correctamente');
 
             
@@ -251,10 +277,33 @@ export class NewServiceComponent implements OnInit {
     selectionComission(event){
         console.log("EVENTO DE SELÑECCION: ",event.value)
         if(event.value.master_name == 'FIJO'){
+            this.ownCommissionForm.removeControl('ownCommission_percentage');
+            this.ownCommissionForm.removeControl('ownCommission_criterion');
+            this.owncomissionPercentage = false
+            this.owncomissionCriterio = false
+            this.owncomissionFixed = true
+        } else if(event.value.master_name == 'PORCENTUAL'){
+            this.ownCommissionForm.removeControl('ownCommission_fixed');
+            this.owncomissionFixed = false
+            this.owncomissionCriterio = true
+            this.owncomissionPercentage = true
+        } else if (event.value.master_name == 'MULTIPLE'){
+            this.owncomissionCriterio = true
+            this.owncomissionFixed = true
+            this.owncomissionPercentage = true
+        }
+    }
+
+    selectionComissionProv(event){
+        console.log("EVENTO DE SELÑECCION: ",event.value)
+        if(event.value.master_name == 'FIJO'){
+            this.comissionForm.removeControl('comission_percentage');
+            this.comissionForm.removeControl('comission_criterion');
             this.comissionPercentage = false
             this.comissionCriterio = false
             this.comissionFixed = true
         } else if(event.value.master_name == 'PORCENTUAL'){
+            this.comissionForm.removeControl('comission_fixed');
             this.comissionFixed = false
             this.comissionCriterio = true
             this.comissionPercentage = true
@@ -319,6 +368,59 @@ export class NewServiceComponent implements OnInit {
         this.paymentFieldsForm.reset();
         this.dataPayment = [...this.register]
         console.log("DATApayment: ", this.dataPayment)
+    }
+
+    onNext() {
+        // Validar el formulario del paso actual
+        if (this.currentStep === 0 && !this.serviceForm.valid) {
+            this.mytoastr.showWarning('Complete el formulario','')
+            return;
+        }
+
+        if(!this.idService){
+        
+            if (this.currentStep === 1 && !this.comissionForm.valid) {
+                this.mytoastr.showWarning('Complete el formulario','')
+                return;
+            }
+        } else if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
+            this.mytoastr.showWarning('Complete el formulario Com.Client','')
+            return;
+        }
+
+        if (!this.idService) {
+
+            if (this.currentStep === 2 && this.dataPayment.length == 0) {
+                this.mytoastr.showWarning('Agregue datos a la tabla: ', 'Min 1')
+                return;
+            }
+        }
+
+        if (this.currentStep < this.steps.length-1) {
+            this.currentStep++;
+        } 
+
+        // Habilitar pestañas subsiguientes
+        if (this.currentStep === 1) {
+            this.tab2 = false;
+        }
+
+        if (this.currentStep === 2) {
+                this.tab3 = false;
+        }
+
+        
+        if(this.currentStep === this.steps.length-1){
+            this.saveService();
+        }
+        console.log("currentStep: ",this.currentStep)
+
+    }
+
+    onPrevious() {
+        this.currentStep--;
+        console.log("NEGATIVO: ", this.currentStep)
+        if (this.currentStep < 0) this.cancel();
     }
 
     cancel(){

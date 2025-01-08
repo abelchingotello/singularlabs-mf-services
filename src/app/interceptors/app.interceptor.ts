@@ -27,6 +27,7 @@ export class AppInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let intReq = request;
     const token = this.authService.getToken();
+    // console.log("TOKENNNN: ",token)
     const companyId = this.companyService.getCompanyId();
     // const companyId = this.companyService.getCompanyId();
 
