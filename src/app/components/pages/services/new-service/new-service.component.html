@@ -6,7 +6,7 @@
         </uni-image-card>
 
         <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight backgroundColor="primary">
-            <mat-tab label="Datos de Servicio">
+            <mat-tab label="Datos de Servicio" >
                 <mat-card >
                     <mat-card-content>
                         <div class="p-4">
@@ -141,7 +141,7 @@
                                     </mat-form-field>
                                     <mat-form-field *ngIf="comissionFixed" appearance="outline" fxFlex="25%" class="col-md-6">
                                         <mat-label>Comisión fija</mat-label>
-                                        <input formControlName="comission_fixed" type="number" matInput />
+                                        <input formControlName="comission_fixed" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -150,7 +150,7 @@
                                     <mat-form-field *ngIf="comissionCriterio" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión de criterio</mat-label>
-                                        <input formControlName="comission_criterion" type="number" matInput />
+                                        <input formControlName="comission_criterion" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -159,7 +159,7 @@
                                     <mat-form-field *ngIf="comissionPercentage" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión porcentual </mat-label>
-                                        <input formControlName="comission_percentage" type="number" matInput />
+                                        <input formControlName="comission_percentage" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -187,7 +187,7 @@
                                     <mat-form-field *ngIf="owncomissionFixed" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión fija</mat-label>
-                                        <input formControlName="ownCommission_fixed" type="number" matInput />
+                                        <input formControlName="ownCommission_fixed" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -196,7 +196,7 @@
                                     <mat-form-field *ngIf="owncomissionCriterio" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión de criterio</mat-label>
-                                        <input formControlName="ownCommission_criterion" type="number" matInput />
+                                        <input formControlName="ownCommission_criterion" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -205,7 +205,7 @@
                                     <mat-form-field *ngIf="owncomissionPercentage" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión porcentual </mat-label>
-                                        <input formControlName="ownCommission_percentage" type="number" matInput />
+                                        <input formControlName="ownCommission_percentage" type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -319,7 +319,7 @@
                         Cancelar
                     </button>
                     <button mat-flat-button (click)="onNext()">
-                        {{ currentStep === steps.length-1 ? 'Finalizar' : 'Siguiente' }}
+                        {{ currentStep === stepsOrig.length-1 ? 'Finalizar' : 'Siguiente' }}
                     </button>
                 </div>
             </mat-card-content>

@@ -34,21 +34,21 @@
         <mat-card-content>
           <div >
             <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
-            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)">
+            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)">
   
-              <!-- <div class="action-buttons d-inline-block"> -->
-                <button [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()" >
-                  <mat-icon matTooltip="Editar">edit</mat-icon>
+              <div class="d-flex">
+                <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()"  >
+                  <mat-icon matTooltip="Editar">assignment_ind</mat-icon>
                 </button>
                 <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
-                  <mat-label>Seleccionar</mat-label>
+                  <mat-label>Actualizar</mat-label>
                 
                 <mat-select (selectionChange)="selectOption($event)">
                   <!-- <mat-option>Ninguno</mat-option> -->
                   <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
                 </mat-select>
               </mat-form-field>
-              <!-- </div> --> 
+              </div> 
             </uni-dynamic-table>
           </div>
         </mat-card-content>

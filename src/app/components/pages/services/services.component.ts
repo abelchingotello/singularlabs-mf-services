@@ -8,6 +8,7 @@ import { DynamicTableComponent } from '../../library/dynamic-table/dynamic-table
 import { MasterService } from 'src/app/services/master.service';
 import { PersonService } from 'src/app/services/person.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { MytoastrService } from 'src/app/services/mytoastr';
 
 @Component({
   selector: 'uni-services',
@@ -24,9 +25,9 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Cliente', 'attribute': 'idClient'},
   ];
   public options: any[] = [
-    { value: 'Act. servicio', id:'1'},
-    { value: 'Act. Entidad-Servicio', id:'2'},
-    { value: 'Act. Client-Servicio', id:'3'},
+    { value: 'Servicio', id:'1'},
+    { value: 'Entidad-Servicio', id:'2'},
+    { value: 'Client-Servicio', id:'3'},
   ]
 
   public pageSize: any = 5;
@@ -36,6 +37,14 @@ export class ServicesComponent implements OnInit {
   public dataFilter : any;
   public dataService : any[];
   public functionDataCurrent: (pageSize: any) => any;
+  public disabledEditOption: any
+  public editOption: any;
+  public selectedIds: any;
+  public stateMaster: any;
+  public idClient : any;
+  public idProvider : any;
+  public dataIdService : any;
+  public optionId:any
 
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
@@ -48,16 +57,17 @@ export class ServicesComponent implements OnInit {
     private service : ServicesService,
     private master : MasterService,
     private person : PersonService,
-    private spinner : SpinnerService
+    private spinner : SpinnerService,
+    private mytoastr : MytoastrService
   ) { }
 
   ngOnInit(): void {
     this.formService();
     this.dataMaster();
       // Suscribirse a cambios y convertir a mayúsculas
-  this.serviceForm.get('service_name')?.valueChanges.subscribe(value => {
+  this.service_name?.valueChanges.subscribe(value => {
     if (value) {
-      this.serviceForm.get('service_name')?.setValue(value.toUpperCase(), { emitEvent: false });
+      this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
     }
   });
   }
@@ -74,8 +84,12 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData(){
+    if(this.service_name.value == '' || this.service_name.value == undefined){
+      this.mytoastr.showWarning('Ingrese un valor válido','')
+      return
+    }
     const input = this.service_name.value.toUpperCase();
-    console.log("busqueda_ 0",input)
+    // console.log("busqueda_ 0",input)
     this.spinner.spinnerOnOff();
     // return
     this.services.getServices(input).subscribe({
@@ -92,17 +106,16 @@ export class ServicesComponent implements OnInit {
         this.close = true
       }
     })
-    console.log("BUSCANDO....")
+    // console.log("BUSCANDO....")
   }
 
   cleanSearch(){
     this.service_name.setValue('')
     this.close = false;
     this.clearData();
-    console.log("BORRANDO....")
+    // console.log("BORRANDO....")
   }
 
-  optionId:any
   selectOption(event){
     this.optionId=event.value
     // if(this.optionId.id == '1'){
@@ -115,10 +128,6 @@ export class ServicesComponent implements OnInit {
     this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
   
-  public disabledEditOption: any
-  public editOption: any
-  public selectedIds: any
-
   handleSelectedIds(selectedIds: any[]) {
     // console.log("Id's: ", selectedIds)
     this.disabledEditOption = selectedIds.length !== 1;
@@ -132,6 +141,7 @@ export class ServicesComponent implements OnInit {
     }
     console.log("Id--s: ", selectedIds)
   }
+
   selectedHandle(event){
     console.log("SELECTED: ", event[0])
     if(this.selectedIds.length ===1){
@@ -149,7 +159,7 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  stateMaster
+
   dataMaster(){
     this.master.getItemsMasterTable(1).subscribe({
       next: (data) => {
@@ -170,7 +180,6 @@ export class ServicesComponent implements OnInit {
     }));
   }
 
-  dataIdService
   getIdService(idService){
     this.service.getIdServices(idService).subscribe({
         next:(response)=>{
@@ -194,8 +203,6 @@ export class ServicesComponent implements OnInit {
     // this.functionDataCurrent(this.pageSize);
   }
 
-  idClient
-  idProvider
   getIdPerson(idClient?:string,idProvider?:string,callback?: () => void){
     const id = idClient || idProvider
     this.person.postIdPerson(id).subscribe({

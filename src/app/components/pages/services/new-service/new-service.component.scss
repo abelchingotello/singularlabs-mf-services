@@ -109,4 +109,12 @@
   box-sizing: border-box; /* Incluye padding y borde en el cálculo del ancho */
 }
 
+::ng-deep .mat-tab-header {
+  background-color: #1d1d1d8c !important;
+  border-radius: 8px !important;
+}
 
+// habilitar el color de las letras cuando están deshabilitadas
+::ng-deep .mat-tab-label{
+  opacity: 1 !important ;
+}

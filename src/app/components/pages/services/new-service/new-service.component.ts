@@ -52,7 +52,9 @@ export class NewServiceComponent implements OnInit {
     public comissionCriterio : boolean = true
     public comissionPercentage : boolean = true
     public currentStep : number = 0;
+    public stepsOrig = []
     public steps: string[] = ['datos-servicio', 'datos-comisiones', 'datos-pagos'];
+    public stepsAsig: string[] = ['datos-servicio', 'datos-comisiones'];
     public disableTab3: boolean = true
     public tab2: boolean = true
     public tab3: boolean = true
@@ -89,9 +91,23 @@ export class NewServiceComponent implements OnInit {
         } else {
             this.serviceForm.removeControl('service_client');
         }
-        
 
+        this.inputMayusName();
 
+    }
+
+    inputMayusName(){
+        this.service_name?.valueChanges.subscribe(value => {
+            if (value) {
+                this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
+            }
+        });
+
+        this.service_type_business?.valueChanges.subscribe(value => {
+            if (value) {
+                this.service_type_business?.setValue(value.toUpperCase(), { emitEvent: false });
+            }
+        });
     }
 
     dataProvRecaud(){
@@ -222,7 +238,7 @@ export class NewServiceComponent implements OnInit {
             }
             console.log("DATA para registro : ",data)
             console.log("DATA DE PAGOS : ",this.dataPayment)
-            return
+            // return
             this.updateAddService(data,'Guardado correctamente');
 
             
@@ -370,33 +386,34 @@ export class NewServiceComponent implements OnInit {
         console.log("DATApayment: ", this.dataPayment)
     }
 
-    onNext() {
+    onNext(){
+        if(this.idService){
+            this.stepsOrig = this.stepsAsig
+            this.onNextAsign();
+        } else {
+            this.stepsOrig = this.steps
+            this.onNextAdd();
+        }
+    }
+
+    onNextAdd() {
         // Validar el formulario del paso actual
         if (this.currentStep === 0 && !this.serviceForm.valid) {
             this.mytoastr.showWarning('Complete el formulario','')
             return;
         }
 
-        if(!this.idService){
-        
-            if (this.currentStep === 1 && !this.comissionForm.valid) {
+        if (this.currentStep === 1 && !this.comissionForm.valid) {
                 this.mytoastr.showWarning('Complete el formulario','')
                 return;
-            }
-        } else if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
-            this.mytoastr.showWarning('Complete el formulario Com.Client','')
-            return;
         }
 
-        if (!this.idService) {
-
-            if (this.currentStep === 2 && this.dataPayment.length == 0) {
+        if (this.currentStep === 2 && this.dataPayment.length == 0) {
                 this.mytoastr.showWarning('Agregue datos a la tabla: ', 'Min 1')
                 return;
-            }
         }
 
-        if (this.currentStep < this.steps.length-1) {
+        if (this.currentStep < this.stepsOrig.length-1) {
             this.currentStep++;
         } 
 
@@ -409,8 +426,37 @@ export class NewServiceComponent implements OnInit {
                 this.tab3 = false;
         }
 
+        if(this.currentStep === this.stepsOrig.length-1 && this.dataPayment.length>0){
+            // console.log("INGRESO PARA REGISTRARSE-Add")
+            this.saveService();
+        }
+        console.log("currentStep: ",this.currentStep)
+
+    }
+
+    onNextAsign() {
+        // Validar el formulario del paso actual
+        if (this.currentStep === 0 && !this.serviceForm.valid) {
+            this.mytoastr.showWarning('Complete el formulario','')
+            return;
+        }
+
+        if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
+            this.mytoastr.showWarning('Complete el formulario Com.Client','')
+            return;
+        }
+
+        if (this.currentStep < this.stepsOrig.length-1) {
+            this.currentStep++;
+        } 
+
+        // Habilitar pestañas subsiguientes
+        if (this.currentStep === 1) {
+            this.tab2 = false;
+        }
         
-        if(this.currentStep === this.steps.length-1){
+        if(this.currentStep === this.stepsOrig.length-1){
+            // console.log("INGRESO PARA REGISTRARSE-AsIG")
             this.saveService();
         }
         console.log("currentStep: ",this.currentStep)
@@ -426,6 +472,7 @@ export class NewServiceComponent implements OnInit {
     cancel(){
         this.router.navigate(['/service'])
     }
+
 
     get service_name(){
         return this.serviceForm.get('service_name')
