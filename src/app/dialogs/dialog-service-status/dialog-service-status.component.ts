@@ -43,7 +43,7 @@ export class DialogServiceStatusComponent implements OnInit {
     this.service_id.setValue(this.data.resp.data[0].id)
     this.service_business.setValue(this.data.resp.data[0].business)
     this.service_description.setValue(this.data.resp.data[0].description)
-    this.service_collectingEntity.setValue(this.data.resp.collectingEntity)
+    // this.service_collectingEntity.setValue(this.data.resp.collectingEntity)
     this.service_serviceType.setValue(this.data.resp.data[0].serviceType.name);
     this.stateMaster = this.data.state;
     this.formEntity.disable();
@@ -58,7 +58,7 @@ export class DialogServiceStatusComponent implements OnInit {
       business: [''],
       serviceType: [''],
       description: [''],
-      collectingEntity: [''],
+      // collectingEntity: [''],
     })
   }
 
@@ -164,9 +164,9 @@ export class DialogServiceStatusComponent implements OnInit {
   get service_description(){
     return this.formEntity.get('description')
   }
-  get service_collectingEntity(){
-    return this.formEntity.get('collectingEntity')
-  }
+  // get service_collectingEntity(){
+  //   return this.formEntity.get('collectingEntity')
+  // }
   get service_entity(){
     return this.formEntity.get('entity')
   }

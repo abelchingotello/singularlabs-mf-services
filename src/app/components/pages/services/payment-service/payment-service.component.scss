@@ -1,0 +1,54 @@
+.payment-card {
+    max-width: 800px;
+    margin: 20px auto;
+  }
+
+  .info-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .info-text {
+    margin-left: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .label {
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .divider {
+    margin: 20px 0;
+  }
+
+  .amount-section {
+    padding: 16px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  .amount-label {
+    display: flex;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.54);
+    margin-bottom: 8px;
+  }
+
+  .amount-label mat-icon {
+    margin-right: 8px;
+  }
+
+  .amount-value {
+    font-size: 24px;
+    font-weight: 500;
+    color: #1976d2;
+  }

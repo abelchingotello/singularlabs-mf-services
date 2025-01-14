@@ -27,7 +27,8 @@ export class AuthService {
     }
     try {
       const res: any = await this.httpClient.post<any>(`${this.url}/auth`, credentials).toPromise();
-      this.decodeToken()
+      this.decodeToken();
+      this.user = res.user
       return res.validSession;
     } catch (err) {
       console.error('Error:', err);

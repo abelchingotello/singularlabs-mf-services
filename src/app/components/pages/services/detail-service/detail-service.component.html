@@ -1,0 +1,115 @@
+<div class="content bg-gray-3">
+    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+        <uni-image-card title="Detalle de servicio" externImage="https://img.freepik.com/vector-premium/recibo-papel-dinero-efectivo-icono-ilustracion-aislada_385450-89.jpg?semt=ais_hybrid" size="7%">
+        </uni-image-card>
+        <mat-card class="custom-border-radius-1-25">
+            <div class="p-4">
+                <form>
+                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4">
+                        <mat-label> Servicio </mat-label>
+                        <mat-select (selectionChange)="servicesSelec($event)">
+                            <mat-option *ngFor="let serv of services" [value]="serv">
+                                {{serv.value}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
+                        <mat-label> N° Suministro </mat-label>
+                        <input type="text" matInput>
+                    </mat-form-field>
+        
+                    <mat-form-field appearance="outline" class="col-md-4">
+                        <mat-label> Entidad Recaudadora </mat-label>
+                        <mat-select>
+                            <mat-option value="BBVA">
+                                BBVA
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+        
+
+                    
+        
+        
+                    <button type="button" class="btn btn-primary" mat-flat-button (click)="search()">Buscar</button>
+        
+                </form>
+            </div>
+        </mat-card>
+<!-- 
+        <mat-card>
+            <mat-label>Titular: {{nameTit}}</mat-label>
+        </mat-card>
+
+        <mat-card *ngIf="searchAct">
+            <mat-list>
+                <mat-list-item *ngFor="let detail of dataDetail">
+                            
+                    <div> Fecha de Venc. : {{detail.maturityDate}}</div>
+            
+                    <mat-selection-list>
+                        <mat-list-option *ngFor="let amount of detail.amounts">
+                            <div mat-line>{{amount.amountType.name}}</div>
+                            <div mat-line>{{amount.amountValue.amount}}</div>
+                            <div mat-line>{{amount.amountValue.currency}}</div>
+                        </mat-list-option>
+                    </mat-selection-list>
+                </mat-list-item>
+            </mat-list>
+        </mat-card> -->
+
+        <mat-card *ngIf="searchAct" class="payment-card">
+            <mat-card-header>
+                <mat-card-title>Detalles de Pago</mat-card-title>
+                <mat-card-subtitle>
+                    <div class="holder-info">
+                        <mat-icon>person</mat-icon>
+                        <span>Titular: {{nameTit}}</span>
+                    </div>
+                </mat-card-subtitle>
+            </mat-card-header>
+        
+            
+            <mat-card-content>
+                <div class="payment-list">
+                    <div *ngFor="let detail of dataDetail" class="payment-item">
+                        <div class="date-header">
+                            <mat-icon>event</mat-icon>
+                            <span>Fecha de Vencimiento: {{detail.maturityDate | date:'dd/MM/yyyy'}}</span>
+                        </div>
+        
+                        <mat-divider></mat-divider>
+        
+                        <mat-selection-list  (selectionChange)="listSelection($event)"  class="amounts-list">
+                            <mat-list-option  *ngFor="let amount of detail.amounts"
+                                [value]="{ detail: detail, amount: amount }"
+                                
+                                class="amount-item">
+                                <div class="amount-content">
+                                    <div class="amount-type">
+                                        <mat-icon>description</mat-icon>
+                                        <span class="fw-normal" style="font-size: 12px;">{{amount.amountType.name}}</span>
+                                    </div>
+        
+                                    <div class="amount-details">
+                                        <div class="amount-value">
+                                            <mat-icon style="margin-top:7px">attach_money</mat-icon>
+                                            <!-- <mat-icon>currency_exchange</mat-icon> -->
+                                            <span class="fw-normal" style="font-size: 15px;">{{amount.amountValue.amount | number:'1.2-2'}}</span>
+                                        </div>
+                                        <div class="currency">
+                                            <span style="font-size: 11px;">{{amount.amountValue.currency}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-list-option>
+                        </mat-selection-list>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <button type="button" class="btn btn-primary" (click)="payment()">Pagar</button>
+    </div>
+</div>

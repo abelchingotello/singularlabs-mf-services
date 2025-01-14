@@ -3,6 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
+import { AuthService } from 'src/app/services/auth.service';
 import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
@@ -58,6 +59,7 @@ export class NewServiceComponent implements OnInit {
     public disableTab3: boolean = true
     public tab2: boolean = true
     public tab3: boolean = true
+    public userName : any
 
     
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
@@ -70,10 +72,13 @@ export class NewServiceComponent implements OnInit {
         private mytoastr: MytoastrService,
         private service : ServicesService,
         private masterService: MasterService,
-        private spinner : SpinnerService
+        private spinner : SpinnerService,
+        private authService : AuthService
     ) { }
 
     ngOnInit(): void {
+        this.userName= this.authService.getUser();
+        console.log("userid: ",this.userName.Username)
         this.idService = this.activeRouter.snapshot.params['id'];
         this.initializeFormGroup();
         this.listData();
@@ -135,6 +140,7 @@ export class NewServiceComponent implements OnInit {
     }
 
     listData() {
+        this.spinner.spinnerOnOff();
         forkJoin([
             this.masterService.getItemsMasterTable('12'), // depar
             this.masterService.getItemsMasterTable('14'), // tipoServic
@@ -159,7 +165,12 @@ export class NewServiceComponent implements OnInit {
             },
             error: (error) => {
                 console.error("Error loading master table data:", error);
+                this.spinner.spinnerOnOff();
+            },
+            complete:()=> {
+                this.spinner.spinnerOnOff();
             }
+
         });
     }
 
@@ -218,22 +229,22 @@ export class NewServiceComponent implements OnInit {
                 idClient: '00000100', //ID DE RECAUDADORA
                 idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
                 serviceName: this.serviceForm.value.service_name, //nnomb de servicio
-                userRegistration: "DEYNER",
+                userRegistration: this.userName.Username,
                 idTypeService: this.serviceForm.value.service_type.master_idTypeService,
                 typeService: this.serviceForm.value.service_type.master_name,//master
                 business: this.serviceForm.value.service_type_business, //nombre de negocio
                 status: this.serviceForm.value.service_state.master_name,
                 zone: this.service_zone.value.master_department,
                 collectorName: "",//vacio cuando son clientes // somos proveedores
-                typeComission:this.comissionForm.value.comission_type.master_name,
-                comissionFixed:this.comissionForm.value.comission_fixed,
-                comissionCriterion:this.comissionForm.value.comission_criterion,
-                comissionPCT:this.comissionForm.value.comission_percentage,
-                ownComissionType:this.ownCommissionForm.value.ownCommission_type.master_name,
-                ownFixedComission:this.ownCommissionForm.value.ownCommission_fixed,
+                typeComission: this.comissionForm.value.comission_type.master_name,
+                comissionFixed: this.comissionForm.value.comission_fixed,
+                comissionCriterion: this.comissionForm.value.comission_criterion,
+                comissionPCT: this.comissionForm.value.comission_percentage,
+                ownComissionType: this.ownCommissionForm.value.ownCommission_type.master_name,
+                ownFixedComission: this.ownCommissionForm.value.ownCommission_fixed,
                 ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion,
-                ownPCTComission:this.ownCommissionForm.value.ownCommission_percentage,
-                indicators:this.indicatrs,
+                ownPCTComission: this.ownCommissionForm.value.ownCommission_percentage,
+                indicators: this.indicatrs,
                 additionalPaymentFields: this.dataPayment
             }
             console.log("DATA para registro : ",data)
@@ -268,7 +279,7 @@ export class NewServiceComponent implements OnInit {
                 idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
                 idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
                 serviceName: this.service_name.value, //nnomb de servicio
-                userRegistration: "DEYNER",
+                userRegistration: this.userName.Username,
                 idTypeService: this.service_type.value.master_idTypeService,
                 typeService: this.service_type.value.master_name,//master
                 business: this.service_type_business.value, //nombre de negocio

@@ -70,6 +70,13 @@
               "sourceMap": true,
               "namedChunks": true,
               "outputHashing": "none"
+            },
+            "desarrollo":{
+              "deployUrl":"https://io.dev.achingo.com/singularlabs-mf-services/",
+              "fileReplacements":[{
+                "replace":"src/environments/environment.ts",
+                "with":"src/environments/environment.desarrollo.ts"
+              }]
             }
           },
           "defaultConfiguration": "production"
@@ -82,6 +89,9 @@
             },
             "development": {
               "browserTarget": "singularlabs-mf-services:build:development"
+            },
+            "desarrollo": {
+              "browserTarget": "singularlabs-mf-services:build:desarrollo"
             }
           },
           "defaultConfiguration": "development"

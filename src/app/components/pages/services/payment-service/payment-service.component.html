@@ -1,0 +1,87 @@
+<div class="content bg-gray-3">
+    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+        <uni-image-card title="Pago de servicio"
+            externImage="https://static.vecteezy.com/system/resources/previews/035/997/184/non_2x/cartoon-businessman-hands-with-sign-payment-bill-receipt-vector.jpg"
+            size="8%">
+        </uni-image-card>
+
+        <mat-card class="payment-card" >
+            <mat-card-header>
+                <mat-card-title>
+                    Detalle del Pago
+                </mat-card-title>
+                <mat-card-subtitle>
+                    {{ payment.titular }}
+                </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <mat-grid-list cols="2" rowHeight="70px">
+                    <mat-grid-tile>
+                        <div class="info-container">
+                            <mat-icon color="primary">confirmation_number</mat-icon>
+                            <div class="info-text">
+                                <span class="label">Código</span>
+                                <span class="value">{{ payment.valor }}</span>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+
+                    <mat-grid-tile>
+                        <div class="info-container">
+                            <mat-icon color="primary">account_balance</mat-icon>
+                            <div class="info-text">
+                                <span class="label">Entidad</span>
+                                <span class="value">{{ payment.ers }}</span>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+
+                    <mat-grid-tile>
+                        <div class="info-container">
+                            <mat-icon color="primary">description</mat-icon>
+                            <div class="info-text" *ngFor="let ref of data1">
+                                <span class="label">Número de Referencia</span>
+                                <span class="value">{{ ref.number | slice:0:20 }}...</span>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+
+                    <mat-grid-tile>
+                        <div class="info-container">
+                            <mat-icon color="primary">event</mat-icon>
+                            <div class="info-text">
+                                <span class="label">Fecha de Vencimiento</span>
+                                <span class="value">{{ payment.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+
+                    <mat-grid-tile>
+                        <div class="info-container">
+                            <mat-icon color="primary">payments</mat-icon>
+                            <div class="info-text" *ngFor="let paymt of data1">
+                                <span class="label">Importe</span>
+                                <span class="value">{{ paymt.monto | currency:paymt.moneda:'symbol':'1.2-2' }}</span>
+                            </div>
+                        </div>
+                    </mat-grid-tile>
+                </mat-grid-list>
+
+                <mat-divider class="divider"></mat-divider>
+
+                <div class="amount-section">
+                    <div class="amount-label">
+                        <mat-icon color="primary">payments</mat-icon>
+                        <span>{{ payment.tipoMonto }}</span>
+                    </div>
+                    <div class="amount-value">
+                        {{ payment.monto | currency:payment.moneda:'symbol':'1.2-2' }}
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+
+    </div>
+</div>

@@ -6,13 +6,17 @@ import { MaterialModule } from 'src/app/modules/material/material.module';
 import { LibraryModule } from '../../library/library.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ServicesComponent } from './services.component';
+import { DetailServiceComponent } from './detail-service/detail-service.component';
+import { PaymentServiceComponent } from './payment-service/payment-service.component';
 
 
 
 @NgModule({
   declarations: [
     NewServiceComponent,
-    ServicesComponent
+    ServicesComponent,
+    DetailServiceComponent,
+    PaymentServiceComponent
   ],
   imports: [
     CommonModule,

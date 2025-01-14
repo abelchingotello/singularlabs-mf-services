@@ -10,6 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatListModule } from '@angular/material/list';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 
 @NgModule({
@@ -26,7 +28,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatAutocompleteModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatListModule,
+    MatGridListModule 
   ]
 })
 export class MaterialModule { }

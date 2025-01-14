@@ -1,0 +1,98 @@
+.payment-card {
+    // margin: 16px;
+    border-radius: 8px;
+    
+    .mat-card-header {
+      margin-bottom: 16px;
+    }
+  }
+  
+  .payment-list {
+    padding: 10px;
+    .payment-item {
+      margin-bottom: 24px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .date-header {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: #464343;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    color : white;
+    
+    mat-icon {
+      margin-right: 8px;
+      color: white;
+    }
+  }
+  
+  .amounts-list {
+    padding: 0;
+    
+    .amount-item {
+      margin: 8px 0;
+      
+      &:hover {
+        background-color: #fafafa;
+      }
+    }
+  }
+  
+  .amount-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    width: 100%;
+  }
+  
+  .amount-type {
+    display: flex;
+    align-items: center;
+    
+    mat-icon {
+      margin-right: 8px;
+      color: #666;
+    }
+  }
+  
+  .amount-details {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .amount-value, .currency {
+    display: flex;
+    align-items: center;
+    
+    mat-icon {
+    //   margin-right: 4px;
+      font-size: 18px;
+      color: #666;
+    }
+  }
+
+
+  .holder-info {
+    display: flex;
+    align-items: center;
+    margin-top: 28px;
+    
+    mat-icon {
+      margin-right: 8px;
+      color: #666;
+    }
+    
+    span {
+      font-size: 1.1em;
+      color: #333;
+    }
+  }
