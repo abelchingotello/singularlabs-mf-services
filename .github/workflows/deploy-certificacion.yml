@@ -24,7 +24,6 @@ jobs:
 
     - name: Install dependencies
       run: npm install
-
    # Verificar si los secretos se pasan correctamente
     - name: Verificar secretos
       run: |
