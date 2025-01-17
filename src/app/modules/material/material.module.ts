@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MatButtonModule,
     MatTooltipModule,
     MatListModule,
-    MatGridListModule 
+    MatGridListModule,
+    MatCheckboxModule
   ]
 })
 export class MaterialModule { }

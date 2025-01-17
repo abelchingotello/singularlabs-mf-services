@@ -27,6 +27,23 @@ export class NewServiceComponent implements OnInit {
         { 'name': 'Editable', 'attribute': 'isEditable'},
     ];
 
+    indicatrs = [
+        { id: "PAY_BILL", name: "BASE DE DATOS", isActive: false },
+        { id: "PAY_PARTIAL", name: "PAGO PARCIAL", isActive: false },
+        { id: "PAY_CARD", name: "PAGO CON TARJETA", isActive: false },
+        { id: "FREQUENT_OPERATION", name: "OPERACION FRECUENTE", isActive: false },
+        { id: "PAY_DEBT_OLDEST", name: "DEUDA MAS ANTIGUA", isActive: false },
+        { id: "PAY_ONLINE", name: "INTERCONECTADO, PAGO EN LINEA", isActive: false },
+        { id: "PAY_ACCOUNT", name: "PAGO CON CARGO EN CUENTA", isActive: false },
+        { id: "PAY_REFLECTED", name: "REFLEJO DE PAGO", isActive: false },
+        { id: "PAY_AUTOMATIC", name: "DEBITO AUTOMATICO", isActive: false },
+        { id: "PAY_FIXED_RATE", name: "TASAS FIJAS", isActive: false },
+        { id: "PAY_CASH", name: "PAGO EN EFECTIVO", isActive: false },
+        { id: "PAY_CHECK_INTERNAL", name: "PAGO CON CHEQUE PROPIO BANCO", isActive: false },
+        { id: "PAY_CHECK_EXTERNAL", name: "PAGO CON CHEQUE OTRO BANCO", isActive: false },
+        { id: "PAY_MULTIPLE_PAYMENTS", name: "ACTUALIZACION MASIVA DE DEUDAS", isActive: false },
+      ];
+
     public serviceForm!: FormGroup;
     public comissionForm!: FormGroup;
     public ownCommissionForm!: FormGroup;
@@ -59,7 +76,10 @@ export class NewServiceComponent implements OnInit {
     public disableTab3: boolean = true
     public tab2: boolean = true
     public tab3: boolean = true
-    public userName : any
+    public userName : any;
+    public register = [];
+    public isMandatory : boolean = false
+    public isEdit: boolean = false
 
     
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
@@ -180,7 +200,7 @@ export class NewServiceComponent implements OnInit {
             service_name: ['',Validators.required],
             service_prov: ['',Validators.required],
             service_client: ['', Validators.required],
-            service_convenio: ['', Validators.required],
+            service_convenio: [''],
             service_type: ['', Validators.required],
             service_type_business: ['', Validators.required],
             service_state: ['', Validators.required],
@@ -210,8 +230,8 @@ export class NewServiceComponent implements OnInit {
             paymentFields_fieldType: ['', Validators.required],
             paymentFields_fieldMask: ['', Validators.required],
             paymentFields_max: ['', Validators.required],
-            paymentFields_mandatory: ['', Validators.required],
-            paymentFields_edit: ['', Validators.required],
+            paymentFields_mandatory: this.isMandatory,
+            paymentFields_edit: this.isEdit,
         });
 
     }
@@ -223,17 +243,18 @@ export class NewServiceComponent implements OnInit {
             console.log("FORMULARIOCOMISSION : ",this.comissionForm.value)
             console.log("FORMULARIO-OWM : ",this.ownCommissionForm.value)
             console.log("FORMULARIO-PAYMENTS : ",this.paymentFieldsForm.value)
+            const dataServiceForm = this.serviceForm.value
             // return
             const data = {
-                idProvider: this.serviceForm.value.service_prov,// ID ´PROVEEDOR 
+                idProvider: dataServiceForm.service_prov.idPerson,// ID ´PROVEEDOR 
                 idClient: '00000100', //ID DE RECAUDADORA
-                idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
-                serviceName: this.serviceForm.value.service_name, //nnomb de servicio
+                idServiceProv: dataServiceForm.service_convenio || this.numConvenio(dataServiceForm.service_prov.date), //id de convenio
+                serviceName: dataServiceForm.service_name, //nnomb de servicio
                 userRegistration: this.userName.Username,
-                idTypeService: this.serviceForm.value.service_type.master_idTypeService,
-                typeService: this.serviceForm.value.service_type.master_name,//master
-                business: this.serviceForm.value.service_type_business, //nombre de negocio
-                status: this.serviceForm.value.service_state.master_name,
+                idTypeService: dataServiceForm.service_type.master_idTypeService,
+                typeService: dataServiceForm.service_type.master_name,//master
+                business: dataServiceForm.service_type_business, //nombre de negocio
+                status: dataServiceForm.service_state.master_name,
                 zone: this.service_zone.value.master_department,
                 collectorName: "",//vacio cuando son clientes // somos proveedores
                 typeComission: this.comissionForm.value.comission_type.master_name,
@@ -248,7 +269,7 @@ export class NewServiceComponent implements OnInit {
                 additionalPaymentFields: this.dataPayment
             }
             console.log("DATA para registro : ",data)
-            console.log("DATA DE PAGOS : ",this.dataPayment)
+            // console.log("DATA DE PAGOS : ",this.dataPayment)
             // return
             this.updateAddService(data,'Guardado correctamente');
 
@@ -260,6 +281,7 @@ export class NewServiceComponent implements OnInit {
     }
 
     updateAddService(data:any,resp:string){
+        this.spinner.spinnerOnOff();
         this.service.registerService(data).subscribe({
             next: (response: any) => {
                 console.log("RESPUESTA: ", response)
@@ -268,6 +290,13 @@ export class NewServiceComponent implements OnInit {
                     return
                 }
                 this.mytoastr.showSuccess(resp, '')
+            },
+            error: (error: any) => {
+                console.error("ERROR: ", error)
+            },
+            complete :()=>{
+                this.spinner.spinnerOnOff();
+                this.router.navigate(['/service'])
             }
         })
     }
@@ -367,6 +396,9 @@ export class NewServiceComponent implements OnInit {
                     this.typeStatus.find(status => status.master_name === response.data[0].status)
                 );
                 this.dataPayment = response.data[0]["additional-payment-fields"]
+                this.indicatrs = response.data[0].indicators
+
+                console.log("INDICADORES: ",this.indicatrs)
             },
             error(err) {
                 console.error("ERROR: ",err)
@@ -376,8 +408,12 @@ export class NewServiceComponent implements OnInit {
             },
         })
     }
-    register = []
+
     registerPayment(){
+        if(!this.paymentFieldsForm.valid){
+            this.mytoastr.showWarning('Complete el formulario','')
+            return
+        }
         console.log("FORMULARIO DE PAGO : ",this.paymentFieldsForm.value)
         const data = {
             id: this.paymentFieldsForm.value.paymentFields_id,
@@ -388,13 +424,24 @@ export class NewServiceComponent implements OnInit {
             },
             fieldMask: this.paymentFieldsForm.value.paymentFields_fieldMask,
             maximumLength: this.paymentFieldsForm.value.paymentFields_max,
-            isMandatory: this.paymentFieldsForm.value.paymentFields_mandatory,
-            isEditable: this.paymentFieldsForm.value.paymentFields_edit
+            isMandatory: this.paymentFieldsForm.value.paymentFields_mandatory || this.isMandatory,
+            isEditable: this.paymentFieldsForm.value.paymentFields_edit || this.isEdit
         }
         this.register.push(data)
         this.paymentFieldsForm.reset();
         this.dataPayment = [...this.register]
         console.log("DATApayment: ", this.dataPayment)
+    }
+
+    selectIndicat(event){
+        const selectedIds = event.value.map((indicator: any) => indicator.id);
+        // console.log("SELECTEDID: ",selectedIds)
+        // Actualiza isActive basado en las selecciones
+        this.indicatrs.forEach(indicator => {
+            indicator.isActive = selectedIds.includes(indicator.id);
+        });
+    
+        // console.log("Indicadores actualizados:", this.indicatrs);
     }
 
     onNext(){
@@ -484,6 +531,14 @@ export class NewServiceComponent implements OnInit {
         this.router.navigate(['/service'])
     }
 
+    numConvenio(dataDate){
+        const date = new Date(dataDate);
+        const anio = date.getUTCFullYear(); // Obtiene el año
+        const time = date.toISOString().slice(11, 19).replace(/:/g, ""); // Hora sin puntos
+
+        return `${anio}${time}`;
+    }
+
 
     get service_name(){
         return this.serviceForm.get('service_name')
@@ -512,78 +567,5 @@ export class NewServiceComponent implements OnInit {
     get ownCommission_fixed(){
         return this.ownCommissionForm.get('ownCommission_fixed')
     }
-
-    indicatrs = [{
-          "id": "PAY_BILL",
-          "name": "BASE DE DATOS",
-          "isActive": true
-        },
-        {
-          "id": "PAY_PARTIAL",
-          "name": "PAGO PARCIAL",
-          "isActive": false
-        },
-        {
-          "id": "PAY_CARD",
-          "name": "PAGO CON TARJETA",
-          "isActive": true
-        },
-        {
-          "id": "FREQUENT_OPERATION",
-          "name": "OPERACION FRECUENTE",
-          "isActive": true
-        },
-        {
-          "id": "PAY_DEBT_OLDEST",
-          "name": "DEUDA MAS ANTIGUA",
-          "isActive": true
-        },
-        {
-          "id": "PAY_ONLINE",
-          "name": "INTERCONECTADO, PAGO EN LINEA",
-          "isActive": false
-        },
-        {
-          "id": "PAY_ACCOUNT",
-          "name": "PAGO CON CARGO EN CUENTA",
-          "isActive": true
-        },
-        {
-          "id": "PAY_REFLECTED",
-          "name": "REFLEJO DE PAGO",
-          "isActive": false
-        },
-        {
-          "id": "PAY_AUTOMATIC",
-          "name": "DEBITO AUTOMATICO",
-          "isActive": false
-        },
-        {
-          "id": "PAY_FIXED_RATE",
-          "name": "TASAS FIJAS",
-          "isActive": false
-        },
-        {
-          "id": "PAY_CASH",
-          "name": "PAGO EN EFECTIVO",
-          "isActive": true
-        },
-        {
-          "id": "PAY_CHECK_INTERNAL",
-          "name": "PAGO CON CHEQUE PROPIO BANCO",
-          "isActive": true
-        },
-        {
-          "id": "PAY_CHECK_EXTERNAL",
-          "name": "PAGO CON CHEQUE OTRO BANCO",
-          "isActive": true
-        },
-        {
-          "id": "PAY_MULTIPLE_PAYMENTS",
-          "name": "ACTUALIZACION MASIVA DE DEUDAS",
-          "isActive": false
-        }
-      ]
-
 
 }

@@ -79,7 +79,7 @@
                 </tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsWithSelect"></tr>
                 <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" [colSpan]="displayedColumnsWithSelect?.length">No hay datos para mostrar</td>
+                    <td class="mat-cell not-data-cell" [colSpan]="displayedColumnsWithSelect?.length">No hay datos para mostrar</td>
                 </tr>
             </table>
         </div>
@@ -166,7 +166,7 @@
             </tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumnsWithSelect"></tr>
             <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="6">No hay datos para mostrar</td>
+                <td class="mat-cell not-data-cell" colspan="6">No hay datos para mostrar</td>
             </tr>
         </table>
     </div>

@@ -6,7 +6,7 @@
         </uni-image-card>
 
         <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight backgroundColor="primary">
-            <mat-tab label="Datos de Servicio" >
+            <mat-tab label="Datos de Servicio">
                 <mat-card >
                     <mat-card-content>
                         <div class="p-4">
@@ -26,7 +26,7 @@
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_prov">
                                             <mat-option *ngFor="let prov of typePro"
-                                                [value]="prov.servicePerson.idPerson">{{prov.servicePerson.nameAlias}}</mat-option>
+                                                [value]="prov.servicePerson">{{prov.servicePerson.nameAlias}}</mat-option>
                                         </mat-select>
                                         <!-- <mat-error *ngIf="name?.hasError('required')">
                             Este campo es requerido
@@ -105,6 +105,17 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
+
+                                    <mat-form-field *ngIf="editAsigService" appearance="outline" class="col-md-4">
+                                        <mat-label>Indicadores</mat-label>
+                                        <mat-select (selectionChange)="selectIndicat($event)" multiple>
+                                            <mat-option [value]="indicators" *ngFor="let indicators of indicatrs">
+                                                {{indicators.name}}
+                                            </mat-option>
+                                        </mat-select>
+
+                                    </mat-form-field>
+
         
                                 </form>
                                 <!-- <div class="btn-guardar button-container">
@@ -274,27 +285,14 @@
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
         
-                                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
+
+                                    <mat-checkbox formControlName="paymentFields_mandatory" class="col-md-4">
                                         <mat-label>Es obligatorio</mat-label>
-                                        <input formControlName="paymentFields_mandatory" type="text" matInput
-                                            placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                Este campo es requerido
-                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
-                                    </mat-form-field>
-        
-                                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
-                                        <mat-label>Es editable</mat-label>
-                                        <input formControlName="paymentFields_edit" type="text" matInput
-                                            placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                Este campo es requerido
-                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
-                                    </mat-form-field>
-        
-        
+                                    </mat-checkbox>
+                                    <mat-checkbox formControlName="paymentFields_edit" class="col-md-4">
+                                        <mat-label>Es Editable</mat-label>    
+                                    </mat-checkbox>
+
                                 </form>
                                 <div class="button-container">
                                     <button class="btn btn-guardar styled-button" (click)="registerPayment()">
