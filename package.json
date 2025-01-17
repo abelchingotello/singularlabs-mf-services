@@ -11,6 +11,8 @@
     "build-desa:single-spa:singularlabs-mf-services": "ng build singularlabs-mf-services --configuration desarrollo",
     "serve:single-spa:singularlabs-mf-services": "ng s --project singularlabs-mf-services --disable-host-check --port 4216 --live-reload false"
   },
+
+  
   "private": true,
   "dependencies": {
     "@angular/animations": "^14.2.0",
