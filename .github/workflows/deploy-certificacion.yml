@@ -1,0 +1,48 @@
+name: Build and Deploy to S3
+
+on:
+  push:
+    branches:
+      - services-apintegracion-desa
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.17.0'
+
+    - name: Install dependencies
+      run: npm install
+
+   # Verificar si los secretos se pasan correctamente
+    - name: Verificar secretos
+      run: |
+       echo "Bucket Name: ${{secrets.AWS_BUCKET_PI}}"
+       echo "Región: ${{secrets.AWS_REGION_PI}}"
+       echo "Rol: ${{secrets.AWS_ACCESS_PI}}"
+
+    - name: Build project with the correct environment configuration
+      run: npm run build-desa:single-spa:singularlabs-mf-services:desarrollo
+
+
+    - name: Connect to AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-session-name: awssyncsession
+        role-to-assume: ${{secrets.AWS_ACCESS_PI}}
+        aws-region: ${{secrets.AWS_REGION_PI}}
+
+
+    - name: Update to S3
+      run: aws s3 sync ./dist/ s3://${{secrets.AWS_ACCESS_PI}}/singularlabs-mf-services --delete
