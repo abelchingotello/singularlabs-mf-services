@@ -35,14 +35,12 @@ jobs:
     - name: Build project with the correct environment configuration
       run: npm run build-desa:single-spa:singularlabs-mf-services
 
-
     - name: Connect to AWS
       uses: aws-actions/configure-aws-credentials@v2
       with:
         role-session-name: awssyncsession
         role-to-assume: ${{secrets.AWS_ACCESS_PI}}
         aws-region: ${{secrets.AWS_REGION_PI}}
-
 
     - name: Update to S3
       run: aws s3 sync ./dist/ s3://${{secrets.AWS_BUCKET_PI}}/singularlabs-mf-services --delete
