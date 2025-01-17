@@ -33,7 +33,7 @@ jobs:
        echo "Rol: ${{secrets.AWS_ACCESS_PI}}"
 
     - name: Build project with the correct environment configuration
-      run: npm run build-desa:single-spa:singularlabs-mf-services:desarrollo
+      run: npm run build-desa:single-spa:singularlabs-mf-services
 
 
     - name: Connect to AWS
