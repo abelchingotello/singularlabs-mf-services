@@ -248,7 +248,7 @@ export class NewServiceComponent implements OnInit {
             const data = {
                 idProvider: dataServiceForm.service_prov.idPerson,// ID ´PROVEEDOR 
                 idClient: '00000100', //ID DE RECAUDADORA
-                idServiceProv: dataServiceForm.service_convenio || this.numConvenio(dataServiceForm.service_prov.date), //id de convenio
+                idServiceProv: dataServiceForm.service_convenio || this.numConvenio(), //id de convenio
                 serviceName: dataServiceForm.service_name, //nnomb de servicio
                 userRegistration: this.userName.Username,
                 idTypeService: dataServiceForm.service_type.master_idTypeService,
@@ -531,12 +531,17 @@ export class NewServiceComponent implements OnInit {
         this.router.navigate(['/service'])
     }
 
-    numConvenio(dataDate){
-        const date = new Date(dataDate);
-        const anio = date.getUTCFullYear(); // Obtiene el año
-        const time = date.toISOString().slice(11, 19).replace(/:/g, ""); // Hora sin puntos
-
-        return `${anio}${time}`;
+    numConvenio(){
+        const date = new Date();
+        const anio = date.getFullYear(); // Obtiene el año
+        const dia = date.getDate();
+        const mes = date.getMonth() + 1;
+        const timeLocal = date
+        .toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour12: false }) // Formato 24 horas
+        .replace(/:/g, ""); // Quita los dos puntos
+        // console.log("TIEMPO LOCAL: ",anio)
+        // console.log("TIEMPO LOCAL: ",date)
+        return `${anio}${dia}${mes}${timeLocal}`;
     }
 
 
