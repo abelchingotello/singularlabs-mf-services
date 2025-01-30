@@ -493,32 +493,87 @@ export class NewServiceComponent implements OnInit {
     }
 
     onNextAsign() {
-        // Validar el formulario del paso actual
-        if (this.currentStep === 0 && !this.serviceForm.valid) {
-            this.mytoastr.showWarning('Complete el formulario','')
+        // Validar el paso actual
+        if (!this.validateCurrentStep()) {
             return;
         }
 
-        if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
-            this.mytoastr.showWarning('Complete el formulario Com.Client','')
-            return;
-        }
-
-        if (this.currentStep < this.stepsOrig.length-1) {
+        // Si la validación es exitosa, proceder al siguiente paso
+        if (this.currentStep < this.stepsOrig.length - 1) {
             this.currentStep++;
-        } 
+            this.updateTabVisibility();
+        } else {
+            this.finalizeForm();
+        }
+    }
 
-        // Habilitar pestañas subsiguientes
+    private updateTabVisibility() {
         if (this.currentStep === 1) {
             this.tab2 = false;
         }
-        
-        if(this.currentStep === this.stepsOrig.length-1){
-            // console.log("INGRESO PARA REGISTRARSE-AsIG")
-            this.saveService();
-        }
-        console.log("currentStep: ",this.currentStep)
+    }
 
+
+    private finalizeForm() {
+        // Asegurarse de que todos los formularios estén válidos antes de finalizar
+        if (this.serviceForm.valid && this.ownCommissionForm.valid) {
+            // Aquí va tu lógica para guardar/enviar el formulario
+            console.log('Formulario completado y válido');
+            this.saveService();
+        } else {
+            this.mytoastr.showWarning('Complete todos los formularios antes de finalizar', '');
+        }
+    }
+
+    // onNextAsign() {
+    //     // Validar el formulario del paso actual
+    //     if (this.currentStep === 0 && !this.serviceForm.valid) {
+    //         this.mytoastr.showWarning('Complete el formulario','')
+    //         return;
+    //     }
+
+    //     if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
+    //         this.mytoastr.showWarning('Complete el formulario Com.Client','')
+    //         return;
+    //     }
+
+    //     if (this.currentStep < this.stepsOrig.length-1) {
+    //         this.currentStep++;
+    //     } 
+
+    //     // Habilitar pestañas subsiguientes
+    //     if (this.currentStep === 1) {
+    //         this.tab2 = false;
+    //     }
+        
+    //     if(this.currentStep === this.stepsOrig.length-1){
+    //         // console.log("INGRESO PARA REGISTRARSE-AsIG")
+    //         // this.saveService();
+    //     }
+    //     console.log("currentStep: ",this.currentStep)
+
+    // }
+
+
+    private validateCurrentStep(): boolean {
+        switch (this.currentStep) {
+            case 0:
+                if (!this.serviceForm.valid) {
+                    this.mytoastr.showWarning('Complete el formulario', '');
+                    return false;
+                }
+                return true;
+
+            case 1:
+                if (!this.ownCommissionForm.valid) {
+                    this.mytoastr.showWarning('Complete el formulario Com.Client', '');
+                    return false;
+                }
+                return true;
+
+            default:
+                return true;
+        }
     }
 
     onPrevious() {
