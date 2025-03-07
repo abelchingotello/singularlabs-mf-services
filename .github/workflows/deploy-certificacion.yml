@@ -44,5 +44,3 @@ jobs:
 
     - name: Update to S3
       run: aws s3 sync ./dist/ s3://${{secrets.AWS_BUCKET_KPROD_V2_SERVICES}}/singularlabs-mf-services --delete
-    - name: Update to S3
-      run: aws s3 sync ./dist/ s3://${{secrets.AWS_BUCKET_PI}}/singularlabs-mf-services --delete
