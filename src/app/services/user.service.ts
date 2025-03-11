@@ -51,7 +51,7 @@ export class UserService {
   }
 
   getUsersId(id : string,): Observable<any>{
-    return this.httpClient.get(`${this.url}/auth/${id}`);
+    return this.httpClient.get(`${this.url}/oauth/${id}`);
   }
 
   getPersonId(id : string,): Observable<any>{
@@ -59,7 +59,7 @@ export class UserService {
   }
 
   postUser(data:any):Observable<any> {
-    return this.httpClient.post(`${this.url}/auth`, data);
+    return this.httpClient.post(`${this.url}/oauth`, data);
   }
   
   updateUser(data:any,id: string):Observable<any> {
