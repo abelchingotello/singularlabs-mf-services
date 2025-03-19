@@ -27,8 +27,15 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   }
 
+  getServicesData(): Observable<any>{
+    return this.httpClient.get<any>(`${this.url}/services`);
+  }
+
   getIdServices(id:string): Observable<any>{
     return this.httpClient.post<any>(`${this.url}/services/${id}`,null);
+  }
+  getIdServicePerson(id:string): Observable<any>{
+    return this.httpClient.get<any>(`${this.url}/services/${id}`);
   }
 
   getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {

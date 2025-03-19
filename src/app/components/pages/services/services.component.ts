@@ -70,6 +70,29 @@ export class ServicesComponent implements OnInit {
       this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
     }
   });
+
+  this.dataInitial();
+
+  }
+
+  dataInitial(){
+    this.spinner.spinnerOnOff();
+    this.service.getServicesData().subscribe({
+      next:(value) =>{
+        this.dataService = value.data.map(item => ({
+          ...item,
+          serviceTypeName: item.serviceType?.name || ''
+        }));
+      },
+      error:(err)=> {
+        this.mytoastr.showError("Error al cargar servicios","")
+        console.error("Error", err)
+          this.spinner.spinnerOnOff()
+      },
+      complete:()=> {
+          this.spinner.spinnerOnOff();
+      },
+    })
   }
 
 
@@ -94,12 +117,17 @@ export class ServicesComponent implements OnInit {
     // return
     this.services.getServices(input).subscribe({
       next : (data) => {
+        if(data.statusCode == 201){
+          this.mytoastr.showWarning(data.messages,'')
+          return
+        }
         this.dataFilter = data
         this.data();
         console.log(data);
       },
       error : (err) => {
         console.log(err);
+        this.spinner.spinnerOnOff();
       },
       complete : () => {
         this.spinner.spinnerOnOff();
@@ -200,6 +228,7 @@ export class ServicesComponent implements OnInit {
   reload() {
     // this.clearData();
     this.dynamic.clearSelection();
+    this.dataInitial();
     // this.functionDataCurrent(this.pageSize);
   }
 
