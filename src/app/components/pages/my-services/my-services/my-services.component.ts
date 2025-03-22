@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { ServicesService } from 'src/app/services/services.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
   selector: 'uni-my-services',
@@ -26,22 +28,34 @@ export class MyServicesComponent implements OnInit {
   public pageSize: any = 5;
   public pageKey: any[];
   public dataService : any[];
+  public personId : string;
 
 
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
   constructor(
     private service : ServicesService,
-    private auth : AuthService
+    private cookie : CookieService,
+    private spinner : SpinnerService
+
   ) { }
 
   ngOnInit(): void {
-    this.service.getIdServicePerson('61299700').subscribe({
+    this.spinner.spinnerOnOff();
+    this.personId = this.cookie.get('person_id')
+
+    this.service.getIdServicePerson(this.personId).subscribe({
       next: (value) => {
           this.dataService = value.data.map(item => ({
             ...item,
             serviceTypeName: item.serviceType?.name || ''
           }));
           console.log("valor id: ",value)
+      },
+      error:(err)=> {
+          console.error("error: ",err)
+      },
+      complete:()=> {
+          this.spinner.spinnerOnOff();
       },
     })
   }
