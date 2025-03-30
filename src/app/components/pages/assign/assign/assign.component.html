@@ -1,0 +1,219 @@
+<div class="content bg-gray-3">
+    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+        <uni-image-card title="Asignación de servicio">
+
+        </uni-image-card>
+
+        <!-- <mat-card *ngIf="zeroView" class="container">
+            <mat-card class="card">
+                <mat-card-title>Servicio a entidades</mat-card-title>
+                <mat-card-content>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-button class="btn btn-primary" (click)="serviceEntity()">Ingresar</button>
+                </mat-card-actions>
+            </mat-card>
+
+            <mat-card class="card">
+                <mat-card-title>Servicios a entidad</mat-card-title>
+                <mat-card-content>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-button class="btn btn-primary" (click)="entityService()">Ingresar</button>
+                </mat-card-actions>
+            </mat-card>
+        </mat-card> -->
+
+        <div class="dashboard-container" *ngIf="zeroView">
+            <div class="cards-wrapper">
+                <mat-card class="service-card">
+                    <div class="card-content-wrapper">
+                        <div class="icon-container">
+                            <mat-icon>business</mat-icon>
+                        </div>
+                        <mat-card-content>
+                            <h2 class="card-title">Servicio a entidades</h2>
+                            <!-- <p class="card-description">Gestione los servicios que ofrece a sus entidades asociadas</p> -->
+                        </mat-card-content>
+                    </div>
+                    <mat-card-actions align="end">
+                        <button mat-raised-button color="primary" (click)="serviceEntity()">
+                            <span>Ingresar</span>
+                            <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+
+                <mat-card class="service-card">
+                    <div class="card-content-wrapper">
+                        <div class="icon-container">
+                            <mat-icon>settings</mat-icon>
+                        </div>
+                        <mat-card-content>
+                            <h2 class="card-title">Servicios a entidad</h2>
+                            <!-- <p class="card-description">Administre los servicios proporcionados por las entidades</p> -->
+                        </mat-card-content>
+                    </div>
+                    <mat-card-actions align="end">
+                        <button mat-raised-button color="primary" (click)="entityService()">
+                            <span>Ingresar</span>
+                            <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+        </div>
+
+
+        <div *ngIf="oneView">
+
+
+            <mat-card>
+                <form [formGroup]="formAssign" class="form-grid" style="margin: 22px 22px 0px 22px;">
+                    <mat-card-content>
+                        <div class="grid-container">
+
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Servicio</mat-label>
+                                <mat-select (selectionChange)="selectedService($event)" formControlName="service">
+                                    <!-- <mat-option [value]="">NINGUNO</mat-option> -->
+                                    <mat-option *ngFor="let service of serviceName" [value]="service">{{ service.name
+                                        }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Entidad</mat-label>
+                                <mat-select formControlName="entity" (selectionChange)="selectEntity($event)" multiple>
+                                    <!-- <mat-option [value]="">NINGUNO</mat-option> -->
+                                    <mat-option [disabled]="disableAll" value="TODOS">TODOS</mat-option>
+                                    <mat-option *ngFor="let entity of persons" [value]="entity"
+                                        [disabled]="disableEntities">
+                                        {{ entity.servicePerson.nameAlias }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Tipo Comisión</mat-label>
+                                <mat-select formControlName="comission"
+                                    (selectionChange)="typeComissionService($event)">
+                                    <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
+                                        type.master_name }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" *ngIf="comissionFixed">
+                                <mat-label>Comisión Fija</mat-label>
+                                <input formControlName="fixed" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+
+
+                            <mat-form-field appearance="outline" *ngIf="comissionPorcent">
+                                <mat-label>Comisión Porcentual</mat-label>
+                                <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+
+
+                            <mat-form-field appearance="outline" *ngIf="comissionMultiple">
+                                <mat-label>Comisión Múltiple</mat-label>
+                                <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+                        </div>
+                    </mat-card-content>
+                </form>
+                <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-primary" (click)="registerServiceAssign()">Registrar</button>
+                </div>
+            </mat-card>
+
+
+
+            <mat-card>
+
+                <uni-dynamic-table element_id="idPerson" [columns]="columns" [data]="data">
+
+                </uni-dynamic-table>
+            </mat-card>
+        </div>
+
+
+        <div *ngIf="twoView">
+            <mat-card>
+                <form [formGroup]="formAssignService" class="form-grid" style="margin: 22px 22px 0px 22px;">
+                    <mat-card-content>
+                        <div class="grid-container">
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Entidad</mat-label>
+                                <mat-select formControlName="entity" (selectionChange)="selectAsignService($event)">
+                                    <!-- <mat-option [value]="">NINGUNO</mat-option> -->
+                                    <!-- <mat-option [disabled]="disableAll" value="TODOS">TODOS</mat-option> -->
+                                    <mat-option *ngFor="let entity of persons" [value]="entity"
+                                        [disabled]="disableEntities">
+                                        {{ entity.servicePerson.nameAlias }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Servicio</mat-label>
+                                <mat-select (selectionChange)="selectedServiceAssing($event)" formControlName="service"
+                                    multiple>
+                                    <mat-option value="TODOS" [disabled]="disableServiceAll">TODOS</mat-option>
+                                    <mat-option *ngFor="let service of serviceName" [value]="service"
+                                        [disabled]="disableServiceOption">{{ service.name
+                                        }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Tipo Comisión</mat-label>
+                                <mat-select formControlName="comission"
+                                    (selectionChange)="typeComissionServiceAssign($event)">
+                                    <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
+                                        type.master_name }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" *ngIf="comissionFixed">
+                                <mat-label>Comisión Fija</mat-label>
+                                <input formControlName="fixed" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+
+
+                            <mat-form-field appearance="outline" *ngIf="comissionPorcent">
+                                <mat-label>Comisión Porcentual</mat-label>
+                                <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" *ngIf="comissionMultiple">
+                                <mat-label>Comisión Múltiple</mat-label>
+                                <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+                        </div>
+                    </mat-card-content>
+                </form>
+                <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-primary" (click)="registerServiceEntity()">Registrar</button>
+                </div>
+            </mat-card>
+
+            <mat-card>
+
+                <uni-dynamic-table element_id="idPerson" [columns]="columnsService" [data]="dataServicesEntity">
+
+                </uni-dynamic-table>
+            </mat-card>
+        </div>
+
+        <div *ngIf="cancel" style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
+            <button type="button" class="btn btn-primary" (click)="cancelar()">Cancelar</button>
+        </div>
+    </div>
+</div>

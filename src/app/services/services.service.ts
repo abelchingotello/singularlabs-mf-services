@@ -21,14 +21,41 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/register`,data);
   }
 
-  getServices(name:string): Observable<any>{
+  registerServiceAssign(data:any):Observable<any>{
+    return this.httpClient.post<any>(`${this.url}/services/register/assign`,data);
+  }
+
+  // getServices(name:string): Observable<any>{
+  //   let params = new HttpParams()
+  //   .set('name', name);
+  //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
+  // }
+
+  getServices(name?:string,idClient?:string): Observable<any>{
     let params = new HttpParams()
-    .set('name', name);
+    if(name){
+      params = params.set('name', name);
+    }
+    // if(idClient){
+    //   params = params.set('idClient', idClient);
+    // }
     return this.httpClient.get<any>(`${this.url}/services`,{params: params});
+  }
+
+  getTypeServices(name?:string): Observable<any>{
+    let params = new HttpParams()
+    if(name){
+      params = params.set('name', name);
+    }
+    return this.httpClient.get<any>(`${this.url}/services/type`,{params: params});
   }
 
   getServicesData(): Observable<any>{
     return this.httpClient.get<any>(`${this.url}/services`);
+  }
+
+  getServicesCategory(): Observable<any>{
+    return this.httpClient.get<any>(`${this.url}/services/category`);
   }
 
   getIdServices(id:string): Observable<any>{

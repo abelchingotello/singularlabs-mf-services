@@ -23,6 +23,9 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName'},
     { 'name': 'Proveedor', 'attribute': 'idProvider'},
     { 'name': 'Cliente', 'attribute': 'idClient'},
+    { 'name': 'Estado', 'attribute': 'status','config':{
+      'styleClass':true
+    }},
   ];
   public options: any[] = [
     { value: 'Servicio', id:'1'},
@@ -79,7 +82,7 @@ export class ServicesComponent implements OnInit {
     this.spinner.spinnerOnOff();
     this.service.getServicesData().subscribe({
       next:(value) =>{
-        this.dataService = value.data.map(item => ({
+        this.dataService = value.data.Items.map(item => ({
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
