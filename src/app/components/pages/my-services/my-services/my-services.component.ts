@@ -19,6 +19,9 @@ export class MyServicesComponent implements OnInit {
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName'},
     { 'name': 'Proveedor', 'attribute': 'idProvider'},
     { 'name': 'Cliente', 'attribute': 'idClient'},
+    { 'name': 'Estado', 'attribute': 'status','config':{
+      'styleClass':true
+    }},
   ];
   public options: any[] = [
     { value: 'Servicio', id:'1'},
@@ -29,7 +32,7 @@ export class MyServicesComponent implements OnInit {
   public pageKey: any[];
   public dataService : any[];
   public personId : string;
-
+  public prefix : string;
 
     @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
   constructor(
@@ -41,9 +44,11 @@ export class MyServicesComponent implements OnInit {
 
   ngOnInit(): void {
     this.spinner.spinnerOnOff();
-    this.personId = this.cookie.get('person_id')
+    this.personId = this.cookie.get('person_id');
+    this.prefix = this.cookie.get('prefix')
+    
 
-    this.service.getIdServicePerson(this.personId).subscribe({
+    this.service.getIdServicePerson(this.personId,this.prefix).subscribe({
       next: (value) => {
           this.dataService = value.data.map(item => ({
             ...item,

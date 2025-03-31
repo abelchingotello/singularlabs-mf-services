@@ -61,8 +61,14 @@ export class ServicesService {
   getIdServices(id:string): Observable<any>{
     return this.httpClient.post<any>(`${this.url}/services/${id}`,null);
   }
-  getIdServicePerson(id:string): Observable<any>{
-    return this.httpClient.get<any>(`${this.url}/services/${id}`);
+  getIdServicePerson(id:string,type?:string): Observable<any>{
+    let params = new HttpParams();
+
+    if(type){
+      params = params.set('idClient', type);
+    }
+
+    return this.httpClient.get<any>(`${this.url}/services/${id}`,{params:params});
   }
 
   getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {

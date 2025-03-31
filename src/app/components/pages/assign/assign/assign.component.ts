@@ -143,7 +143,7 @@ export class AssignComponent implements OnInit {
   }
 
   selectEntity(event) {
-    // console.log("evento ttiy: ", event.value.length)
+    console.log("evento ttiy: ", event.value)
     if (event.value == 'TODOS') {
       this.disableEntities = true
       this.getRecaudador();
@@ -289,13 +289,13 @@ export class AssignComponent implements OnInit {
   dataRegister
   registerServiceAssign(){
     // this.spinner.spinnerOnOff();
-    console.log("DATA USUSARUIS: ",this.dataService)
+    console.log("DATA servicio a entidades: ",this.data)
     // return
     this.dataRegister = this.data.map(value=>({
 
         idProvider: '00000100',// ID ´PROVEEDOR 
         idClient: value.idPerson, //ID DE RECAUDADORA
-        idServiceProv: value.id_serviceProv, //id de convenio
+        idServiceProv: this.dataService.id_serviceProv, //id de convenio
         serviceName: this.dataService.name, //nnomb de servicio
         userRegistration: this.cookies.get('person_id') || 'desconocido',
         idTypeService: this.dataService.serviceType.id,
@@ -311,7 +311,7 @@ export class AssignComponent implements OnInit {
         indicators:this.dataService.indicators,
         additionalPaymentFields: this.dataService['additional-payment-fields']
       }))
-
+      // return
       console.log("data de registro: ", this.dataRegister)
 
       this.registerServiceRequest(this.dataRegister)
