@@ -166,7 +166,7 @@
                                 <mat-select (selectionChange)="selectedServiceAssing($event)" formControlName="service"
                                     multiple>
                                     <mat-option value="TODOS" [disabled]="disableServiceAll">TODOS</mat-option>
-                                    <mat-option *ngFor="let service of serviceName" [value]="service"
+                                    <mat-option *ngFor="let service of allItems" [value]="service"
                                         [disabled]="disableServiceOption">{{ service.name
                                         }}</mat-option>
                                 </mat-select>

@@ -42,6 +42,14 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   }
 
+  getServicesPageKey(pageKey?:any[]): Observable<any>{
+    let params = new HttpParams()
+    if (pageKey !== undefined) {
+      params = params.set('pageKey', JSON.stringify(pageKey));
+    }
+    return this.httpClient.get<any>(`${this.url}/services`,{params: params});
+  }
+
   getTypeServices(name?:string): Observable<any>{
     let params = new HttpParams()
     if(name){
