@@ -23,6 +23,9 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName'},
     { 'name': 'Proveedor', 'attribute': 'idProvider'},
     { 'name': 'Cliente', 'attribute': 'idClient'},
+    { 'name': 'Estado', 'attribute': 'status','config':{
+      'styleClass':true
+    }},
   ];
   public options: any[] = [
     { value: 'Servicio', id:'1'},
@@ -70,12 +73,36 @@ export class ServicesComponent implements OnInit {
       this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
     }
   });
+
+  this.dataInitial();
+
+  }
+
+  dataInitial(){
+    this.spinner.spinnerOnOff();
+    this.service.getServicesData().subscribe({
+      next:(value) =>{
+        this.dataService = value.data.Items.map(item => ({
+          ...item,
+          serviceTypeName: item.serviceType?.name || ''
+        }));
+      },
+      error:(err)=> {
+        this.mytoastr.showError("Error al cargar servicios","")
+        console.error("Error", err)
+          this.spinner.spinnerOnOff()
+      },
+      complete:()=> {
+          this.spinner.spinnerOnOff();
+      },
+    })
   }
 
 
   formService(){
     this.serviceForm = this.fb.group({
-      service_name : ['']
+      service_name : [''],
+      status:['']
     })
   }
 
@@ -94,12 +121,17 @@ export class ServicesComponent implements OnInit {
     // return
     this.services.getServices(input).subscribe({
       next : (data) => {
+        if(data.statusCode == 201){
+          this.mytoastr.showWarning(data.messages,'')
+          return
+        }
         this.dataFilter = data
         this.data();
         console.log(data);
       },
       error : (err) => {
         console.log(err);
+        this.spinner.spinnerOnOff();
       },
       complete : () => {
         this.spinner.spinnerOnOff();
@@ -170,6 +202,18 @@ export class ServicesComponent implements OnInit {
         console.error('Error:', error);
       },
     });
+
+    this.master.getItemsMasterTable(1).subscribe({
+      next: (data) => {
+        this.stateMaster = data;
+        console.log("DATAMASTER", data)
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+
+
   }
 
 
@@ -200,6 +244,7 @@ export class ServicesComponent implements OnInit {
   reload() {
     // this.clearData();
     this.dynamic.clearSelection();
+    this.dataInitial();
     // this.functionDataCurrent(this.pageSize);
   }
 

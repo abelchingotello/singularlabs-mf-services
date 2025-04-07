@@ -522,6 +522,7 @@ export class NewServiceComponent implements OnInit {
     // }
 
     onNextAsign() {
+
         // Validar el paso actual
         if (!this.validateCurrentStep()) {
             return;
@@ -554,6 +555,36 @@ export class NewServiceComponent implements OnInit {
             this.mytoastr.showWarning('Complete todos los formularios antes de finalizar', '');
         }
     }
+
+    // onNextAsign() {
+    //     // Validar el formulario del paso actual
+    //     if (this.currentStep === 0 && !this.serviceForm.valid) {
+    //         this.mytoastr.showWarning('Complete el formulario','')
+    //         return;
+    //     }
+
+    //     if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
+    //         this.mytoastr.showWarning('Complete el formulario Com.Client','')
+    //         return;
+    //     }
+
+    //     if (this.currentStep < this.stepsOrig.length-1) {
+    //         this.currentStep++;
+    //     } 
+
+    //     // Habilitar pestañas subsiguientes
+    //     if (this.currentStep === 1) {
+    //         this.tab2 = false;
+    //     }
+        
+    //     if(this.currentStep === this.stepsOrig.length-1){
+    //         // console.log("INGRESO PARA REGISTRARSE-AsIG")
+    //         // this.saveService();
+    //     }
+    //     console.log("currentStep: ",this.currentStep)
+
+    // }
+
 
     private validateCurrentStep(): boolean {
         switch (this.currentStep) {
