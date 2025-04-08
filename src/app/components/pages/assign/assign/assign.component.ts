@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-import { forkJoin } from 'rxjs';
+import { expand, filter, forkJoin, of, reduce, scan, startWith } from 'rxjs';
 import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PersonService } from 'src/app/services/person.service';
@@ -56,6 +56,7 @@ export class AssignComponent implements OnInit {
   public zeroView : boolean  = true;
   public cancel : boolean  = false;
   public dataServicesEntity : any;
+  public allItems : any;
 
   constructor(
     private serviceServ : ServicesService,
@@ -70,12 +71,27 @@ export class AssignComponent implements OnInit {
   ngOnInit(): void {
     this.listData();
     this.initialForm();
-    this.serviceServ.getServices(null,'00000100').subscribe({
-      next: (data) => {
-        console.log("data de servicios idClient:",data)
-      }
-    })
+    // setTimeout(() => {
+    this.loadAllServices().subscribe(allItems => {
+      console.log("allItems: ",allItems)
+      this.allItems = allItems;
+    });
+    // }, 0);
   }
+
+  loadAllServices() {
+    return this.serviceServ.getServicesPageKey().pipe(
+      expand(response => 
+        response?.data?.nextPageKey 
+          ? this.serviceServ.getServicesPageKey(response.data.nextPageKey) 
+          : of(null) // Detiene la recursión si no hay más páginas
+      ),
+      filter(response => response !== null),
+      scan((acc, response) => acc.concat(response.data.Items), []),
+      startWith([]), // Asegura que siempre haya una emisión inicial
+    );
+  }
+  
 
 
   initialForm(){
@@ -146,6 +162,8 @@ export class AssignComponent implements OnInit {
     console.log("evento ttiy: ", event.value)
     if (event.value == 'TODOS') {
       this.disableEntities = true
+      // this.data = this.allItems;
+      // console.log("dataAssign: ",this.data)
       this.getRecaudador();
     } else {
       this.disableEntities = false
@@ -167,8 +185,9 @@ export class AssignComponent implements OnInit {
   selectedServiceAssing(event){
     console.log("evento services: ", event.value)
     if(event.value == 'TODOS'){
-      this.disableServiceOption = true
-      this.dataServicesEntity = this.convertDataService(this.serviceName)
+      this.disableServiceOption = true;
+      this.dataServicesEntity = this.allItems;
+      // this.dataServicesEntity = this.convertDataService(this.serviceName)
     } else {
       this.disableServiceOption = false
       this.disableServiceAll = true
@@ -343,9 +362,9 @@ export class AssignComponent implements OnInit {
 
     }))
 
-    console.log("dataregisterService : ",this.dataRegisterService)
-
+    console.log("dataregisterService : ",this.dataRegisterService);
     this.registerServiceRequest(this.dataRegisterService)
+
 
   }
 
@@ -382,14 +401,32 @@ export class AssignComponent implements OnInit {
     this.cancel = false
   }
 
+  chunkArray(array: any[], size: number): any[][] {
+    return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+      array.slice(i * size, i * size + size)
+    );
+  }
+
 
   registerServiceRequest(data:any){
+
+    // const chunkedData = this.chunkArray(data, 1000);
+
+    // chunkedData.forEach((chunk, index) => {
+    //   console.log(`Enviando fragmento ${index + 1} de ${chunkedData.length}`);
+      
+    //   this.serviceServ.registerServiceAssign(chunk).subscribe({
+    //     next: response => console.log(`Fragmento ${index + 1} enviado con éxito`, response),
+    //     error: err => console.error(`Error en el fragmento ${index + 1}`, err)
+    //   });
+    // });
+
     this.spinner.spinnerOnOff();
     this.serviceServ.registerServiceAssign(data).subscribe({
       next: (response) => {
         // console.log("RESPUESTA DE REGISTRO: ", response)
         if(response.statusCode == 207){
-          this.spinner.spinnerOnOff();
+          // this.spinner.spinnerOnOff();
           this.mytoastr.showWarning('Error : Algunos servicios ya fueron asignados','')
           return
         }

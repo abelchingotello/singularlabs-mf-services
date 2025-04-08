@@ -101,7 +101,8 @@ export class ServicesComponent implements OnInit {
 
   formService(){
     this.serviceForm = this.fb.group({
-      service_name : ['']
+      service_name : [''],
+      status:['']
     })
   }
 
@@ -201,6 +202,18 @@ export class ServicesComponent implements OnInit {
         console.error('Error:', error);
       },
     });
+
+    this.master.getItemsMasterTable(1).subscribe({
+      next: (data) => {
+        this.stateMaster = data;
+        console.log("DATAMASTER", data)
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+
+
   }
 
 
