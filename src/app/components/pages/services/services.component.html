@@ -2,12 +2,12 @@
     <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
         <uni-image-card title="Servicios"
         externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
-    
+
         <div class="align-content-center">
             <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="addService()">
               <mat-icon>add</mat-icon>
               <span class="custom-span-icon-responsive">Añadir</span>
-              
+
             </button>
           </div>
     </uni-image-card>
@@ -27,28 +27,28 @@
             </mat-form-field>
           </div>
         </mat-card-content>
-      </form> 
+      </form>
       </mat-card>
 
     <mat-card class="custom-border-radius-1-25">
         <mat-card-content>
           <div >
             <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
-            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)">
-  
+            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)" [customExportFunction]="exportDataViaAPI.bind(this)">
+
               <div class="d-flex">
                 <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()"  >
                   <mat-icon matTooltip="Editar">assignment_ind</mat-icon>
                 </button>
                 <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
                   <mat-label>Actualizar</mat-label>
-                
+
                 <mat-select (selectionChange)="selectOption($event)">
                   <!-- <mat-option>Ninguno</mat-option> -->
                   <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
                 </mat-select>
               </mat-form-field>
-              </div> 
+              </div>
             </uni-dynamic-table>
           </div>
         </mat-card-content>

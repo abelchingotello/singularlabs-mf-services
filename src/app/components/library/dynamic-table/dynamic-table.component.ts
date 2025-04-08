@@ -47,10 +47,18 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
 
+  //------------
+  @Input() customExportFunction: ((fileType: 'xlsx' | 'csv') => void) | null = null;
+  //------------
+
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
   @Output() selectedChange = new EventEmitter<any[]>();
   @Output() cellClick: EventEmitter<any> = new EventEmitter<any>();
+
+  //------------------------
+  @Output() exportRequest = new EventEmitter<'xlsx' | 'csv'>();
+  //------------------------
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
@@ -99,7 +107,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         this.dataSource.data = this.data;
         this.dataPrint.data = this.data;
       }
-  
+
       // Verificar si se ha modificado pageKey o si ha cambiado el tamaño de los datos
       if (this.pageKey) {
         // Si hay un pageKey válido o los datos han aumentado de tamaño, activamos hasNextPage
@@ -107,13 +115,13 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
       }else{
         // this.paginator.hasNextPage = () => false;
       }
-  
+
       // Actualizar el tamaño anterior de los datos para futuras comparaciones
-  
+
       // Iniciar o reiniciar la tabla
       this.initTable();
     }
-  
+
     if (changes['columns']) {
       // Actualizamos las columnas visibles y los atributos de las columnas cuando cambien
       this.displayedColumns = this.columns.map(column => column.name);
@@ -180,7 +188,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         console.warn("element_id no está definido");
         return;
     }
-  
+
     if(this.element_id === 'ALL'){
       this.selectedIds = this.selection.selected;
     }
@@ -308,45 +316,59 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     return wb;
   }
 
+  // exportExcel() {
+  //   const wb = this.createWorkbook('Users');
+  //   const ws = wb.Sheets['Users'];
+
+  //   // Ajusta el ancho de las columnas según el contenido
+  //   const columnWidths = this.columns.map(col => {
+  //     const maxWidth = Math.max(
+  //       col.name.length, // Longitud del encabezado
+  //       ...this.filterAttributes().map(item => (item[col.attribute] ? item[col.attribute].toString().length : 0)) // Longitud de los valores
+  //     );
+  //     return { wpx: maxWidth * 10 }; // Multiplica por un factor para un mejor ajuste visual
+  //   });
+
+  //   // Establece los anchos de las columnas
+  //   ws['!cols'] = columnWidths;
+
+  //   XLSX.writeFile(wb, 'Excel tabla.xlsx');
+  // }
+
+  // exportCsv() {
+  //   const wb = this.createWorkbook('Users', true);
+  //   const ws = wb.Sheets['Users'];
+
+  //   // Convierte la hoja a CSV con cada valor entre comillas
+  //   const csv = XLSX.utils.sheet_to_csv(ws, {
+  //     FS: ',',
+  //     RS: '\n',
+  //     // Envolver cada campo en comillas dobles
+  //     forceQuotes: true, // Utiliza quoteColumns para asegurar que todos los campos estén entre comillas
+  //   });
+
+  //   // Crea un archivo CSV y dispara la descarga
+  //   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  //   const link = document.createElement('a');
+  //   link.href = URL.createObjectURL(blob);
+  //   link.setAttribute('download', 'tabla.csv');
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // }
+
+  //------------
   exportExcel() {
-    const wb = this.createWorkbook('Users');
-    const ws = wb.Sheets['Users'];
-
-    // Ajusta el ancho de las columnas según el contenido
-    const columnWidths = this.columns.map(col => {
-      const maxWidth = Math.max(
-        col.name.length, // Longitud del encabezado
-        ...this.filterAttributes().map(item => (item[col.attribute] ? item[col.attribute].toString().length : 0)) // Longitud de los valores
-      );
-      return { wpx: maxWidth * 10 }; // Multiplica por un factor para un mejor ajuste visual
-    });
-
-    // Establece los anchos de las columnas
-    ws['!cols'] = columnWidths;
-
-    XLSX.writeFile(wb, 'Excel tabla.xlsx');
+    if (this.customExportFunction) {
+      this.customExportFunction('xlsx');
+    }
   }
 
   exportCsv() {
-    const wb = this.createWorkbook('Users', true);
-    const ws = wb.Sheets['Users'];
 
-    // Convierte la hoja a CSV con cada valor entre comillas
-    const csv = XLSX.utils.sheet_to_csv(ws, {
-      FS: ',',
-      RS: '\n',
-      // Envolver cada campo en comillas dobles
-      forceQuotes: true, // Utiliza quoteColumns para asegurar que todos los campos estén entre comillas
-    });
-
-    // Crea un archivo CSV y dispara la descarga
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', 'tabla.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (this.customExportFunction) {
+      this.customExportFunction('csv');
+    }
   }
 
   filterAttributes() {
@@ -363,7 +385,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         // Obtiene la configuración de la columna de forma eficiente
         const columnConfig = columnConfigMap.get(attribute);
         let value = item[attribute];
-        
+
         if(!value){ //Evitar errores cuando el elemento no contiene el atributo
           newObj[attribute] = '';
           break;

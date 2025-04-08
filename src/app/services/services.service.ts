@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse  } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -74,7 +74,7 @@ export class ServicesService {
   getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {
     let params = new HttpParams();
     if(typeEntity) params = params.set('typeEntity', typeEntity);
-    
+
     if(nameAlias) params = params.set('nameAlias', nameAlias);
 
     return this.httpClient.get(`${this.url}/person/entity`, {params:params});
@@ -87,7 +87,7 @@ export class ServicesService {
   updateServiceEntity(data:any):Observable<any>{
     return this.httpClient.patch(`${this.url}/services/status/entity`,data);
   }
-  
+
   updateServiceClient(data:any):Observable<any>{
     return this.httpClient.patch(`${this.url}/services/status/one`,data);
   }
@@ -98,5 +98,25 @@ export class ServicesService {
     .set('ers', ers);
     return this.httpClient.post<any>(`${this.url}/services/${id}/bills`,null,{params:params});
   }
+
+  //-------
+  exportServices(
+    format: 'xlsx' | 'csv',
+    filters: any
+  ): Observable<HttpResponse<string>> {
+    const params = new HttpParams({
+      fromObject: {
+        ...filters,
+        format: format
+      }
+    });
+
+    return this.httpClient.get(`${this.url}/services/export`, {
+      params,
+      observe: 'response',
+      responseType: 'text' // para manejar base64
+    });
+  }
+  //-------
 
 }
