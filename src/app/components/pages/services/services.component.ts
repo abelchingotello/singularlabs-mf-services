@@ -23,6 +23,9 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName'},
     { 'name': 'Proveedor', 'attribute': 'idProvider'},
     { 'name': 'Cliente', 'attribute': 'idClient'},
+    { 'name': 'Estado', 'attribute': 'status','config':{
+      'styleClass':true
+    }},
   ];
   public options: any[] = [
     { value: 'Servicio', id:'1'},
@@ -70,12 +73,36 @@ export class ServicesComponent implements OnInit {
       this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
     }
   });
+
+  this.dataInitial();
+
+  }
+
+  dataInitial(){
+    this.spinner.spinnerOnOff();
+    this.service.getServicesData().subscribe({
+      next:(value) =>{
+        this.dataService = value.data.Items.map(item => ({
+          ...item,
+          serviceTypeName: item.serviceType?.name || ''
+        }));
+      },
+      error:(err)=> {
+        this.mytoastr.showError("Error al cargar servicios","")
+        console.error("Error", err)
+          this.spinner.spinnerOnOff()
+      },
+      complete:()=> {
+          this.spinner.spinnerOnOff();
+      },
+    })
   }
 
 
   formService(){
     this.serviceForm = this.fb.group({
-      service_name : ['']
+      service_name : [''],
+      status:['']
     })
   }
 
@@ -94,12 +121,17 @@ export class ServicesComponent implements OnInit {
     // return
     this.services.getServices(input).subscribe({
       next : (data) => {
+        if(data.statusCode == 201){
+          this.mytoastr.showWarning(data.messages,'')
+          return
+        }
         this.dataFilter = data
         this.data();
         console.log(data);
       },
       error : (err) => {
         console.log(err);
+        this.spinner.spinnerOnOff();
       },
       complete : () => {
         this.spinner.spinnerOnOff();
@@ -127,7 +159,7 @@ export class ServicesComponent implements OnInit {
     // this.selectedIds
     this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
-  
+
   handleSelectedIds(selectedIds: any[]) {
     // console.log("Id's: ", selectedIds)
     this.disabledEditOption = selectedIds.length !== 1;
@@ -137,7 +169,7 @@ export class ServicesComponent implements OnInit {
     if(this.selectedIds.length ===1){
 
       this.getIdService(selectedIds)
-    
+
     }
     console.log("Id--s: ", selectedIds)
   }
@@ -170,6 +202,18 @@ export class ServicesComponent implements OnInit {
         console.error('Error:', error);
       },
     });
+
+    this.master.getItemsMasterTable(1).subscribe({
+      next: (data) => {
+        this.stateMaster = data;
+        console.log("DATAMASTER", data)
+      },
+      error: (error) => {
+        console.error('Error:', error);
+      },
+    });
+
+
   }
 
 
@@ -200,6 +244,7 @@ export class ServicesComponent implements OnInit {
   reload() {
     // this.clearData();
     this.dynamic.clearSelection();
+    this.dataInitial();
     // this.functionDataCurrent(this.pageSize);
   }
 
@@ -217,7 +262,7 @@ export class ServicesComponent implements OnInit {
         console.error(error);
       },
       complete: () =>{
-        if (callback) callback(); 
+        if (callback) callback();
           console.log('complete');
       },
     })
@@ -225,7 +270,7 @@ export class ServicesComponent implements OnInit {
 
 
   openDialogType(stateId:string): void {
-    
+
     const dialogRef = this.dialog.open(DialogServiceStatusComponent, {
       width:'900px',
       data: {
@@ -253,5 +298,75 @@ export class ServicesComponent implements OnInit {
     return this.serviceForm.get('service_name')
   }
 
+  exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
+    console.log('exportDataViaAPI called with', fileType);
+    this.spinner.spinnerOnOff();
+
+    // Preparar los filtros para la exportación
+    const exportFilters: Record<string, any> = {};
+
+    // Si hay un filtro por nombre de servicio activo, incluirlo
+     // Si hay un filtro por nombre de servicio activo, incluirlo
+    if (this.service_name?.value) {
+      exportFilters['name'] = this.service_name.value; // Notación de corchetes
+    }
+
+    this.services.exportServices(fileType, exportFilters).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+
+        // Verificar si la respuesta tiene cuerpo
+        if (!response.body) {
+          this.mytoastr.showError('La respuesta no contiene datos', '');
+          return;
+        }
+        else{
+          console.log("BODY DEVUELTO", response.body);
+        }
+
+        try {
+          // Decodificar base64
+          const responseBody = response.body;
+          const byteCharacters = atob(responseBody);
+          const byteArray = new Uint8Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteArray[i] = byteCharacters.charCodeAt(i);
+          }
+
+          // Obtener nombre del archivo desde headers
+          let filename = `servicios_${new Date().toISOString().split('T')[0]}.${fileType}`;
+          const contentDisposition = response.headers.get('Content-Disposition');
+          if (contentDisposition) {
+            const parts = contentDisposition.split('filename=');
+            if (parts.length > 1) {
+              filename = parts[1].replace(/"/g, '').trim();
+            }
+          }
+
+          console.log('Downloading file:', filename);
+
+          // Crear Blob con el tipo MIME del backend
+          const blob = new Blob([byteArray], {
+            type: response.headers.get('Content-Type') || 'application/octet-stream'
+          });
+
+          // Descargar
+          const link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = filename;
+          link.click();
+          window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+          console.error('Error procesando la respuesta:', error);
+          this.mytoastr.showError(`Error al procesar la respuesta: ${error.message}`, '');
+        }
+      },
+      error: (error) => {
+        console.error('Error al exportar los datos:', error);
+        this.mytoastr.showError('Error al exportar los datos', '');
+        this.spinner.spinnerOnOff();
+      }
+    });
+  }
 
 }
