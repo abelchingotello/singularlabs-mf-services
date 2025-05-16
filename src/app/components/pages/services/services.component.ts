@@ -21,8 +21,13 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Nombre', 'attribute': 'name' },
     { 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName'},
-    { 'name': 'Proveedor', 'attribute': 'idProvider'},
-    { 'name': 'Cliente', 'attribute': 'idClient'},
+    { 'name': 'Proveedor', 'attribute': 'nameProvider'},
+    { 'name': 'Cliente', 'attribute': 'nameClient'},
+    {
+      'name': 'Fecha', 'attribute': 'date', 'config': {
+        'formatDate': { format: 'dd/MM/yyyy', locale: 'en-US' },
+      }
+    },
     { 'name': 'Estado', 'attribute': 'status','config':{
       'styleClass':true
     }},
@@ -125,6 +130,7 @@ export class ServicesComponent implements OnInit {
           this.mytoastr.showWarning(data.messages,'')
           return
         }
+        //this.clearData();
         this.dataFilter = data
         this.data();
         console.log(data);
@@ -218,7 +224,9 @@ export class ServicesComponent implements OnInit {
 
 
   data() {
-    this.dataService = this.dataFilter.data.map(item => ({
+    console.log("dataService", this.dataService)
+    console.log("DATA", this.dataFilter.data)
+    this.dataService = this.dataFilter.data.Items.map(item => ({
       ...item,
       serviceTypeName: item.serviceType?.name || ''
     }));
@@ -270,7 +278,7 @@ export class ServicesComponent implements OnInit {
 
 
   openDialogType(stateId:string): void {
-
+    console.log("ID",stateId)
     const dialogRef = this.dialog.open(DialogServiceStatusComponent, {
       width:'900px',
       data: {
