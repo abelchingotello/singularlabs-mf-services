@@ -72,7 +72,7 @@
               "outputHashing": "none"
             },
             "desarrollo":{
-              "deployUrl":"https://d3vipb1u67lyvd.cloudfront.net/singularlabs-mf-services/",
+              "deployUrl":"https://io.dev.achingo.com/singularlabs-mf-services/",
               "fileReplacements":[{
                 "replace":"src/environments/environment.ts",
                 "with":"src/environments/environment.desarrollo.ts"
