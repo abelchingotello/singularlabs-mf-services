@@ -1,36 +1,16 @@
+// Grid para formularios
 .form-grid .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-
-.container {
-  padding: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  // height: 100vh;
-  gap: 20px;
-}
-
-.card {
-  width: 300px;
-  text-align: center;
-  padding: 16px;
-}
-
-// stylos previos
-
-
-/* Estilos para el contenedor principal */
+// Dashboard principal
 .dashboard-container {
   padding: 24px;
   background-color: #ffffff;
-  // min-height: 100vh;
 }
 
-/* Wrapper para las tarjetas con diseño flexible */
 .cards-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -38,7 +18,7 @@
   justify-content: center;
 }
 
-/* Estilos para cada tarjeta */
+// Tarjetas de servicio
 .service-card {
   width: 300px;
   border-radius: 10px;
@@ -46,14 +26,13 @@
   transition: transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
   background-color: white;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 }
 
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Contenedor para el contenido principal */
 .card-content-wrapper {
   padding: 16px;
   display: flex;
@@ -61,7 +40,6 @@
   align-items: center;
 }
 
-/* Contenedor para el ícono */
 .icon-container {
   background-color: #3f51b5;
   color: white;
@@ -72,15 +50,14 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+  }
 }
 
-.icon-container mat-icon {
-  font-size: 30px;
-  width: 30px;
-  height: 30px;
-}
-
-/* Estilos para el título y descripción */
 .card-title {
   font-size: 20px;
   font-weight: 500;
@@ -95,20 +72,27 @@
   margin-bottom: 8px;
 }
 
-/*Estilos para carga de excel*/
+// Sección de carga de Excel
 .excel-upload-section {
   margin-bottom: 20px;
 
-  mat-card-header {
-    mat-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  mat-card-header mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 }
 
-// Overlay para el diálogo
+.excel-upload-container {
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-out;
+
+  mat-card {
+    margin-bottom: 16px;
+  }
+}
+
+// Overlay y diálogo modal
 .overlay {
   position: fixed;
   top: 0;
@@ -124,17 +108,14 @@
   animation: fadeInBg 0.3s ease-out;
 }
 
-// Diálogo
 .dialog-card {
   min-width: 260px;
   max-width: 92vw;
-
   border-radius: 12px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  // Header del diálogo
   mat-card-header {
     padding: 14px 16px 8px 16px !important;
     background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
@@ -172,7 +153,6 @@
     }
   }
 
-  // Contenido del diálogo
   mat-card-content {
     padding: 8px 16px 4px 16px !important;
 
@@ -209,7 +189,6 @@
     }
   }
 
-  // Acciones del diálogo
   mat-card-actions {
     padding: 8px 16px 16px 16px !important;
     background: #fafafa;
@@ -220,7 +199,6 @@
     margin-top: 0;
 
     button {
-      //padding: 32px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 500;
@@ -238,10 +216,7 @@
         margin: 0;
       }
 
-      // Botón secundario
       &[mat-button] {
-        //padding: 16px;
-        //justify-content: flex-end;
         background: white;
         color: #666;
         border: 2px solid #e0e0e0;
@@ -253,11 +228,11 @@
         }
       }
 
-      // Botón primario
       &[mat-raised-button] {
         background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
         box-shadow: 0 2px 8px rgba(63, 81, 181, 0.3);
         padding: 8px 24px;
+
         &:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(63, 81, 181, 0.4);
@@ -281,44 +256,10 @@
 }
 
 .animate-dialog {
-  animation: scaleIn 0.25s cubic-bezier(.4, 0, .2, 1);
+  animation: slideInScale 0.25s cubic-bezier(.4, 0, .2, 1);
 }
 
-// Animaciones
-@keyframes fadeInBg {
-  from {
-    background: rgba(0, 0, 0, 0);
-    backdrop-filter: blur(0px);
-  }
-
-  to {
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-  }
-}
-
-@keyframes slideInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateY(-40px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-// Contenedor principal de carga de Excel
-.excel-upload-container {
-  margin-bottom: 20px;
-
-  mat-card {
-    margin-bottom: 16px;
-  }
-}
-
-// Sección de carga de archivo
+// Área de carga de archivos
 .file-upload-section {
   margin-bottom: 20px;
 
@@ -365,9 +306,8 @@
   gap: 12px;
   justify-content: flex-end;
   margin-top: 16px;
-  padding-right: 32px;
-  padding-left: 32px;
-  padding-bottom: 32px;
+  padding: 0 32px 32px 32px;
+
   button {
     display: flex;
     align-items: center;
@@ -375,19 +315,17 @@
   }
 }
 
-/* */
-
-
-
+// Estilos generales para mat-card-actions
 mat-card-actions {
   padding: 16px;
   border-top: 1px solid #eee;
+
+  button mat-icon {
+    margin-left: 8px;
+  }
 }
 
-button mat-icon {
-  margin-left: 8px;
-}
-
+// Responsive design
 @media (max-width: 768px) {
   .service-card {
     width: 100%;
@@ -448,37 +386,30 @@ button mat-icon {
     opacity: 0;
     transform: translateY(-20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.excel-upload-container {
-  animation: fadeIn 0.3s ease-out;
-}
-
-// Estilos para el estado de procesamiento
-.processing-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 20px;
-  color: #666;
-
-  mat-icon {
-    animation: spin 1s linear infinite;
+@keyframes fadeInBg {
+  from {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+  }
+  to {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
   }
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-40px);
   }
-
-  100% {
-    transform: rotate(360deg);
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
