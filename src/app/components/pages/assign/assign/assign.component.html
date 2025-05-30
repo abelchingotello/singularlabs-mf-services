@@ -4,26 +4,6 @@
 
     </uni-image-card>
 
-    <!-- <mat-card *ngIf="zeroView" class="container">
-            <mat-card class="card">
-                <mat-card-title>Servicio a entidades</mat-card-title>
-                <mat-card-content>
-                </mat-card-content>
-                <mat-card-actions>
-                    <button mat-button class="btn btn-primary" (click)="serviceEntity()">Ingresar</button>
-                </mat-card-actions>
-            </mat-card>
-
-            <mat-card class="card">
-                <mat-card-title>Servicios a entidad</mat-card-title>
-                <mat-card-content>
-                </mat-card-content>
-                <mat-card-actions>
-                    <button mat-button class="btn btn-primary" (click)="entityService()">Ingresar</button>
-                </mat-card-actions>
-            </mat-card>
-        </mat-card> -->
-
     <div class="dashboard-container" *ngIf="zeroView">
       <div class="cards-wrapper">
         <mat-card class="service-card">
@@ -66,7 +46,6 @@
 
 
     <div *ngIf="oneView">
-
 
       <mat-card>
         <form [formGroup]="formAssign" class="form-grid" style="margin: 22px 22px 0px 22px;">
@@ -126,11 +105,10 @@
           </mat-card-content>
         </form>
         <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
-          <button type="button" class="btn btn-primary" [disabled]="!dataService || !data || data.length === 0" (click)="registerServiceAssign()">Registrar</button>
+          <button type="button" class="btn btn-primary" [disabled]="!dataService || !data || data.length === 0"
+            (click)="registerServiceAssign()">Registrar</button>
         </div>
       </mat-card>
-
-
 
       <mat-card>
 
@@ -142,6 +120,127 @@
 
 
     <div *ngIf="twoView">
+
+      <!-- Diálogo para solicitar el id client -->
+      <div *ngIf="showIdClientDialog" class="overlay">
+        <mat-card class="dialog-card animate-dialog">
+          <mat-card-header>
+            <mat-card-title>ID Cliente Requerido</mat-card-title>
+            <mat-card-subtitle>Ingrese el ID del cliente para las asignaciones</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>ID Cliente</mat-label>
+              <input matInput type="text" [(ngModel)]="requiredIdClient" placeholder="Ejem: 39926100">
+              <!-- <mat-hint>Este ID de cliente se aplicará a todas las asignaciones del archivo</mat-hint> -->
+            </mat-form-field>
+          </mat-card-content>
+          <mat-card-actions align="end" class="dialog-actions">
+            <button mat-button (click)="cancelIdClientDialog()">
+              <mat-icon>close</mat-icon>
+              Cancelar
+            </button>
+            <button mat-raised-button color="primary" (click)="confirmIdClient()">
+              <mat-icon>check</mat-icon>
+              Continuar
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+
+      <div class="excel-upload-section">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>cloud_upload</mat-icon>
+              Carga Masiva desde Excel
+            </mat-card-title>
+            <mat-card-subtitle>
+              Cargar múltiples asignaciones desde un archivo Excel
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <button mat-raised-button color="accent" (click)="showExcelUploadDialog()">
+              <mat-icon>upload_file</mat-icon>
+              Cargar desde Excel
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <!-- Sección de carga de Excel -->
+      <div *ngIf="showExcelUpload" class="excel-upload-container">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>description</mat-icon>
+              Cargar Archivo Excel
+            </mat-card-title>
+            <mat-card-subtitle>
+              ID Cliente: {{requiredIdClient}}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="file-upload-section">
+              <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx,.xls"
+                style="display: none;">
+              <div class="upload-area" (click)="fileInput.click()">
+                <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                <p *ngIf="!selectedFile">Haga clic para seleccionar un archivo Excel</p>
+                <p *ngIf="selectedFile" class="selected-file">
+                  <mat-icon>insert_drive_file</mat-icon>
+                  {{selectedFile.name}}
+                </p>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button mat-raised-button color="primary" [disabled]="!selectedFile || isProcessingExcel"
+                (click)="processExcelFile()">
+                <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
+                <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
+                {{isProcessingExcel ? 'Procesando...' : 'Procesar Archivo'}}
+              </button>
+              <button mat-button (click)="cancelExcelUpload()">Cancelar</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card *ngIf="excelData.length > 0">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>table_view</mat-icon>
+              Datos Procesados ({{excelData.length}} registros)
+            </mat-card-title>
+            <mat-card-subtitle>
+              Revise los datos antes de confirmar las asignaciones
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <uni-dynamic-table element_id="idService" [columns]="[
+            { 'name': 'Código Servicio', 'attribute': 'idService' },
+            { 'name': 'Nombre del Servicio', 'attribute': 'serviceName' },
+            { 'name': 'Id Servicio Proveedor', 'attribute': 'idServiceProv' },
+            { 'name': 'Estado', 'attribute': 'status' },
+            { 'name': 'Tipo Comisión', 'attribute': 'ownComissionType' },
+            { 'name': 'Comisión Fija', 'attribute': 'ownFixedComission' },
+            { 'name': 'Comisión Porcentual', 'attribute': 'ownPCTComission' },
+            { 'name': 'Criterio de comisión', 'attribute': 'ownCriterionComission' },
+            { 'name': 'Zona', 'attribute': 'zone' }
+          ]" [data]="data" [actionsOptions]="false">
+            </uni-dynamic-table>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-button color="warn" (click)="clearExcelData()">
+              <mat-icon>clear</mat-icon>
+              Limpiar
+            </button>
+            <button mat-raised-button color="primary" (click)="confirmExcelAssignments()">
+              <mat-icon>check</mat-icon>
+              Confirmar Asignaciones
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
       <mat-card>
         <form [formGroup]="formAssignService" class="form-grid" style="margin: 22px 22px 0px 22px;">
           <mat-card-content>
@@ -199,6 +298,7 @@
         </div>
       </mat-card>
 
+
       <mat-card>
 
         <uni-dynamic-table element_id="idPerson" [columns]="columnsService" [data]="dataServicesEntity">
@@ -206,6 +306,8 @@
         </uni-dynamic-table>
       </mat-card>
     </div>
+
+
 
     <div *ngIf="cancel" style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
       <button type="button" class="btn btn-primary" (click)="cancelar()">Cancelar</button>

@@ -7,6 +7,10 @@ import { MytoastrService } from 'src/app/services/mytoastr';
 import { PersonService } from 'src/app/services/person.service';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { ChangeDetectorRef } from '@angular/core';
+//
+import * as XLSX from 'xlsx';
+//
 
 @Component({
   selector: 'uni-assign',
@@ -62,6 +66,15 @@ export class AssignComponent implements OnInit {
   public dataServicesEntity: any;
   public allItems: any;
 
+  // propiedades para la carga de un archivo excel
+  public showExcelUpload: boolean = false;
+  public selectedFile: File | null = null;
+  public excelData: any[] = [];
+  public isProcessingExcel: boolean = false;
+  public requiredIdClient: string = '';
+  public showIdClientDialog: boolean = false;
+  //------------------
+
   constructor(
     private serviceServ: ServicesService,
     private masterService: MasterService,
@@ -69,7 +82,8 @@ export class AssignComponent implements OnInit {
     private fb: FormBuilder,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
-    private cookies: CookieService
+    private cookies: CookieService,
+    private cdRef: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -109,6 +123,16 @@ export class AssignComponent implements OnInit {
     );
   }
 
+  initExcelUploadState() {
+    console.log("####initExcelUploadState####");
+    this.showIdClientDialog = false;
+    this.showExcelUpload = false;
+    this.selectedFile = null;
+    this.excelData = [];
+    this.requiredIdClient = '';
+    this.isProcessingExcel = false;
+    this.data = [];
+  }
 
 
   initialForm() {
@@ -393,7 +417,7 @@ export class AssignComponent implements OnInit {
 
 
   // De una persona a varios servicios
-  registerServiceAssign(){
+  registerServiceAssign() {
     // Comprobar si existe un servicio seleccionado
     if (!this.dataService) {
       this.mytoastr.showWarning('Error', 'Debe seleccionar un servicio válido primero');
@@ -406,27 +430,27 @@ export class AssignComponent implements OnInit {
       return;
     }
 
-    console.log("DATA servicio a entidades: ",this.data)
+    console.log("DATA servicio a entidades: ", this.data)
     //Limpiar cuando se cambie de tipo de comisión
-    this.dataRegister = this.data.map(value=>({
-        idProvider: '00000100',// ID ´PROVEEDOR
-        idClient: value.idPerson, //ID DE RECAUDADORA
-        idServiceProv: this.dataService.id_serviceProv, //id de convenio
-        serviceName: this.dataService.name, //nnomb de servicio
-        userRegistration: this.cookies.get('person_id') || 'desconocido',
-        idTypeService: this.dataService.serviceType.id,
-        typeService: this.dataService.serviceType.name,//master
-        business: this.dataService.business, //nombre de negocio
-        status: this.dataService.status,
-        zone: 'MULTIDEPARTAMENTAL',
-        collectorName: "",//vacio cuando son clientes // somos proveedores
-        ownFixedComission: this.fixed ?? 0, //numeber
-        ownCriterionComission: this.multiple ?? 0, //number
-        ownPCTComission: this.porcent ?? 0, //number
-        ownComissionType: this.comission,
-        indicators:this.dataService.indicators,
-        additionalPaymentFields: this.dataService['additional-payment-fields']
-      }))
+    this.dataRegister = this.data.map(value => ({
+      idProvider: '00000100',// ID ´PROVEEDOR
+      idClient: value.idPerson, //ID DE RECAUDADORA
+      idServiceProv: this.dataService.id_serviceProv, //id de convenio
+      serviceName: this.dataService.name, //nnomb de servicio
+      userRegistration: this.cookies.get('person_id') || 'desconocido',
+      idTypeService: this.dataService.serviceType.id,
+      typeService: this.dataService.serviceType.name,//master
+      business: this.dataService.business, //nombre de negocio
+      status: this.dataService.status,
+      zone: 'MULTIDEPARTAMENTAL',
+      collectorName: "",//vacio cuando son clientes // somos proveedores
+      ownFixedComission: this.fixed ?? 0, //numeber
+      ownCriterionComission: this.multiple ?? 0, //number
+      ownPCTComission: this.porcent ?? 0, //number
+      ownComissionType: this.comission,
+      indicators: this.dataService.indicators,
+      additionalPaymentFields: this.dataService['additional-payment-fields']
+    }))
 
     console.log("data de registro: ", this.dataRegister)
     this.registerServiceRequest(this.dataRegister)
@@ -479,21 +503,29 @@ export class AssignComponent implements OnInit {
     this.oneView = true;
     this.twoView = false;
     this.zeroView = false;
-    this.cancel = true
+    this.cancel = true;
+    this.showIdClientDialog = false;
+    this.showExcelUpload = false;
   }
 
   entityService() {
     this.twoView = true;
     this.oneView = false;
     this.zeroView = false;
-    this.cancel = true
+    this.cancel = true;
+    this.initExcelUploadState();
+    //this.cdRef.detectChanges();
+    // this.showIdClientDialog = false;
+    // this.showExcelUpload = false;
   }
 
   cancelar() {
     this.twoView = false;
     this.oneView = false;
     this.zeroView = true;
-    this.cancel = false
+    this.cancel = false;
+    this.showIdClientDialog = false;
+    this.showExcelUpload = false;
   }
 
   chunkArray(array: any[], size: number): any[][] {
@@ -540,6 +572,179 @@ export class AssignComponent implements OnInit {
       }
     })
   }
+
+
+  //Asiganción por archivo
+  // Método para mostrar el diálogo de ID Cliente
+  showExcelUploadDialog() {
+    console.log("Click en mostrar el cuadro de diálogo", this.showIdClientDialog);
+    this.showIdClientDialog = true;
+    this.requiredIdClient = '';
+    setTimeout(() => {
+      this.showIdClientDialog = true;
+    }, 0);
+  }
+  // Método para confirmar el ID Cliente e iniciar la carga
+  confirmIdClient() {
+    if (!this.requiredIdClient.trim()) {
+      this.mytoastr.showWarning('Error', 'Debe ingresar un ID Cliente válido');
+      return;
+    }
+    this.showIdClientDialog = false;
+    this.showExcelUpload = true;
+  }
+
+  // Método para cancelar el diálogo
+  cancelIdClientDialog() {
+    this.showIdClientDialog = false;
+    this.requiredIdClient = '';
+  }
+
+  // Método para manejar la selección de archivo
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar que sea un archivo Excel
+      const allowedTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        this.mytoastr.showWarning('Error', 'Por favor seleccione un archivo Excel válido (.xlsx o .xls)');
+        return;
+      }
+
+      this.selectedFile = file;
+    }
+  }
+
+  // Método para procesar el archivo Excel
+  async processExcelFile() {
+    if (!this.selectedFile) {
+      this.mytoastr.showWarning('Error', 'Por favor seleccione un archivo');
+      return;
+    }
+
+    this.isProcessingExcel = true;
+    this.spinner.spinnerOnOff();
+
+    try {
+      const arrayBuffer = await this.selectedFile.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer);
+
+      // Obtener la primera hoja
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Convertir a JSON
+      const excelData = XLSX.utils.sheet_to_json(worksheet);
+
+      // Procesar los datos usando la lógica del script original
+      const processedData = this.convertExcelToAssignmentFormat(excelData);
+
+      console.log("Primer objeto de asiganción construido", processedData[0]);
+
+      if (processedData.length === 0) {
+        this.mytoastr.showWarning('Error', 'No se encontraron datos válidos en el archivo');
+        return;
+      }
+
+      // Asignar los datos procesados para mostrar en la tabla
+      this.excelData = processedData;
+      this.data = this.convertDataForTable(processedData);
+
+      this.mytoastr.showSuccess('Archivo procesado correctamente', `Se cargaron ${processedData.length} registros`);
+
+    } catch (error) {
+      console.error('Error procesando archivo Excel:', error);
+      this.mytoastr.showError('Error', 'Error al procesar el archivo Excel');
+    } finally {
+      this.isProcessingExcel = false;
+      this.spinner.spinnerOnOff();
+    }
+  }
+
+  // Método para convertir datos de Excel al formato de asignación
+  convertExcelToAssignmentFormat(excelData: any[]): any[] {
+    const idProvider = "00000100"; // ID fijo del proveedor
+
+    return excelData.map(row => {
+      const jsonObj = {
+        idProvider: idProvider,
+        idClient: this.requiredIdClient, // Usar el ID Cliente ingresado
+        idService: row["CÓDIGO DE SERVICIO"] || "",
+        serviceName: row["NOMBRE DE SERVICIO"] || "",
+        idServiceProv: row["CODIGO DE SERVICIO DEL PROVEEDOR"] || "",
+        userRegistration: this.cookies.get('person_id') || 'desconocido',
+        status: row["ESTADO"] || "",
+        zone: "MULTIDEPARTAMENTAL",
+        ownFixedComission: "",
+        ownCriterionComission: "",
+        ownPCTComission: "",
+        ownComissionType: ""
+      };
+
+      const tipoComision = row["TIPO DE COMISION"] || "";
+      const valorComision = row["VALOR DE COMISION"] || "";
+
+      // Lógica de comisiones del script original
+      if (tipoComision === "Comisión fija") {
+        jsonObj.ownComissionType = "FIJO";
+        jsonObj.ownFixedComission = valorComision;
+      } else if (tipoComision === "Comsión porcentual sobre el monto" ||
+        tipoComision === "Comisión porcentual sobre el monto") {
+        jsonObj.ownComissionType = "PORCENTUAL";
+        jsonObj.ownPCTComission = valorComision;
+      } else if (tipoComision === "Comisión Múltiple") {
+        jsonObj.ownComissionType = "MULTIPLE";
+      }
+
+      return jsonObj;
+    });
+  }
+
+  // Método para convertir datos para mostrar en la tabla dinámica
+  convertDataForTable(data: any[]): any[] {
+    return data.map(item => ({
+      idService: item.idService,
+      serviceName: item.serviceName,
+      idServiceProv: item.idServiceProv,
+      status: item.status,
+      ownComissionType: item.ownComissionType,
+      ownFixedComission: item.ownFixedComission,
+      ownPCTComission: item.ownPCTComission,
+      zone: item.zone
+    }));
+  }
+
+  // Método para confirmar y enviar las asignaciones desde Excel
+  confirmExcelAssignments() {
+    if (this.excelData.length === 0) {
+      this.mytoastr.showWarning('Error', 'No hay datos para procesar');
+      return;
+    }
+
+    // Usar el método existente para registrar las asignaciones
+    this.registerServiceRequest(this.excelData);
+  }
+
+  // Método para cancelar la carga de Excel
+  cancelExcelUpload() {
+    this.showExcelUpload = false;
+    this.selectedFile = null;
+    this.excelData = [];
+    this.data = [];
+  }
+
+  // Método para limpiar los datos de Excel
+  clearExcelData() {
+    this.excelData = [];
+    this.data = [];
+    this.selectedFile = null;
+  }
+
+  //#########################################
 
   get service() {
     return this.formAssign.get('service')

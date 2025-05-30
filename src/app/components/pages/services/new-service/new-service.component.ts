@@ -409,6 +409,7 @@ export class NewServiceComponent implements OnInit {
       // Se reconstruye el formulario eliminando todos los controles excepto el tipo
       if (this.comissionForm.get('comission_fixed')) {
         this.comissionForm.removeControl('comission_fixed');
+
       }
       if (this.comissionForm.get('comission_criterion')) {
         this.comissionForm.removeControl('comission_criterion');
