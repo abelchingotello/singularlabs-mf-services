@@ -11,8 +11,6 @@
     "build-desa:single-spa:singularlabs-mf-services": "ng build singularlabs-mf-services --configuration desarrollo",
     "serve:single-spa:singularlabs-mf-services": "ng s --project singularlabs-mf-services --disable-host-check --port 4216 --live-reload false"
   },
-
-  
   "private": true,
   "dependencies": {
     "@angular/animations": "^14.2.0",
@@ -46,6 +44,7 @@
     "@angular/compiler-cli": "^14.2.0",
     "@types/jasmine": "~4.0.0",
     "@types/node": "^16.18.108",
+    "@types/xlsx": "^0.0.36",
     "jasmine-core": "~4.3.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.1.0",
