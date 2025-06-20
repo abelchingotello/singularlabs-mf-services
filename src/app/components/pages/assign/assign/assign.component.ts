@@ -242,6 +242,11 @@ export class AssignComponent implements OnInit {
     }
   }
 
+  selectClient(event) {
+    console.log("evento ttiy: ", event.value)
+    this.requiredIdClient = event.value;
+  }
+
   selectedPerson
   selectAsignService(event) {
     this.selectedPerson = event.value
@@ -557,6 +562,11 @@ export class AssignComponent implements OnInit {
           this.mytoastr.showWarning('Error : Algunos servicios ya fueron asignados', '')
           return
         }
+        if (response.statusCode == 400) {
+          // this.spinner.spinnerOnOff();
+          this.mytoastr.showWarning('No se registro ningun item', '')
+          return
+        }
         if (response.statusCode == 200) {
           this.mytoastr.showSuccess('Servicio asignado con éxito', '')
         }
@@ -676,6 +686,7 @@ export class AssignComponent implements OnInit {
         idService: row["CÓDIGO DE SERVICIO"] || "",
         serviceName: row["NOMBRE DE SERVICIO"] || "",
         idServiceProv: row["CODIGO DE SERVICIO DEL PROVEEDOR"] || "",
+        codProveedor: row["CODIGO DEL PROVEEDOR"] || "",
         userRegistration: this.cookies.get('person_id') || 'desconocido',
         status: row["ESTADO"] || "",
         zone: "MULTIDEPARTAMENTAL",
@@ -710,6 +721,7 @@ export class AssignComponent implements OnInit {
       idService: item.idService,
       serviceName: item.serviceName,
       idServiceProv: item.idServiceProv,
+      codProveedor: item.codProveedor,
       status: item.status,
       ownComissionType: item.ownComissionType,
       ownFixedComission: item.ownFixedComission,
