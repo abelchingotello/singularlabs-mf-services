@@ -9,17 +9,19 @@
         <mat-card class="service-card">
           <div class="card-content-wrapper">
             <div class="icon-container">
-              <mat-icon>business</mat-icon>
+              <mat-icon>shop</mat-icon>
+              <mat-icon>arrow_forward</mat-icon>
+              <mat-icon>people</mat-icon>
             </div>
             <mat-card-content>
               <h2 class="card-title">Servicio a entidades</h2>
               <!-- <p class="card-description">Gestione los servicios que ofrece a sus entidades asociadas</p> -->
             </mat-card-content>
           </div>
-          <mat-card-actions align="end">
+          <mat-card-actions align="end" class="button-asign">
             <button mat-raised-button color="primary" (click)="serviceEntity()">
               <span>Ingresar</span>
-              <mat-icon>arrow_forward</mat-icon>
+              <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
           </mat-card-actions>
         </mat-card>
@@ -27,17 +29,19 @@
         <mat-card class="service-card">
           <div class="card-content-wrapper">
             <div class="icon-container">
-              <mat-icon>settings</mat-icon>
+              <mat-icon>shop_two</mat-icon>
+              <mat-icon>arrow_forward</mat-icon>
+              <mat-icon>person</mat-icon>
             </div>
             <mat-card-content>
               <h2 class="card-title">Servicios a entidad</h2>
               <!-- <p class="card-description">Administre los servicios proporcionados por las entidades</p> -->
             </mat-card-content>
           </div>
-          <mat-card-actions align="end">
+          <mat-card-actions align="end" class="button-asign">
             <button mat-raised-button color="primary" (click)="entityService()">
               <span>Ingresar</span>
-              <mat-icon>arrow_forward</mat-icon>
+              <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
           </mat-card-actions>
         </mat-card>
@@ -55,10 +59,32 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Servicio</mat-label>
-                <mat-select (selectionChange)="selectedService($event)" formControlName="service">
-                  <!-- <mat-option [value]="">NINGUNO</mat-option> -->
-                  <mat-option *ngFor="let service of serviceName" [value]="service">{{ service.name
-                    }}</mat-option>
+                <mat-select 
+                  (selectionChange)="selectedService($event)" 
+                  formControlName="service"
+                  disableOptionCentering
+                  panelClass="custom-select-panel"
+                >
+                  <!-- Buscador dentro de un mat-option que NO se selecciona -->
+                  <mat-option disabled class="search-option">
+                    <input
+                      matInput
+                      placeholder="Buscar servicio..."
+                      [(ngModel)]="serviceFilter"
+                      [ngModelOptions]="{standalone: true}"
+                      (ngModelChange)="filterServices()"
+                      (click)="$event.stopPropagation()"
+                      (keydown.space)="$event.stopPropagation()"
+                      (keydown.enter)="$event.stopPropagation()"
+                      autocomplete="off"
+                    />
+                  </mat-option>
+
+                  <!-- Opciones filtradas -->
+                  <mat-option *ngFor="let service of filteredServices" [value]="service">
+                    {{ service.name }}
+                  </mat-option>
+
                 </mat-select>
               </mat-form-field>
 
@@ -173,7 +199,7 @@
           </mat-card-content>
 
           <mat-card-actions>
-            <button mat-raised-button color="accent" (click)="confirmIdClient()" [disabled]="requiredIdClient==''">
+            <button mat-raised-button color="accent" (click)="confirmIdClient()" [disabled]="requiredIdClient=='' ">
               <mat-icon>upload_file</mat-icon>
               Cargar desde Excel
             </button>
@@ -191,7 +217,7 @@
               Cargar Archivo Excel
             </mat-card-title>
           </mat-card-header>
-          <mat-card-content>
+          <mat-card-content class="upload-content">
             <div class="file-upload-section">
               <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx,.xls"
                 style="display: none;">

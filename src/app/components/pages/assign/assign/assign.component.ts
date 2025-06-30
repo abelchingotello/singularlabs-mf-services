@@ -50,6 +50,8 @@ export class AssignComponent implements OnInit {
 
   public data: any;
   public serviceName: any;
+  public filteredServices: any[] = []; // Lista filtrada que se mostrará
+  public serviceFilter: string = '';
   public typeComission: any;
   public persons: any;
   public category: any;
@@ -181,6 +183,7 @@ export class AssignComponent implements OnInit {
   //     },
   //   });
   // }
+  
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
@@ -195,6 +198,7 @@ export class AssignComponent implements OnInit {
         this.persons = person.data;
         console.log("SERVICIOS: ", this.persons)
 
+        this.filteredServices = this.serviceName;
         // this.spinner.spinnerOnOff();
       },
       error: (error) => {
@@ -367,6 +371,13 @@ export class AssignComponent implements OnInit {
     // Usar directamente el servicio seleccionado sin hacer llamada HTTP
     this.dataService = event.value;
     console.log("DATASERVICIO: ", this.dataService);
+  }
+
+  filterServices() {
+    const value = this.serviceFilter?.toLowerCase() || '';
+    this.filteredServices = this.serviceName.filter(service =>
+      service.name.toLowerCase().includes(value)
+    );
   }
 
   //Desabilitado para pruebas

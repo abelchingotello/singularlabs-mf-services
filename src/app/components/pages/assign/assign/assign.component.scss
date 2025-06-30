@@ -43,9 +43,9 @@
 .icon-container {
   background-color: #3f51b5;
   color: white;
-  width: 60px;
+  width: 125px;
   height: 60px;
-  border-radius: 50%;
+  border-radius: 5%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -55,6 +55,8 @@
     font-size: 30px;
     width: 30px;
     height: 30px;
+    margin-right: 5px;
+    margin-left: 5px;
   }
 }
 
@@ -126,7 +128,11 @@
 .excel-upload-container {
   margin-bottom: 20px;
   animation: fadeIn 0.3s ease-out;
-
+  mat-card-header mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  }
   mat-card {
     margin-bottom: 16px;
   }
@@ -365,10 +371,30 @@ mat-card-actions {
   }
 }
 
+.upload-content{
+  padding: 0px 36px !important;
+}
+
+::ng-deep .search-option {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+  border-bottom: 1px solid #ccc;
+}
+
+::ng-deep .custom-select-panel .mat-option-text {
+  white-space: normal;
+}
+
+.button-asign {
+    margin-right: 10px !important;
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .service-card {
-    width: 100%;
+    width: 100% ;
   }
 
   .dialog-card {

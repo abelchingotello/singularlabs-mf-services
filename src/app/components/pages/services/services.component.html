@@ -4,10 +4,14 @@
         externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
     
         <div class="align-content-center">
-            <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="addService()">
+            <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark me-2" (click)="addService()">
               <mat-icon>add</mat-icon>
               <span class="custom-span-icon-responsive">Añadir</span>
-              
+            </button>
+
+            <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="updateService()">
+              <mat-icon>upload_file</mat-icon>
+              <span class="custom-span-icon-responsive">Importar</span>
             </button>
           </div>
     </uni-image-card>
@@ -83,7 +87,7 @@
   
               <div class="d-flex">
                 <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()"  >
-                  <mat-icon matTooltip="Editar">assignment_ind</mat-icon>
+                  <mat-icon matTooltip="Asignar">assignment_ind</mat-icon>
                 </button>
                 <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
                   <mat-label>Actualizar</mat-label>

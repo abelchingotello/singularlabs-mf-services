@@ -110,6 +110,10 @@ export class ServicesComponent implements OnInit {
     this.router.navigate(['service/add'])
   }
 
+  updateService(){
+    this.router.navigate(['service/import'])
+  }
+
   searchData(){
     if(this.service_name.value == '' || this.service_name.value == undefined){
       this.mytoastr.showWarning('Ingrese un valor válido','')

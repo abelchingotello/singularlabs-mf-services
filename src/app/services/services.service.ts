@@ -22,7 +22,11 @@ export class ServicesService {
   }
 
   registerServiceAssign(data:any):Observable<any>{
-    return this.httpClient.post<any>(`${this.url}/services/register/assign`,data);
+    return this.httpClient.post<any>(`${this.url}/services/assign`,data);
+  }
+
+  registerServiceImport(data:any):Observable<any>{
+    return this.httpClient.post<any>(`${this.url}/services/register/massive`,data);
   }
 
   // getServices(name:string): Observable<any>{
