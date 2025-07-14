@@ -93,10 +93,11 @@ export class AssignComponent implements OnInit {
     this.initialForm();
     // setTimeout(() => {
     this.loadAllServices().subscribe(allItems => {
-      console.log("allItems: ", allItems)
+      //console.log("allItems: ", allItems)
       // Filtrar solo los servicios habilitados
       this.allItems = allItems.filter(service => service.status === "HABILITADO");
-      console.log("Servicios habilitados: ", this.allItems);
+      this.filteredServices = this.allItems;
+      //console.log("Servicios habilitados: ", this.allItems);
     });
 
     //Desabilitado por pruebas
@@ -187,18 +188,18 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.serviceServ.getServices(),
+      //this.serviceServ.getServices(),
       this.masterService.getItemsMasterTable('15'), // tipoComission
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
     ]).subscribe({
       next: (response) => {
-        const [service, typeComission, person] = response;
-        this.serviceName = service.data?.Items;
+        const [typeComission, person] = response;
+        //this.serviceName = service.data?.Items;
         this.typeComission = typeComission;
         this.persons = person.data;
         console.log("SERVICIOS: ", this.persons)
 
-        this.filteredServices = this.serviceName;
+        //this.filteredServices = this.serviceName;
         // this.spinner.spinnerOnOff();
       },
       error: (error) => {
@@ -375,7 +376,7 @@ export class AssignComponent implements OnInit {
 
   filterServices() {
     const value = this.serviceFilter?.toLowerCase() || '';
-    this.filteredServices = this.serviceName.filter(service =>
+    this.filteredServices = this.allItems.filter(service =>
       service.name.toLowerCase().includes(value)
     );
   }
