@@ -41,7 +41,7 @@ export class ServicesComponent implements OnInit {
   public pageKey: any[];
   public close: boolean = false;
   public serviceForm!: FormGroup;
-  public dataFilter: any;
+  public dataFilter: any = [];
   public dataService: any[];
   public functionDataCurrent: (pageSize: any) => any;
   public disabledEditOption: any
@@ -54,7 +54,7 @@ export class ServicesComponent implements OnInit {
   public optionId: any
   private pagUtils: PaginationUtils | undefined;
   public page: number = -1; // Variable para la página actual
-  public count: number = 50; // Variable para el total de elementos
+  public count: number = null; // Variable para el total de elementos
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
@@ -68,7 +68,7 @@ export class ServicesComponent implements OnInit {
     private person: PersonService,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService
-  ) { 
+  ) {
     this.pagUtils = new PaginationUtils();
   }
 
@@ -91,20 +91,22 @@ export class ServicesComponent implements OnInit {
   dataInitial(pageSize: any) {
     const input = this.service_name.value.toUpperCase();
     const inputStatus = this.status.value.toUpperCase();
-
-    // console.log("busqueda_ 0",input)
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, inputStatus, pageSize, this.pageKey).subscribe({
+    this.services.getServices(input, inputStatus, this.count, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
-        this.dataFilter = data;
+        this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
+        // this.dataFilter = data;
+        this.dataService = this.dataFilter.map(item => ({
+          ...item,
+          serviceTypeName: item.serviceType?.name || ''
+        }));
         this.pageKey = data.data.nextPageKey ?? null;
-        this.data();
-        console.log(data);
+        this.count = data.data.Count ?? 0;
       },
       error: (err) => {
         console.log(err);
@@ -115,7 +117,6 @@ export class ServicesComponent implements OnInit {
         this.close = true
       }
     })
-    // console.log("BUSCANDO....")
   }
 
 
@@ -135,6 +136,7 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData() {
+    this.count = null;
     if (this.service_name.value == '' || this.service_name.value == undefined) {
       this.mytoastr.showWarning('Ingrese un valor válido', '')
       return
@@ -146,7 +148,6 @@ export class ServicesComponent implements OnInit {
     this.service_name.setValue('')
     this.close = false;
     this.clearData();
-    // console.log("BORRANDO....")
   }
 
   selectOption(event) {
@@ -162,21 +163,17 @@ export class ServicesComponent implements OnInit {
   }
 
   handleSelectedIds(selectedIds: any[]) {
-    // console.log("Id's: ", selectedIds)
     this.disabledEditOption = selectedIds.length !== 1;
     this.editOption = selectedIds.length == 1;
-    console.log("DESAHIBILITR: ", this.disabledEditOption)
     this.selectedIds = selectedIds;
     if (this.selectedIds.length === 1) {
 
       this.getIdService(selectedIds)
 
     }
-    console.log("Id--s: ", selectedIds)
   }
 
   selectedHandle(event) {
-    console.log("SELECTED: ", event[0])
     if (this.selectedIds.length === 1) {
       this.spinner.spinnerOnOff();
       let completedRequests = 0; // Contador para peticiones completadas
@@ -197,32 +194,11 @@ export class ServicesComponent implements OnInit {
     this.master.getItemsMasterTable(1).subscribe({
       next: (data) => {
         this.stateMaster = data;
-        console.log("DATAMASTER", data)
       },
       error: (error) => {
         console.error('Error:', error);
       },
     });
-
-    // this.master.getItemsMasterTable(1).subscribe({
-    //   next: (data) => {
-    //     this.stateMaster = data;
-    //     console.log("DATAMASTER", data)
-    //   },
-    //   error: (error) => {
-    //     console.error('Error:', error);
-    //   },
-    // });
-
-
-  }
-
-
-  data() {
-    this.dataService = this.dataFilter.data.Items.map(item => ({
-      ...item,
-      serviceTypeName: item.serviceType?.name || ''
-    }));
   }
 
   getIdService(idService) {
@@ -256,8 +232,6 @@ export class ServicesComponent implements OnInit {
         // this.spinner.spinnerOnOff();
         if (idClient) this.idClient = response.data[0];
         if (idProvider) this.idProvider = response.data[0];
-        console.log("idClient: ", this.idClient)
-        console.log("idProvider: ", this.idProvider)
       },
       error: (error) => {
         console.error(error);
@@ -285,7 +259,6 @@ export class ServicesComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.reload();
-      console.log('The dialog was closed', result);
       this.searchData();
     });
   }
@@ -296,12 +269,9 @@ export class ServicesComponent implements OnInit {
 
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
-    console.log("keyyyyyy", this.pageKey)
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
-    console.log('pageSize', this.pageSize)
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
-    console.log('Página cambiada', event);
-}
+  }
 
 
   /******************************************** METODOS GET ****************************************/

@@ -35,7 +35,7 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string, limit?: any, pageKey?: any[]): Observable<any> {
+  getServices(name: string, status: string,count:number, limit?: any, pageKey?: any[]): Observable<any> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
@@ -50,6 +50,9 @@ export class ServicesService {
 
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
+    }
+    if (count != null) {
+      params = params.set('count', count);
     }
     return this.httpClient.get<any>(`${this.url}/services`, { params: params });
   }
