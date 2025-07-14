@@ -90,7 +90,8 @@ export class ServicesComponent implements OnInit {
 
   dataInitial(pageSize: any) {
     const input = this.service_name.value.toUpperCase();
-    const inputStatus = this.status.value.toUpperCase();
+    const inputStatus = this.status.value?.master_name?.toUpperCase();
+    
     this.spinner.spinnerOnOff();
     // return
     this.services.getServices(input, inputStatus, this.count, pageSize, this.pageKey).subscribe({
@@ -136,8 +137,9 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData() {
+    console.log('searchData', this.service_name.value, this.status.value);
     this.count = null;
-    if (this.service_name.value == '' || this.service_name.value == undefined) {
+    if (this.service_name.value == '' || this.service_name.value == undefined || !this.status.value) {
       this.mytoastr.showWarning('Ingrese un valor válido', '')
       return
     }
