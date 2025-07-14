@@ -68,7 +68,9 @@ export class ServicesComponent implements OnInit {
     private person: PersonService,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService
-  ) { }
+  ) { 
+    this.pagUtils = new PaginationUtils();
+  }
 
   ngOnInit(): void {
     this.formService();
@@ -294,17 +296,11 @@ export class ServicesComponent implements OnInit {
 
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
-    // Actualiza el tamaño de la página y el pageKey
+    console.log("keyyyyyy", this.pageKey)
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
-    console.log('pageKey antes de cambio: ', this.pageKey);  // Verifica el valor actual de pageKey
-
-    // Actualiza el pageKey correctamente
-    //this.pageKey = event.pageIndex;  // Asigna el pageKey correctamente
-
-    // Asegúrate de que esta función esté llamando a dataInitial con el pageKey actualizado
+    console.log('pageSize', this.pageSize)
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
-
-    console.log('pageKey después de cambio: ', this.pageKey);  // Verifica que el pageKey se haya actualizado correctamente
+    console.log('Página cambiada', event);
 }
 
 
