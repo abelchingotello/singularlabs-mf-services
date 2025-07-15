@@ -23,8 +23,8 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Nombre', 'attribute': 'name' },
     { 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
-    { 'name': 'Proveedor', 'attribute': 'idProvider' },
-    { 'name': 'Cliente', 'attribute': 'idClient' },
+    { 'name': 'Proveedor', 'attribute': 'nameProvider' },
+    { 'name': 'Cliente', 'attribute': 'nameClient' },
     {
       'name': 'Estado', 'attribute': 'status', 'config': {
         'styleClass': true
