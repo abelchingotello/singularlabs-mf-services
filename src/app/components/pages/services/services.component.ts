@@ -106,6 +106,7 @@ export class ServicesComponent implements OnInit {
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
+        console.log('dataService', this.dataService);
         this.pageKey = data.data.nextPageKey ?? null;
         this.count = data.data.Count ?? 0;
       },
