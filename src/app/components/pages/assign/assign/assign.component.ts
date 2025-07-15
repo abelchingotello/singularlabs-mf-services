@@ -52,8 +52,8 @@ export class AssignComponent implements OnInit {
   public serviceName: any;
   public filteredServices: any[] = []; // Lista filtrada que se mostrará
   public serviceFilter: string = '';
-  public typeComission: any;
-  public persons: any;
+  public typeComission: any[] = [];
+  public persons: any[] = [];
   public category: any;
   public disableEntities = false;
   public disableAll = false;
@@ -188,7 +188,7 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.serviceServ.getServices(null,null,0),
+      //this.serviceServ.getServices(null,null,0),
       this.masterService.getItemsMasterTable('15'), // tipoComission
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
     ]).subscribe({
