@@ -177,7 +177,8 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  selectedHandle(event) {
+  selectedHandle(event:any) {
+    console.log('event',event);
     if (this.selectedIds.length === 1) {
       this.spinner.spinnerOnOff();
       let completedRequests = 0; // Contador para peticiones completadas
@@ -235,6 +236,7 @@ export class ServicesComponent implements OnInit {
     const id = idClient || idProvider
     this.person.postIdPerson(id).subscribe({
       next: (response) => {
+        
         // this.spinner.spinnerOnOff();
         if (idClient) this.idClient = response.data[0];
         if (idProvider) this.idProvider = response.data[0];
