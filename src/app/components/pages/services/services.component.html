@@ -43,41 +43,50 @@
       </mat-card> -->
 
 
-    <mat-card class="search-card shadow-sm">
-      <form [formGroup]="serviceForm">
-        <mat-card-content>
-          <div class="search-container p-4">
-            <div class="row align-items-center">
-              <div class="col-md-5 mb-3 mb-md-0">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Buscar</mat-label>
-                  <input matInput placeholder="Por nombre" formControlName="service_name">
-                  <button *ngIf="serviceForm.get('service_name').value" mat-icon-button matSuffix
-                    (click)="cleanSearch()" aria-label="Limpiar búsqueda">
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </mat-form-field>
-              </div>
-              <div class="col-md-4 mb-3 mb-md-0">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Estado</mat-label>
-                  <mat-select formControlName="status">
-                    <mat-option *ngFor="let status of stateMaster" [value]="status">
-                      {{status.master_name}}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="col-md-3 d-flex align-items-center">
-                <button class="btn btn-primary px-4 d-flex align-items-center" (click)="searchData()">
-                  <mat-icon class="me-2">search</mat-icon>
-                  <span>Buscar</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-      </form>
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 style="margin-top: 23px; margin-left: 20px;"> Datos de Búsqueda </h2>
+        <form [formGroup]="serviceForm" class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3">
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="service_name">
+          </mat-form-field>
+
+
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Tipo de servicio</mat-label>
+            <input matInput formControlName="service_type">
+          </mat-form-field>
+
+
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of stateMaster" [value]="status">
+                {{status.master_name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+      </mat-card-content>
+
+      <div style="display: flex;
+                        padding-right: 15px;
+                        flex-direction: row;
+                        justify-content: flex-end;
+                        margin-bottom: 10px;">
+
+        <button type="button" class="btn-primary btn" (click)="clearFormAndData()">
+          Limpiar
+        </button>
+        <button type="button" class="btn-primary btn" (click)="searchData()">
+          Buscar
+        </button>
+      </div>
     </mat-card>
 
     <mat-card class="custom-border-radius-1-25">

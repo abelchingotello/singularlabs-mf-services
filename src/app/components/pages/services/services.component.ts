@@ -89,12 +89,13 @@ export class ServicesComponent implements OnInit {
   }
 
   dataInitial(pageSize: any) {
-    const input = this.service_name.value.toUpperCase();
+    const input = this.service_name.value?.toUpperCase();
+    const inputType = this.service_type.value?.toUpperCase();
     const inputStatus = this.status.value?.master_name?.toUpperCase();
 
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, inputStatus, this.count, pageSize, this.pageKey).subscribe({
+    this.services.getServices(input, inputStatus,inputType, this.count, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
@@ -125,6 +126,7 @@ export class ServicesComponent implements OnInit {
   formService() {
     this.serviceForm = this.fb.group({
       service_name: [''],
+      service_type: [''],
       status: ['']
     })
   }
@@ -138,8 +140,7 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData() {
-    console.log('searchData', this.service_name.value, this.status.value);
-    if (this.service_name.value == '' || this.service_name.value == undefined || !this.status.value) {
+    if (!this.service_name.value && !this.status.value && !this.service_type.value) {
       this.mytoastr.showWarning('Ingrese un valor válido', '')
       return
     }
@@ -176,7 +177,8 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  selectedHandle(event) {
+  selectedHandle(event:any) {
+    console.log('event',event);
     if (this.selectedIds.length === 1) {
       this.spinner.spinnerOnOff();
       let completedRequests = 0; // Contador para peticiones completadas
@@ -234,6 +236,7 @@ export class ServicesComponent implements OnInit {
     const id = idClient || idProvider
     this.person.postIdPerson(id).subscribe({
       next: (response) => {
+        
         // this.spinner.spinnerOnOff();
         if (idClient) this.idClient = response.data[0];
         if (idProvider) this.idProvider = response.data[0];
@@ -272,6 +275,14 @@ export class ServicesComponent implements OnInit {
     this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
 
+  /************************************* METODOS DE BOTONES ***********************************/
+  clearFormAndData() {
+    this.clearData();
+    this.serviceForm.reset();
+    this.dataInitial(this.pageSize);
+  }
+
+
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
@@ -283,6 +294,10 @@ export class ServicesComponent implements OnInit {
 
   get service_name() {
     return this.serviceForm.get('service_name')
+  }
+
+   get service_type() {
+    return this.serviceForm.get('service_type')
   }
 
   get status() {
