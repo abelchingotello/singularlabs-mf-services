@@ -447,25 +447,25 @@ export class NewServiceComponent implements OnInit {
         this.spinner.spinnerOnOff();
         this.service.getIdServices(idService).subscribe({
             next:(response)=>{
-                this.service_name.setValue(response.data[0].name)
+                this.service_name.setValue(response.data.name)
                 this.service_name.disable();
                 this.service_type.setValue(
-                    this.typeService.find(type => type.master_name === response.data[0].serviceType.name)
+                    this.typeService.find(type => type.master_name === response.data.serviceType.name)
                 );
                 console.log("typeService: ",this.service_type.value)
                 this.typeService.some((value)=>{
-                    value.master_name === response.data[0].serviceType.name
+                    value.master_name === response.data.serviceType.name
                 })
 
                 console.log("service_type: ",this.service_type.value)
                 this.service_type.disable();
-                this.service_type_business.setValue(response.data[0].business)
+                this.service_type_business.setValue(response.data.business)
                 this.service_type_business.disable();
                 this.service_state.setValue(
-                    this.typeStatus.find(status => status.master_name === response.data[0].status)
+                    this.typeStatus.find(status => status.master_name === response.data.status)
                 );
-                this.dataPayment = response.data[0]["additional-payment-fields"]
-                this.indicatrs = response.data[0].indicators
+                this.dataPayment = response.data["additional-payment-fields"]
+                this.indicatrs = response.data.indicators
 
                 console.log("INDICADORES: ",this.indicatrs)
             },

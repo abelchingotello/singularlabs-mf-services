@@ -207,6 +207,7 @@ export class ServicesComponent implements OnInit {
   }
 
   getIdService(idService) {
+    console.log('idService', idService);
     this.service.getIdServices(idService).subscribe({
       next: (response) => {
         this.dataIdService = response
@@ -222,7 +223,6 @@ export class ServicesComponent implements OnInit {
     this.pageKey = undefined;
     this.dataService = [];
     this.dataFilter = [];
-    // this.reload();
   }
 
   reload() {
@@ -266,8 +266,9 @@ export class ServicesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.reload();
-      this.searchData();
+      this.clearData();
+      this.reload();//Aqui ya se vuelve a llamar a data initial
+      // this.dataInitial(this.pageSize);
     });
   }
 
