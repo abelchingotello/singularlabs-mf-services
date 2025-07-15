@@ -188,7 +188,7 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.serviceServ.getServices(null,null,0),
+      // this.serviceServ.getServices(null,null,0),
       this.masterService.getItemsMasterTable('15'), // tipoComission
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
     ]).subscribe({

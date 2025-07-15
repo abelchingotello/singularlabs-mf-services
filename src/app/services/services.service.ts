@@ -35,13 +35,16 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string,count:number, limit?: any, pageKey?: any[]): Observable<any> {
+  getServices(name: string, status: string,type:string, count:number, limit?: any, pageKey?: any[]): Observable<any> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
     }
     if (status) {
       params = params.set('status', status);
+    }
+    if (type) {
+      params = params.set('type', type);
     }
 
     if (limit !== undefined) {
