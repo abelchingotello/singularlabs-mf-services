@@ -106,10 +106,10 @@ export class AssignComponent implements OnInit {
   //Si funciona, pedir que se suban los 2000 y hacer las mismas pruebas, pero con los 2000
   //No olvidar validar que existan los servicios
   loadAllServices() {  //revisar para que traiga los 2000
-    return this.serviceServ.getServicesPageKey().pipe(
+    return this.serviceServ.getServicesPageKey(200).pipe(
       expand(response =>
         response?.data?.nextPageKey
-          ? this.serviceServ.getServicesPageKey(response.data.nextPageKey)
+          ? this.serviceServ.getServicesPageKey(200,response.data.nextPageKey)
           : of(null) // Detiene la recursión si no hay más páginas
       ),
       filter(response => response !== null),

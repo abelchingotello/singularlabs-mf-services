@@ -60,8 +60,11 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services`, { params: params });
   }
 
-  getServicesPageKey(pageKey?: any[]): Observable<any> {
-    let params = new HttpParams()
+  getServicesPageKey(limit?:number,pageKey?: any[]): Observable<any> {
+    let params = new HttpParams();
+    if (limit !== undefined) {
+      params = params.set('limit', limit);
+    }
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
