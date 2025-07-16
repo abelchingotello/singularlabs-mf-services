@@ -49,6 +49,7 @@ export class NewServiceComponent implements OnInit {
     public ownCommissionForm!: FormGroup;
     public paymentFieldsForm!: FormGroup;
     public idService: string;
+    public idProviderService: string = '';// ID del proveedor del servicio en si, no de la asignación
     public typeService:any ;
     public typeClient:any ;
     public depart :any;
@@ -98,7 +99,6 @@ export class NewServiceComponent implements OnInit {
 
     ngOnInit(): void {
         this.userName= this.authService.getUser();
-        console.log("userid: ",this.userName.Username)
         this.idService = this.activeRouter.snapshot.params['id'];
         this.initializeFormGroup();
         this.listData();
@@ -144,7 +144,6 @@ export class NewServiceComponent implements OnInit {
             },
             error: (error) => {
                 this.mytoastr.showError('Error al obtener datos de Recaudadora','')
-                console.error('ERROR',error)
             }
         })
         this.service.getPerson('PROVEEDOR',null).subscribe({
@@ -154,7 +153,6 @@ export class NewServiceComponent implements OnInit {
             },
             error: (error) => {
                 this.mytoastr.showError('Error al obtener datos de proveedor','')
-                console.error('ERROR',error)
             },
         })
     }
@@ -174,8 +172,6 @@ export class NewServiceComponent implements OnInit {
                 this.typeClient = typeClient.sort((a, b) => a.master_order - b.master_order);
                 this.typeStatus = typeStatus.sort((a, b) => a.master_order - b.master_order);
                 this.typeComission = typeComission.sort((a, b) => a.master_order - b.master_order);
-                console.log("TIPO SERIVICIO:",this.typeService)
-                console.log("DEPART: ", this.depart)
                 if (!this.idService) {
                     this.service_zone.setValue(
                         this.depart.find(zone => zone.master_department === 'MULTIDEPARTAMENTAL')
@@ -238,11 +234,6 @@ export class NewServiceComponent implements OnInit {
 
     saveService() {
         if (!this.idService) {
-
-            console.log("FORMULARIOSERVICIO : ",this.serviceForm.value)
-            console.log("FORMULARIOCOMISSION : ",this.comissionForm.value)
-            console.log("FORMULARIO-OWM : ",this.ownCommissionForm.value)
-            console.log("FORMULARIO-PAYMENTS : ",this.paymentFieldsForm.value)
             const dataServiceForm = this.serviceForm.value
             // return
             const data = {
@@ -268,13 +259,7 @@ export class NewServiceComponent implements OnInit {
                 indicators: this.indicatrs,
                 additionalPaymentFields: this.dataPayment
             }
-            console.log("DATA para registro : ",data)
-            // console.log("DATA DE PAGOS : ",this.dataPayment)
-            // return
             this.updateAddService(data,'Guardado correctamente');
-
-
-            // this.router.navigate(['/service'])
         } else {
             this.updateService();
         }
@@ -284,7 +269,6 @@ export class NewServiceComponent implements OnInit {
         this.spinner.spinnerOnOff();
         this.service.registerService(data).subscribe({
             next: (response: any) => {
-                console.log("RESPUESTA: ", response)
                 if (response.statusCode !== 200) {
                     this.mytoastr.showSuccess(response.messages, '')
                     return
@@ -302,9 +286,10 @@ export class NewServiceComponent implements OnInit {
     }
 
     updateService() {
-        console.log("NAME DEL SERVICIO: ",this.service_name.value)
         const data = {
-                idProvider: '00000100',// ID ´PROVEEDOR
+                idProvider: '00000100',// ID ´PROVEEDOR 
+                codProveedor: this.idProviderService,// Es el id del proveedor del servicio en si, no de la asignación
+                idService:this.idService,
                 idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
                 idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
                 serviceName: this.service_name.value, //nnomb de servicio
@@ -322,36 +307,10 @@ export class NewServiceComponent implements OnInit {
                 indicators:this.indicatrs,
                 additionalPaymentFields: this.dataPayment
         }
-
-        console.log("DATA PARA ACRTUALIZAR :",data)
-        // return
         this.updateAddService(data,'Asignado correctamente');
-        // this.mytoastr.showSuccess('Actualizado correctamente', '')
-        // this.router.navigate(['/service'])
     }
 
-    // selectionComission(event){
-    //     console.log("EVENTO DE SELÑECCION: ",event.value)
-    //     if(event.value.master_name == 'FIJO'){
-    //         this.ownCommissionForm.removeControl('ownCommission_percentage');
-    //         this.ownCommissionForm.removeControl('ownCommission_criterion');
-    //         this.owncomissionPercentage = false
-    //         this.owncomissionCriterio = false
-    //         this.owncomissionFixed = true
-    //     } else if(event.value.master_name == 'PORCENTUAL'){
-    //         this.ownCommissionForm.removeControl('ownCommission_fixed');
-    //         this.owncomissionFixed = false
-    //         this.owncomissionCriterio = true
-    //         this.owncomissionPercentage = true
-    //     } else if (event.value.master_name == 'MULTIPLE'){
-    //         this.owncomissionCriterio = true
-    //         this.owncomissionFixed = true
-    //         this.owncomissionPercentage = true
-    //     }
-    // }
     selectionComission(event) {
-      console.log("EVENTO DE SELECCION: ", event.value);
-
       // Se reconstruye el formulario eliminando todos los controles excepto el tipo
       if (this.ownCommissionForm.get('ownCommission_fixed')) {
         this.ownCommissionForm.removeControl('ownCommission_fixed');
@@ -384,27 +343,7 @@ export class NewServiceComponent implements OnInit {
       }
     }
 
-    // selectionComissionProv(event){
-    //     console.log("EVENTO DE SELECCION: ",event.value)
-    //     if(event.value.master_name == 'FIJO'){
-    //         this.comissionForm.removeControl('comission_percentage');
-    //         this.comissionForm.removeControl('comission_criterion');
-    //         this.comissionPercentage = false
-    //         this.comissionCriterio = false
-    //         this.comissionFixed = true
-    //     } else if(event.value.master_name == 'PORCENTUAL'){
-    //         this.comissionForm.removeControl('comission_fixed');
-    //         this.comissionFixed = false
-    //         this.comissionCriterio = true
-    //         this.comissionPercentage = true
-    //     } else if (event.value.master_name == 'MULTIPLE'){
-    //         this.comissionCriterio = true
-    //         this.comissionFixed = true
-    //         this.comissionPercentage = true
-    //     }
-    // }
     selectionComissionProv(event) {
-      console.log("EVENTO DE SELECCION: ", event.value);
 
       // Se reconstruye el formulario eliminando todos los controles excepto el tipo
       if (this.comissionForm.get('comission_fixed')) {
@@ -439,11 +378,7 @@ export class NewServiceComponent implements OnInit {
       }
     }
 
-    indicatorValue(event){
-        console.log("EVENTO SELECCIONADO : ",event.value)
-    }
-
-    getIdService(idService){
+    getIdService(idService:string){
         this.spinner.spinnerOnOff();
         this.service.getIdServices(idService).subscribe({
             next:(response)=>{
@@ -452,12 +387,9 @@ export class NewServiceComponent implements OnInit {
                 this.service_type.setValue(
                     this.typeService.find(type => type.master_name === response.data.serviceType.name)
                 );
-                console.log("typeService: ",this.service_type.value)
                 this.typeService.some((value)=>{
                     value.master_name === response.data.serviceType.name
-                })
-
-                console.log("service_type: ",this.service_type.value)
+                });
                 this.service_type.disable();
                 this.service_type_business.setValue(response.data.business)
                 this.service_type_business.disable();
@@ -466,8 +398,7 @@ export class NewServiceComponent implements OnInit {
                 );
                 this.dataPayment = response.data["additional-payment-fields"]
                 this.indicatrs = response.data.indicators
-
-                console.log("INDICADORES: ",this.indicatrs)
+                this.idProviderService = response.data.idProvider;
             },
             error(err) {
                 console.error("ERROR: ",err)
@@ -483,7 +414,6 @@ export class NewServiceComponent implements OnInit {
             this.mytoastr.showWarning('Complete el formulario','')
             return
         }
-        console.log("FORMULARIO DE PAGO : ",this.paymentFieldsForm.value)
         const data = {
             id: this.paymentFieldsForm.value.paymentFields_id,
             name: this.paymentFieldsForm.value.paymentFields_name,
@@ -499,18 +429,14 @@ export class NewServiceComponent implements OnInit {
         this.register.push(data)
         this.paymentFieldsForm.reset();
         this.dataPayment = [...this.register]
-        console.log("DATApayment: ", this.dataPayment)
     }
 
     selectIndicat(event){
         const selectedIds = event.value.map((indicator: any) => indicator.id);
-        // console.log("SELECTEDID: ",selectedIds)
         // Actualiza isActive basado en las selecciones
         this.indicatrs.forEach(indicator => {
             indicator.isActive = selectedIds.includes(indicator.id);
         });
-
-        // console.log("Indicadores actualizados:", this.indicatrs);
     }
 
     onNext(){
@@ -554,41 +480,9 @@ export class NewServiceComponent implements OnInit {
         }
 
         if(this.currentStep === this.stepsOrig.length-1 && this.dataPayment.length>0){
-            // console.log("INGRESO PARA REGISTRARSE-Add")
             this.saveService();
         }
-        console.log("currentStep: ",this.currentStep)
-
     }
-
-    // onNextAsign() {
-    //     // Validar el formulario del paso actual
-    //     if (this.currentStep === 0 && !this.serviceForm.valid) {
-    //         this.mytoastr.showWarning('Complete el formulario','')
-    //         return;
-    //     }
-
-    //     if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
-    //         this.mytoastr.showWarning('Complete el formulario Com.Client','')
-    //         return;
-    //     }
-
-    //     if (this.currentStep < this.stepsOrig.length-1) {
-    //         this.currentStep++;
-    //     }
-
-    //     // Habilitar pestañas subsiguientes
-    //     if (this.currentStep === 1) {
-    //         this.tab2 = false;
-    //     }
-
-    //     if(this.currentStep === this.stepsOrig.length-1){
-    //         // console.log("INGRESO PARA REGISTRARSE-AsIG")
-    //         this.saveService();
-    //     }
-    //     console.log("currentStep: ",this.currentStep)
-
-    // }
 
     onNextAsign() {
 
@@ -618,41 +512,12 @@ export class NewServiceComponent implements OnInit {
         // Asegurarse de que todos los formularios estén válidos antes de finalizar
         if (this.serviceForm.valid && this.ownCommissionForm.valid) {
             // Aquí va tu lógica para guardar/enviar el formulario
-            console.log('Formulario completado y válido');
             this.saveService();
         } else {
             this.mytoastr.showWarning('Complete todos los formularios antes de finalizar', '');
         }
     }
 
-    // onNextAsign() {
-    //     // Validar el formulario del paso actual
-    //     if (this.currentStep === 0 && !this.serviceForm.valid) {
-    //         this.mytoastr.showWarning('Complete el formulario','')
-    //         return;
-    //     }
-
-    //     if (this.currentStep === 1 && !this.ownCommissionForm.valid) {
-    //         this.mytoastr.showWarning('Complete el formulario Com.Client','')
-    //         return;
-    //     }
-
-    //     if (this.currentStep < this.stepsOrig.length-1) {
-    //         this.currentStep++;
-    //     }
-
-    //     // Habilitar pestañas subsiguientes
-    //     if (this.currentStep === 1) {
-    //         this.tab2 = false;
-    //     }
-
-    //     if(this.currentStep === this.stepsOrig.length-1){
-    //         // console.log("INGRESO PARA REGISTRARSE-AsIG")
-    //         // this.saveService();
-    //     }
-    //     console.log("currentStep: ",this.currentStep)
-
-    // }
 
 
     private validateCurrentStep(): boolean {
@@ -678,7 +543,6 @@ export class NewServiceComponent implements OnInit {
 
     onPrevious() {
         this.currentStep--;
-        console.log("NEGATIVO: ", this.currentStep)
         if (this.currentStep < 0) this.cancel();
     }
 
@@ -694,8 +558,6 @@ export class NewServiceComponent implements OnInit {
         const timeLocal = date
         .toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour12: false }) // Formato 24 horas
         .replace(/:/g, ""); // Quita los dos puntos
-        // console.log("TIEMPO LOCAL: ",anio)
-        // console.log("TIEMPO LOCAL: ",date)
         return `${anio}${dia}${mes}${timeLocal}`;
     }
 

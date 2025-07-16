@@ -268,7 +268,6 @@ export class ServicesComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.clearData();
       this.reload();//Aqui ya se vuelve a llamar a data initial
-      // this.dataInitial(this.pageSize);
     });
   }
 
