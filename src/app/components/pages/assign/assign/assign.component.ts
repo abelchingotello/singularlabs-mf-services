@@ -67,6 +67,7 @@ export class AssignComponent implements OnInit {
   public cancel: boolean = false;
   public dataServicesEntity: any;
   public allItems: any;
+  public dataRegister:any;
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -91,28 +92,17 @@ export class AssignComponent implements OnInit {
   ngOnInit(): void {
     this.listData();
     this.initialForm();
-    // setTimeout(() => {
     this.loadAllServices().subscribe(allItems => {
-      //console.log("allItems: ", allItems)
       // Filtrar solo los servicios habilitados
       this.allItems = allItems.filter(service => service.status === "HABILITADO");
       this.filteredServices = this.allItems;
-      //console.log("Servicios habilitados: ", this.allItems);
     });
-
-    //Desabilitado por pruebas
-    // this.loadAllServices().subscribe(allItems => {
-    //   console.log("allItems: ",allItems)
-    //   this.allItems = allItems;
-    // });
-    // }, 0);
   }
 
   //Primero hacer que se registre uno por uno
   //Probar que me traigan los 58 actuales y que se puedan asignar
   //Si funciona, pedir que se suban los 2000 y hacer las mismas pruebas, pero con los 2000
   //No olvidar validar que existan los servicios
-
   loadAllServices() {  //revisar para que traiga los 2000
     return this.serviceServ.getServicesPageKey().pipe(
       expand(response =>
@@ -127,7 +117,6 @@ export class AssignComponent implements OnInit {
   }
 
   initExcelUploadState() {
-    console.log("####initExcelUploadState####");
     this.showIdClientDialog = false;
     this.showExcelUpload = false;
     this.selectedFile = null;
@@ -158,33 +147,6 @@ export class AssignComponent implements OnInit {
     })
   }
 
-  //Desabilitado para pruebas
-  // listData() {
-  //   this.spinner.spinnerOnOff();
-  //   forkJoin([
-  //     this.serviceServ.getServices(),
-  //     this.masterService.getItemsMasterTable('15'), // tipoComission
-  //     this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
-  //   ]).subscribe({
-  //     next: (response) => {
-  //       const [service,typeComission,person] = response;
-  //       this.serviceName = service.data?.Items;
-  //       this.typeComission = typeComission;
-  //       this.persons = person.data;
-  //       console.log("SERVICIOS: ",this.persons)
-
-  //       // this.spinner.spinnerOnOff();
-  //     },
-  //     error: (error) => {
-  //       this.spinner.spinnerOnOff();
-  //       console.error("Error loading master table data:", error);
-  //     },
-  //     complete:()=> {
-  //         this.spinner.spinnerOnOff();
-  //     },
-  //   });
-  // }
-  
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
@@ -197,10 +159,6 @@ export class AssignComponent implements OnInit {
         //this.serviceName = service.data?.Items;
         this.typeComission = typeComission;
         this.persons = person.data;
-        console.log("SERVICIOS: ", this.persons)
-
-        //this.filteredServices = this.serviceName;
-        // this.spinner.spinnerOnOff();
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
@@ -216,7 +174,6 @@ export class AssignComponent implements OnInit {
     this.spinner.spinnerOnOff();
     this.personService.getPerson('RECAUDADORA DE SERVICIOS').subscribe({
       next: (response) => {
-        console.log("response", response);
         this.data = this.convertData(response.data)
       },
       error: (error) => {
@@ -231,11 +188,8 @@ export class AssignComponent implements OnInit {
   }
 
   selectEntity(event) {
-    console.log("evento ttiy: ", event.value)
     if (event.value == 'TODOS') {
       this.disableEntities = true
-      // this.data = this.allItems;
-      // console.log("dataAssign: ",this.data)
       this.getRecaudador();
     } else {
       this.disableEntities = false
@@ -248,7 +202,6 @@ export class AssignComponent implements OnInit {
   }
 
   selectClient(event) {
-    console.log("evento ttiy: ", event.value)
     this.requiredIdClient = event.value;
   }
 
@@ -262,7 +215,6 @@ export class AssignComponent implements OnInit {
 
 
   selectedServiceAssing(event) {
-    console.log("evento services: ", event.value)
     if (event.value == 'TODOS') {
       this.disableServiceOption = true;
       this.dataServicesEntity = this.allItems;
@@ -271,7 +223,6 @@ export class AssignComponent implements OnInit {
       this.disableServiceOption = false
       this.disableServiceAll = true
       this.dataServicesEntity = this.convertDataService(event.value)
-      console.log("dataServiceEntity: ", this.dataServicesEntity)
     }
 
     if (event.value.length === 0) {
@@ -315,7 +266,6 @@ export class AssignComponent implements OnInit {
 
 
   typeComissionService(event) {
-    console.log("eventos comission: ", event.value)
     switch (event.value) {
       case 'FIJO':
         this.comissionFixed = true;
@@ -339,7 +289,6 @@ export class AssignComponent implements OnInit {
   }
 
   typeComissionServiceAssign(event) {
-    console.log("eventos comission: ", event.value)
     switch (event.value) {
       case 'FIJO':
         this.comissionFixed = true;
@@ -361,17 +310,9 @@ export class AssignComponent implements OnInit {
         break;
     }
   }
-
-  // selectedService(event){
-  //   console.log("EVENTO VALUE: ",event.value)
-  //   this.getServiceId(event.value.id)
-  // }
-
   selectedService(event) {
-    console.log("EVENTO VALUE: ", event.value)
     // Usar directamente el servicio seleccionado sin hacer llamada HTTP
     this.dataService = event.value;
-    console.log("DATASERVICIO: ", this.dataService);
   }
 
   filterServices() {
@@ -380,58 +321,6 @@ export class AssignComponent implements OnInit {
       service.name.toLowerCase().includes(value)
     );
   }
-
-  //Desabilitado para pruebas
-  // getServiceId(id:string){
-  //   this.serviceServ.getIdServices(id).subscribe({
-  //     next: (response) => {
-  //       if(response.statusCode !== 200){
-  //         this.mytoastr.showWarning('Servicio no encontrado','')
-  //         return
-  //       }
-  //       this.dataService = response.data[0];
-  //       console.log("ADATASERVICIO: ",this.dataService)
-  //     },
-  //     error: (error) => {
-  //       this.mytoastr.showWarning('Error : Servicio no encontrado','')
-  //       console.error(error)
-  //     }
-  //   })
-  // }
-
-  dataRegister
-  //Desabilitado para pruebas
-  // registerServiceAssign() {
-  //   // this.spinner.spinnerOnOff();
-  //   console.log("DATA servicio a entidades: ", this.data)
-  //   // return
-  //   this.dataRegister = this.data.map(value => ({
-
-  //     idProvider: '00000100',// ID ´PROVEEDOR
-  //     idClient: value.idPerson, //ID DE RECAUDADORA
-  //     idServiceProv: this.dataService.id_serviceProv, //id de convenio
-  //     serviceName: this.dataService.name, //nnomb de servicio
-  //     userRegistration: this.cookies.get('person_id') || 'desconocido',
-  //     idTypeService: this.dataService.serviceType.id,
-  //     typeService: this.dataService.serviceType.name,//master
-  //     business: this.dataService.business, //nombre de negocio
-  //     status: this.dataService.status,
-  //     zone: 'MULTIDEPARTAMENTAL',
-  //     collectorName: "",//vacio cuando son clientes // somos proveedores
-  //     ownFixedComission: this.fixed ?? 0, //numeber
-  //     ownCriterionComission: this.multiple ?? 0, //number
-  //     ownPCTComission: this.porcent ?? 0, //number
-  //     ownComissionType: this.comission,
-  //     indicators: this.dataService.indicators,
-  //     additionalPaymentFields: this.dataService['additional-payment-fields']
-  //   }))
-  //   // return
-  //   console.log("data de registro: ", this.dataRegister)
-
-  //   this.registerServiceRequest(this.dataRegister)
-
-  // }
-
 
   // De una persona a varios servicios
   registerServiceAssign() {
@@ -446,8 +335,6 @@ export class AssignComponent implements OnInit {
       this.mytoastr.showWarning('Error', 'Debe seleccionar al menos una entidad');
       return;
     }
-
-    console.log("DATA servicio a entidades: ", this.data)
     //Limpiar cuando se cambie de tipo de comisión
     this.dataRegister = this.data.map(value => ({
       idProvider: '00000100',// ID ´PROVEEDOR
@@ -468,14 +355,11 @@ export class AssignComponent implements OnInit {
       indicators: this.dataService.indicators,
       additionalPaymentFields: this.dataService['additional-payment-fields']
     }))
-
-    console.log("data de registro: ", this.dataRegister)
     this.registerServiceRequest(this.dataRegister)
   }
 
   dataRegisterService
   registerServiceEntity() {
-    console.log("fijo: ", this.fixedAssign)
     this.dataRegisterService = this.dataServicesEntity.map((value) => ({
 
       idProvider: '00000100',// ID ´PROVEEDOR
@@ -498,10 +382,7 @@ export class AssignComponent implements OnInit {
 
     }))
 
-    console.log("dataregisterService : ", this.dataRegisterService);
     this.registerServiceRequest(this.dataRegisterService)
-
-
   }
 
   clearRegister() {
@@ -554,21 +435,9 @@ export class AssignComponent implements OnInit {
 
   registerServiceRequest(data: any) {
 
-    // const chunkedData = this.chunkArray(data, 1000);
-
-    // chunkedData.forEach((chunk, index) => {
-    //   console.log(`Enviando fragmento ${index + 1} de ${chunkedData.length}`);
-
-    //   this.serviceServ.registerServiceAssign(chunk).subscribe({
-    //     next: response => console.log(`Fragmento ${index + 1} enviado con éxito`, response),
-    //     error: err => console.error(`Error en el fragmento ${index + 1}`, err)
-    //   });
-    // });
-
     this.spinner.spinnerOnOff();
     this.serviceServ.registerServiceAssign(data).subscribe({
       next: (response) => {
-        // console.log("RESPUESTA DE REGISTRO: ", response)
         if (response.statusCode == 207) {
           // this.spinner.spinnerOnOff();
           this.mytoastr.showWarning('Error : Algunos servicios ya fueron asignados', '')
@@ -599,7 +468,6 @@ export class AssignComponent implements OnInit {
   //Asiganción por archivo
   // Método para mostrar el diálogo de ID Cliente
   showExcelUploadDialog() {
-    console.log("Click en mostrar el cuadro de diálogo", this.showIdClientDialog);
     this.showIdClientDialog = true;
     this.requiredIdClient = '';
     setTimeout(() => {
@@ -664,9 +532,6 @@ export class AssignComponent implements OnInit {
 
       // Procesar los datos usando la lógica del script original
       const processedData = this.convertExcelToAssignmentFormat(excelData);
-
-      console.log("Primer objeto de asiganción construido", processedData[0]);
-
       if (processedData.length === 0) {
         this.mytoastr.showWarning('Error', 'No se encontraron datos válidos en el archivo');
         return;
