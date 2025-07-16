@@ -20,7 +20,6 @@ import * as XLSX from 'xlsx';
 export class AssignComponent implements OnInit {
 
   public formAssign!: FormGroup<any>
-  public formAssignService!: FormGroup<any>
 
   public columns: any[] = [
     { 'name': 'Nombre Alias', 'attribute': 'nameAlias' },
@@ -70,7 +69,7 @@ export class AssignComponent implements OnInit {
   public dataRegister: any;
   public disableServiceAll: boolean = false;
   public disableServiceOption: boolean = false;
-  public dataRegisterService:any;
+  public dataRegisterService: any;
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -109,7 +108,7 @@ export class AssignComponent implements OnInit {
     return this.serviceServ.getServicesPageKey(200).pipe(
       expand(response =>
         response?.data?.nextPageKey
-          ? this.serviceServ.getServicesPageKey(200,response.data.nextPageKey)
+          ? this.serviceServ.getServicesPageKey(200, response.data.nextPageKey)
           : of(null) // Detiene la recursión si no hay más páginas
       ),
       filter(response => response !== null),
@@ -138,15 +137,6 @@ export class AssignComponent implements OnInit {
       porcent: [''],
       multiple: [''],
     });
-
-    this.formAssignService = this.fb.group({
-      service: [''],
-      entity: [''],
-      comission: ['FIJO', Validators.required],
-      fixed: [''],
-      porcent: [''],
-      multiple: [''],
-    })
   }
 
   listData() {
@@ -355,31 +345,7 @@ export class AssignComponent implements OnInit {
     this.registerServiceRequest(this.dataRegister)
   }
 
-  registerServiceEntity() {
-    this.dataRegisterService = this.dataServicesEntity.map((value) => ({
-
-      idProvider: '00000100',// ID ´PROVEEDOR
-      idClient: this.selectedPerson.servicePerson.idPerson, //ID DE RECAUDADORA
-      idServiceProv: value.id_serviceProv, //id de convenio
-      serviceName: value.name, //nnomb de servicio
-      userRegistration: this.cookies.get('person_id') || 'desconocido',
-      idTypeService: value.serviceTypeId,
-      typeService: value.serviceTypeName,//master
-      business: value.business, //nombre de negocio
-      status: value.status,
-      zone: 'MULTIDEPARTAMENTAL',
-      collectorName: "",//vacio cuando son clientes // somos proveedores
-      ownFixedComission: this.fixedAssign ?? 0, //numeber
-      ownCriterionComission: this.multipleAssign ?? 0, //number
-      ownPCTComission: this.porcentAssign ?? 0, //number
-      ownComissionType: this.comissionAssign,
-      indicators: value.indicators,
-      additionalPaymentFields: value.additional
-
-    }))
-
-    this.registerServiceRequest(this.dataRegisterService)
-  }
+ 
 
   clearRegister() {
     this.data = [];
@@ -390,7 +356,6 @@ export class AssignComponent implements OnInit {
     this.service.setValue('');
     this.entity.setValue('');
     this.fixedSet = ''
-    this.fixedSetAssign = ''
   }
 
   serviceEntity() {
@@ -626,51 +591,13 @@ export class AssignComponent implements OnInit {
     this.selectedFile = null;
   }
 
-  //#########################################
-
-  get service() {
-    return this.formAssign.get('service')
-  }
-
-  get serviceAssign() {
-    return this.formAssign.get('service')
-  }
-  get entity() {
-    return this.formAssign.get('entity')
-  }
-  get entityAssign() {
-    return this.formAssignService.get('entity')
-  }
-  get comission() {
-    return this.formAssign.get('comission').value
-  }
-  get comissionAssign() {
-    return this.formAssignService.get('comission').value
-  }
-  get fixed() {
-    return this.formAssign.get('fixed').value
-  }
-  set fixedSet(value: any) {
-    this.formAssign.get('fixed')?.setValue(value);
-  }
-  get multiple() {
-    return this.formAssign.get('multiple').value
-  }
-  get porcent() {
-    return this.formAssign.get('porcent').value
-  }
-
-  get fixedAssign() {
-    return this.formAssignService.get('fixed').value
-  }
-  set fixedSetAssign(value: any) {
-    this.formAssignService.get('fixed')?.setValue(value);
-  }
-  get multipleAssign() {
-    return this.formAssignService.get('multiple').value
-  }
-  get porcentAssign() {
-    return this.formAssignService.get('porcent').value
-  }
-
+  /*************************************** METODOS GET DEL FORMULARIO ******************************************/
+  get service() { return this.formAssign.get('service') };
+  get serviceAssign() { return this.formAssign.get('service') };
+  get entity() { return this.formAssign.get('entity') };
+  get comission() { return this.formAssign.get('comission').value };
+  get fixed() { return this.formAssign.get('fixed').value };
+  get multiple() { return this.formAssign.get('multiple').value };
+  get porcent() { return this.formAssign.get('porcent').value };
+  set fixedSet(value: any) { this.formAssign.get('fixed')?.setValue(value); };
 }
