@@ -2,6 +2,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ServiceByIdInterface } from '../interfaces/ServiceByIdInterface';
+import { ResponseDTO } from '../interfaces/ResponseInterface';
 
 @Injectable({
   providedIn: 'root'
@@ -94,8 +96,8 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services/category`);
   }
 
-  getIdServices(id: string): Observable<any> {
-    return this.httpClient.post<any>(`${this.url}/services/${id}`, null);
+  getIdServices(id: string): Observable<ResponseDTO<ServiceByIdInterface>> {
+    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`${this.url}/services/${id}`, null);
   }
   getIdServicePerson(id: string, type?: string): Observable<any> {
     let params = new HttpParams();

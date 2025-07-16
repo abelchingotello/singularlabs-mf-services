@@ -44,12 +44,17 @@ export class NewServiceComponent implements OnInit {
         { id: "PAY_MULTIPLE_PAYMENTS", name: "ACTUALIZACION MASIVA DE DEUDAS", isActive: false },
       ];
 
+
     public serviceForm!: FormGroup;
     public comissionForm!: FormGroup;
-    public ownCommissionForm!: FormGroup;
-    public paymentFieldsForm!: FormGroup;
+
+    //***** Valores del servicio padre */
     public idService: string;
     public idProviderService: string = '';// ID del proveedor del servicio en si, no de la asignación
+    public fixcomisionService: number = null;// Comision fija del servicio
+
+    public ownCommissionForm!: FormGroup;
+    public paymentFieldsForm!: FormGroup;
     public typeService:any ;
     public typeClient:any ;
     public depart :any;
@@ -382,6 +387,7 @@ export class NewServiceComponent implements OnInit {
         this.spinner.spinnerOnOff();
         this.service.getIdServices(idService).subscribe({
             next:(response)=>{
+                console.log('Data Service',response)
                 this.service_name.setValue(response.data.name)
                 this.service_name.disable();
                 this.service_type.setValue(
@@ -399,6 +405,7 @@ export class NewServiceComponent implements OnInit {
                 this.dataPayment = response.data["additional-payment-fields"]
                 this.indicatrs = response.data.indicators
                 this.idProviderService = response.data.idProvider;
+                this.fixcomisionService = response.data.fixedcomission;
             },
             error(err) {
                 console.error("ERROR: ",err)
@@ -561,33 +568,24 @@ export class NewServiceComponent implements OnInit {
         return `${anio}${dia}${mes}${timeLocal}`;
     }
 
-
-    get service_name(){
-        return this.serviceForm.get('service_name')
+    /********************************* METODOS PARA INPUTS ****************************************************/
+    validComissionFixed():void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
+        if(this.fixcomisionService && this.ownCommission_fixed.value){
+            if(this.ownCommission_fixed.value > this.fixcomisionService){
+                this.mytoastr.showWarning('La comisión fija debe ser menor que la comisión fija del servicio: ', this.fixcomisionService.toString());
+                this.ownCommission_fixed.setValue('');
+            }
+        }
     }
 
-    get service_type(){
-        return this.serviceForm.get('service_type')
-    }
 
-    get service_category(){
-        return this.serviceForm.get('service_category')
-    }
-
-    get service_state(){
-        return this.serviceForm.get('service_state')
-    }
-
-    get service_zone(){
-        return this.serviceForm.get('service_zone')
-    }
-
-    get service_type_business(){
-        return this.serviceForm.get('service_type_business')
-    }
-
-    get ownCommission_fixed(){
-        return this.ownCommissionForm.get('ownCommission_fixed')
-    }
+    /************************************** METODOS GET *****************************************************/
+    get service_name(){ return this.serviceForm.get('service_name')};
+    get service_type(){return this.serviceForm.get('service_type')};
+    get service_category(){return this.serviceForm.get('service_category')};
+    get service_state(){return this.serviceForm.get('service_state')};
+    get service_zone(){return this.serviceForm.get('service_zone')};
+    get service_type_business(){return this.serviceForm.get('service_type_business')};
+    get ownCommission_fixed(){return this.ownCommissionForm.get('ownCommission_fixed')};
 
 }
