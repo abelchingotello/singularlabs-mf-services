@@ -21,10 +21,10 @@ export class NewServiceComponent implements OnInit {
         { 'name': 'ID', 'attribute': 'id' },
         { 'name': 'Nombre', 'attribute': 'name' },
         // { 'name': 'Tipo de campo', 'attribute': 'paymentFields_fieldType'},
-        { 'name': 'Máscara de campo', 'attribute': 'fieldMask'},
-        { 'name': 'Longitud', 'attribute': 'maximumLength'},
-        { 'name': 'Obligatorio', 'attribute': 'isMandatory'},
-        { 'name': 'Editable', 'attribute': 'isEditable'},
+        { 'name': 'Máscara de campo', 'attribute': 'fieldMask' },
+        { 'name': 'Longitud', 'attribute': 'maximumLength' },
+        { 'name': 'Obligatorio', 'attribute': 'isMandatory' },
+        { 'name': 'Editable', 'attribute': 'isEditable' },
     ];
 
     indicatrs = [
@@ -42,7 +42,7 @@ export class NewServiceComponent implements OnInit {
         { id: "PAY_CHECK_INTERNAL", name: "PAGO CON CHEQUE PROPIO BANCO", isActive: false },
         { id: "PAY_CHECK_EXTERNAL", name: "PAGO CON CHEQUE OTRO BANCO", isActive: false },
         { id: "PAY_MULTIPLE_PAYMENTS", name: "ACTUALIZACION MASIVA DE DEUDAS", isActive: false },
-      ];
+    ];
 
 
     public serviceForm!: FormGroup;
@@ -55,36 +55,36 @@ export class NewServiceComponent implements OnInit {
 
     public ownCommissionForm!: FormGroup;
     public paymentFieldsForm!: FormGroup;
-    public typeService:any ;
-    public typeClient:any ;
-    public depart :any;
-    public typeStatus :any;
-    public typePro :any;
-    public typeProClient :any;
-    public typeComission :any;
-    public titlle : string = 'Nuevo Servicio';
+    public typeService: any;
+    public typeClient: any;
+    public depart: any;
+    public typeStatus: any;
+    public typePro: any;
+    public typeProClient: any;
+    public typeComission: any;
+    public titlle: string = 'Nuevo Servicio';
     public pageSize: any = 5;
     public pageKey: any[];
     public dataPayment = [];
     public functionDataCurrent: (pageSize: any) => any;
-    public editAsigService : boolean = true
-    public editClient : boolean = false
-    public owncomissionFixed : boolean = true
-    public owncomissionCriterio : boolean = true
-    public owncomissionPercentage : boolean = true
-    public comissionFixed : boolean = true
-    public comissionCriterio : boolean = true
-    public comissionPercentage : boolean = true
-    public currentStep : number = 0;
+    public editAsigService: boolean = true
+    public editClient: boolean = false
+    public owncomissionFixed: boolean = true
+    public owncomissionCriterio: boolean = true
+    public owncomissionPercentage: boolean = true
+    public comissionFixed: boolean = true
+    public comissionCriterio: boolean = true
+    public comissionPercentage: boolean = true
+    public currentStep: number = 0;
     public stepsOrig = []
     public steps: string[] = ['datos-servicio', 'datos-comisiones', 'datos-pagos'];
     public stepsAsig: string[] = ['datos-servicio', 'datos-comisiones'];
     public disableTab3: boolean = true
     public tab2: boolean = true
     public tab3: boolean = true
-    public userName : any;
+    public userName: any;
     public register = [];
-    public isMandatory : boolean = false
+    public isMandatory: boolean = false
     public isEdit: boolean = false
 
 
@@ -96,20 +96,20 @@ export class NewServiceComponent implements OnInit {
         private fb: FormBuilder,
         private readonly activeRouter: ActivatedRoute,
         private mytoastr: MytoastrService,
-        private service : ServicesService,
+        private service: ServicesService,
         private masterService: MasterService,
-        private spinner : SpinnerService,
-        private authService : AuthService
+        private spinner: SpinnerService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
-        this.userName= this.authService.getUser();
+        this.userName = this.authService.getUser();
         this.idService = this.activeRouter.snapshot.params['id'];
         this.initializeFormGroup();
         this.listData();
         this.dataProvRecaud();
 
-        if(this.idService){
+        if (this.idService) {
             this.serviceForm.removeControl('service_prov');
             this.disableTab3 = false
             this.titlle = 'Asignar Servicio'
@@ -117,7 +117,7 @@ export class NewServiceComponent implements OnInit {
             this.editClient = true
             setTimeout(() => {
                 this.getIdService(this.idService)
-            },1500);
+            }, 1500);
         } else {
             this.serviceForm.removeControl('service_client');
         }
@@ -126,7 +126,7 @@ export class NewServiceComponent implements OnInit {
 
     }
 
-    inputMayusName(){
+    inputMayusName() {
         this.service_name?.valueChanges.subscribe(value => {
             if (value) {
                 this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
@@ -140,24 +140,24 @@ export class NewServiceComponent implements OnInit {
         });
     }
 
-    dataProvRecaud(){
+    dataProvRecaud() {
 
-        this.service.getPerson('RECAUDADORA DE SERVICIOS',null).subscribe({
+        this.service.getPerson('RECAUDADORA DE SERVICIOS', null).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typeProClient = data.data
             },
             error: (error) => {
-                this.mytoastr.showError('Error al obtener datos de Recaudadora','')
+                this.mytoastr.showError('Error al obtener datos de Recaudadora', '')
             }
         })
-        this.service.getPerson('PROVEEDOR',null).subscribe({
+        this.service.getPerson('PROVEEDOR', null).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typePro = data.data;
             },
             error: (error) => {
-                this.mytoastr.showError('Error al obtener datos de proveedor','')
+                this.mytoastr.showError('Error al obtener datos de proveedor', '')
             },
         })
     }
@@ -188,7 +188,7 @@ export class NewServiceComponent implements OnInit {
                 console.error("Error loading master table data:", error);
                 this.spinner.spinnerOnOff();
             },
-            complete:()=> {
+            complete: () => {
                 this.spinner.spinnerOnOff();
             }
 
@@ -198,8 +198,8 @@ export class NewServiceComponent implements OnInit {
     initializeFormGroup() {
         this.serviceForm = this.fb.group({
             //   service_id: ['', Validators.required],
-            service_name: ['',Validators.required],
-            service_prov: ['',Validators.required],
+            service_name: ['', Validators.required],
+            service_prov: ['', Validators.required],
             service_client: ['', Validators.required],
             service_convenio: [''],
             service_type: ['', Validators.required],
@@ -210,18 +210,18 @@ export class NewServiceComponent implements OnInit {
 
         this.comissionForm = this.fb.group({
             //   service_id: ['', Validators.required],
-            comission_fixed: ['',Validators.required],
-            comission_criterion: ['',Validators.required],
-            comission_percentage: ['',Validators.required],
-            comission_type: ['',Validators.required],
+            comission_fixed: ['', Validators.required],
+            comission_criterion: ['', Validators.required],
+            comission_percentage: ['', Validators.required],
+            comission_type: ['', Validators.required],
         });
 
         this.ownCommissionForm = this.fb.group({
             //   service_id: ['', Validators.required],
-            ownCommission_fixed: ['',Validators.required],
-            ownCommission_criterion: ['',Validators.required],
-            ownCommission_percentage: ['',Validators.required],
-            ownCommission_type: ['',Validators.required],
+            ownCommission_fixed: ['', Validators.required],
+            ownCommission_criterion: ['', Validators.required],
+            ownCommission_percentage: ['', Validators.required],
+            ownCommission_type: ['', Validators.required],
         });
 
         this.paymentFieldsForm = this.fb.group({
@@ -264,13 +264,13 @@ export class NewServiceComponent implements OnInit {
                 indicators: this.indicatrs,
                 additionalPaymentFields: this.dataPayment
             }
-            this.updateAddService(data,'Guardado correctamente');
+            this.updateAddService(data, 'Guardado correctamente');
         } else {
             this.updateService();
         }
     }
 
-    updateAddService(data:any,resp:string){
+    updateAddService(data: any, resp: string) {
         this.spinner.spinnerOnOff();
         this.service.registerService(data).subscribe({
             next: (response: any) => {
@@ -283,7 +283,7 @@ export class NewServiceComponent implements OnInit {
             error: (error: any) => {
                 console.error("ERROR: ", error)
             },
-            complete :()=>{
+            complete: () => {
                 this.spinner.spinnerOnOff();
                 this.router.navigate(['/service'])
             }
@@ -292,108 +292,108 @@ export class NewServiceComponent implements OnInit {
 
     updateService() {
         const data = {
-                idProvider: '00000100',// ID ´PROVEEDOR 
-                codProveedor: this.idProviderService,// Es el id del proveedor del servicio en si, no de la asignación
-                idService:this.idService,
-                idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
-                idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
-                serviceName: this.service_name.value, //nnomb de servicio
-                userRegistration: this.userName.Username,
-                idTypeService: this.service_type.value.master_idTypeService,
-                typeService: this.service_type.value.master_name,//master
-                business: this.service_type_business.value, //nombre de negocio
-                status: this.service_state.value.master_name,
-                zone: this.serviceForm.value.service_zone.master_department,
-                collectorName: "",//vacio cuando son clientes // somos proveedores
-                ownFixedComission: this.ownCommissionForm.value.ownCommission_fixed, //numeber
-                ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion, //number
-                ownPCTComission: this.ownCommissionForm.value.ownCommission_percentage, //number
-                ownComissionType: this.ownCommissionForm.value.ownCommission_type.master_name,
-                indicators:this.indicatrs,
-                additionalPaymentFields: this.dataPayment
+            idProvider: '00000100',// ID ´PROVEEDOR 
+            codProveedor: this.idProviderService,// Es el id del proveedor del servicio en si, no de la asignación
+            idService: this.idService,
+            idClient: this.serviceForm.value.service_client, //ID DE RECAUDADORA
+            idServiceProv: this.serviceForm.value.service_convenio, //id de convenio
+            serviceName: this.service_name.value, //nnomb de servicio
+            userRegistration: this.userName.Username,
+            idTypeService: this.service_type.value.master_idTypeService,
+            typeService: this.service_type.value.master_name,//master
+            business: this.service_type_business.value, //nombre de negocio
+            status: this.service_state.value.master_name,
+            zone: this.serviceForm.value.service_zone.master_department,
+            collectorName: "",//vacio cuando son clientes // somos proveedores
+            ownFixedComission: this.ownCommissionForm.value.ownCommission_fixed, //numeber
+            ownCriterionComission: this.ownCommissionForm.value.ownCommission_criterion, //number
+            ownPCTComission: this.ownCommissionForm.value.ownCommission_percentage, //number
+            ownComissionType: this.ownCommissionForm.value.ownCommission_type.master_name,
+            indicators: this.indicatrs,
+            additionalPaymentFields: this.dataPayment
         }
-        this.updateAddService(data,'Asignado correctamente');
+        this.updateAddService(data, 'Asignado correctamente');
     }
 
     selectionComission(event) {
-      // Se reconstruye el formulario eliminando todos los controles excepto el tipo
-      if (this.ownCommissionForm.get('ownCommission_fixed')) {
-        this.ownCommissionForm.removeControl('ownCommission_fixed');
-      }
-      if (this.ownCommissionForm.get('ownCommission_criterion')) {
-        this.ownCommissionForm.removeControl('ownCommission_criterion');
-      }
-      if (this.ownCommissionForm.get('ownCommission_percentage')) {
-        this.ownCommissionForm.removeControl('ownCommission_percentage');
-      }
+        // Se reconstruye el formulario eliminando todos los controles excepto el tipo
+        if (this.ownCommissionForm.get('ownCommission_fixed')) {
+            this.ownCommissionForm.removeControl('ownCommission_fixed');
+        }
+        if (this.ownCommissionForm.get('ownCommission_criterion')) {
+            this.ownCommissionForm.removeControl('ownCommission_criterion');
+        }
+        if (this.ownCommissionForm.get('ownCommission_percentage')) {
+            this.ownCommissionForm.removeControl('ownCommission_percentage');
+        }
 
-      // Solo controles necesarios
-      if (event.value.master_name == 'FIJO') {
-        this.ownCommissionForm.addControl('ownCommission_fixed', this.fb.control('', Validators.required));
-        this.owncomissionPercentage = false;
-        this.owncomissionCriterio = false;
-        this.owncomissionFixed = true;
-      } else if (event.value.master_name == 'PORCENTUAL') {
-        this.ownCommissionForm.addControl('ownCommission_percentage', this.fb.control('', Validators.required));
-        this.owncomissionFixed = false;
-        this.owncomissionCriterio = true;
-        this.owncomissionPercentage = true;
-      } else if (event.value.master_name == 'MULTIPLE') {
-        this.ownCommissionForm.addControl('ownCommission_fixed', this.fb.control('', Validators.required));
-        this.ownCommissionForm.addControl('ownCommission_criterion', this.fb.control('', Validators.required));
-        this.ownCommissionForm.addControl('ownCommission_percentage', this.fb.control('', Validators.required));
-        this.owncomissionCriterio = true;
-        this.owncomissionFixed = true;
-        this.owncomissionPercentage = true;
-      }
+        // Solo controles necesarios
+        if (event.value.master_name == 'FIJO') {
+            this.ownCommissionForm.addControl('ownCommission_fixed', this.fb.control('', Validators.required));
+            this.owncomissionPercentage = false;
+            this.owncomissionCriterio = false;
+            this.owncomissionFixed = true;
+        } else if (event.value.master_name == 'PORCENTUAL') {
+            this.ownCommissionForm.addControl('ownCommission_percentage', this.fb.control('', Validators.required));
+            this.owncomissionFixed = false;
+            this.owncomissionCriterio = true;
+            this.owncomissionPercentage = true;
+        } else if (event.value.master_name == 'MULTIPLE') {
+            this.ownCommissionForm.addControl('ownCommission_fixed', this.fb.control('', Validators.required));
+            this.ownCommissionForm.addControl('ownCommission_criterion', this.fb.control('', Validators.required));
+            this.ownCommissionForm.addControl('ownCommission_percentage', this.fb.control('', Validators.required));
+            this.owncomissionCriterio = true;
+            this.owncomissionFixed = true;
+            this.owncomissionPercentage = true;
+        }
     }
 
     selectionComissionProv(event) {
 
-      // Se reconstruye el formulario eliminando todos los controles excepto el tipo
-      if (this.comissionForm.get('comission_fixed')) {
-        this.comissionForm.removeControl('comission_fixed');
+        // Se reconstruye el formulario eliminando todos los controles excepto el tipo
+        if (this.comissionForm.get('comission_fixed')) {
+            this.comissionForm.removeControl('comission_fixed');
 
-      }
-      if (this.comissionForm.get('comission_criterion')) {
-        this.comissionForm.removeControl('comission_criterion');
-      }
-      if (this.comissionForm.get('comission_percentage')) {
-        this.comissionForm.removeControl('comission_percentage');
-      }
+        }
+        if (this.comissionForm.get('comission_criterion')) {
+            this.comissionForm.removeControl('comission_criterion');
+        }
+        if (this.comissionForm.get('comission_percentage')) {
+            this.comissionForm.removeControl('comission_percentage');
+        }
 
-      // Solo controles necesarios
-      if (event.value.master_name == 'FIJO') {
-        this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
-        this.comissionPercentage = false;
-        this.comissionCriterio = false;
-        this.comissionFixed = true;
-      } else if (event.value.master_name == 'PORCENTUAL') {
-        this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
-        this.comissionFixed = false;
-        this.comissionCriterio = false;
-        this.comissionPercentage = true;
-      } else if (event.value.master_name == 'MULTIPLE') {
-        this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
-        this.comissionForm.addControl('comission_criterion', this.fb.control('', Validators.required));
-        this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
-        this.comissionCriterio = true;
-        this.comissionFixed = true;
-        this.comissionPercentage = true;
-      }
+        // Solo controles necesarios
+        if (event.value.master_name == 'FIJO') {
+            this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
+            this.comissionPercentage = false;
+            this.comissionCriterio = false;
+            this.comissionFixed = true;
+        } else if (event.value.master_name == 'PORCENTUAL') {
+            this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
+            this.comissionFixed = false;
+            this.comissionCriterio = false;
+            this.comissionPercentage = true;
+        } else if (event.value.master_name == 'MULTIPLE') {
+            this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
+            this.comissionForm.addControl('comission_criterion', this.fb.control('', Validators.required));
+            this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
+            this.comissionCriterio = true;
+            this.comissionFixed = true;
+            this.comissionPercentage = true;
+        }
     }
 
-    getIdService(idService:string){
+    getIdService(idService: string) {
         this.spinner.spinnerOnOff();
         this.service.getIdServices(idService).subscribe({
-            next:(response)=>{
-                console.log('Data Service',response)
+            next: (response) => {
+                console.log('Data Service', response)
                 this.service_name.setValue(response.data.name)
                 this.service_name.disable();
                 this.service_type.setValue(
                     this.typeService.find(type => type.master_name === response.data.serviceType.name)
                 );
-                this.typeService.some((value)=>{
+                this.typeService.some((value) => {
                     value.master_name === response.data.serviceType.name
                 });
                 this.service_type.disable();
@@ -408,17 +408,17 @@ export class NewServiceComponent implements OnInit {
                 this.fixcomisionService = response.data.fixedcomission;
             },
             error(err) {
-                console.error("ERROR: ",err)
+                console.error("ERROR: ", err)
             },
-            complete:()=> {
+            complete: () => {
                 this.spinner.spinnerOnOff();
             },
         })
     }
 
-    registerPayment(){
-        if(!this.paymentFieldsForm.valid){
-            this.mytoastr.showWarning('Complete el formulario','')
+    registerPayment() {
+        if (!this.paymentFieldsForm.valid) {
+            this.mytoastr.showWarning('Complete el formulario', '')
             return
         }
         const data = {
@@ -438,7 +438,7 @@ export class NewServiceComponent implements OnInit {
         this.dataPayment = [...this.register]
     }
 
-    selectIndicat(event){
+    selectIndicat(event) {
         const selectedIds = event.value.map((indicator: any) => indicator.id);
         // Actualiza isActive basado en las selecciones
         this.indicatrs.forEach(indicator => {
@@ -446,8 +446,8 @@ export class NewServiceComponent implements OnInit {
         });
     }
 
-    onNext(){
-        if(this.idService){
+    onNext() {
+        if (this.idService) {
             this.stepsOrig = this.stepsAsig
             this.onNextAsign();
         } else {
@@ -459,21 +459,21 @@ export class NewServiceComponent implements OnInit {
     onNextAdd() {
         // Validar el formulario del paso actual
         if (this.currentStep === 0 && !this.serviceForm.valid) {
-            this.mytoastr.showWarning('Complete el formulario','')
+            this.mytoastr.showWarning('Complete el formulario', '')
             return;
         }
 
         if (this.currentStep === 1 && !this.comissionForm.valid) {
-                this.mytoastr.showWarning('Complete el formulario','')
-                return;
+            this.mytoastr.showWarning('Complete el formulario', '')
+            return;
         }
 
         if (this.currentStep === 2 && this.dataPayment.length == 0) {
-                this.mytoastr.showWarning('Agregue datos a la tabla: ', 'Min 1')
-                return;
+            this.mytoastr.showWarning('Agregue datos a la tabla: ', 'Min 1')
+            return;
         }
 
-        if (this.currentStep < this.stepsOrig.length-1) {
+        if (this.currentStep < this.stepsOrig.length - 1) {
             this.currentStep++;
         }
 
@@ -483,10 +483,10 @@ export class NewServiceComponent implements OnInit {
         }
 
         if (this.currentStep === 2) {
-                this.tab3 = false;
+            this.tab3 = false;
         }
 
-        if(this.currentStep === this.stepsOrig.length-1 && this.dataPayment.length>0){
+        if (this.currentStep === this.stepsOrig.length - 1 && this.dataPayment.length > 0) {
             this.saveService();
         }
     }
@@ -553,25 +553,25 @@ export class NewServiceComponent implements OnInit {
         if (this.currentStep < 0) this.cancel();
     }
 
-    cancel(){
+    cancel() {
         this.router.navigate(['/service'])
     }
 
-    numConvenio(){
+    numConvenio() {
         const date = new Date();
         const anio = date.getFullYear(); // Obtiene el año
         const dia = date.getDate();
         const mes = date.getMonth() + 1;
         const timeLocal = date
-        .toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour12: false }) // Formato 24 horas
-        .replace(/:/g, ""); // Quita los dos puntos
+            .toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour12: false }) // Formato 24 horas
+            .replace(/:/g, ""); // Quita los dos puntos
         return `${anio}${dia}${mes}${timeLocal}`;
     }
 
     /********************************* METODOS PARA INPUTS ****************************************************/
-    validComissionFixed():void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
-        if(this.fixcomisionService && this.ownCommission_fixed.value){
-            if(this.ownCommission_fixed.value > this.fixcomisionService){
+    validComissionFixed(): void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
+        if (this.fixcomisionService && this.ownCommission_fixed.value) {
+            if (Number(this.ownCommission_fixed.value) > this.fixcomisionService) {
                 this.mytoastr.showWarning('La comisión fija debe ser menor que la comisión fija del servicio: ', this.fixcomisionService.toString());
                 this.ownCommission_fixed.setValue('');
             }
@@ -580,12 +580,12 @@ export class NewServiceComponent implements OnInit {
 
 
     /************************************** METODOS GET *****************************************************/
-    get service_name(){ return this.serviceForm.get('service_name')};
-    get service_type(){return this.serviceForm.get('service_type')};
-    get service_category(){return this.serviceForm.get('service_category')};
-    get service_state(){return this.serviceForm.get('service_state')};
-    get service_zone(){return this.serviceForm.get('service_zone')};
-    get service_type_business(){return this.serviceForm.get('service_type_business')};
-    get ownCommission_fixed(){return this.ownCommissionForm.get('ownCommission_fixed')};
+    get service_name() { return this.serviceForm.get('service_name') };
+    get service_type() { return this.serviceForm.get('service_type') };
+    get service_category() { return this.serviceForm.get('service_category') };
+    get service_state() { return this.serviceForm.get('service_state') };
+    get service_zone() { return this.serviceForm.get('service_zone') };
+    get service_type_business() { return this.serviceForm.get('service_type_business') };
+    get ownCommission_fixed() { return this.ownCommissionForm.get('ownCommission_fixed') };
 
 }
