@@ -67,7 +67,10 @@ export class AssignComponent implements OnInit {
   public cancel: boolean = false;
   public dataServicesEntity: any;
   public allItems: any;
-  public dataRegister:any;
+  public dataRegister: any;
+  public disableServiceAll: boolean = false;
+  public disableServiceOption: boolean = false;
+  public dataRegisterService:any;
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -85,8 +88,7 @@ export class AssignComponent implements OnInit {
     private fb: FormBuilder,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
-    private cookies: CookieService,
-    private cdRef: ChangeDetectorRef
+    private cookies: CookieService
   ) { }
 
   ngOnInit(): void {
@@ -150,13 +152,11 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      // this.serviceServ.getServices(null,null,0),
       this.masterService.getItemsMasterTable('15'), // tipoComission
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
     ]).subscribe({
       next: (response) => {
         const [typeComission, person] = response;
-        //this.serviceName = service.data?.Items;
         this.typeComission = typeComission;
         this.persons = person.data;
       },
@@ -210,15 +210,13 @@ export class AssignComponent implements OnInit {
     this.selectedPerson = event.value
   }
 
-  disableServiceAll: boolean = false
-  disableServiceOption: boolean = false
+
 
 
   selectedServiceAssing(event) {
     if (event.value == 'TODOS') {
       this.disableServiceOption = true;
       this.dataServicesEntity = this.allItems;
-      // this.dataServicesEntity = this.convertDataService(this.serviceName)
     } else {
       this.disableServiceOption = false
       this.disableServiceAll = true
@@ -233,7 +231,6 @@ export class AssignComponent implements OnInit {
 
   listEntitySelect(list) {
     this.data = this.convertData(list)
-    // this.data.push(list)
   }
 
   convertDataService(data) {
@@ -358,7 +355,6 @@ export class AssignComponent implements OnInit {
     this.registerServiceRequest(this.dataRegister)
   }
 
-  dataRegisterService
   registerServiceEntity() {
     this.dataRegisterService = this.dataServicesEntity.map((value) => ({
 
@@ -412,9 +408,6 @@ export class AssignComponent implements OnInit {
     this.zeroView = false;
     this.cancel = true;
     this.initExcelUploadState();
-    //this.cdRef.detectChanges();
-    // this.showIdClientDialog = false;
-    // this.showExcelUpload = false;
   }
 
   cancelar() {
