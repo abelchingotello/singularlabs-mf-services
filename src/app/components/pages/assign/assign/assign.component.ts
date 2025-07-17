@@ -355,7 +355,6 @@ export class AssignComponent implements OnInit {
     this.serviceAssign.setValue('');
     this.service.setValue('');
     this.entity.setValue('');
-    this.fixedSet = ''
   }
 
   serviceEntity() {
@@ -599,5 +598,4 @@ export class AssignComponent implements OnInit {
   get fixed() { return this.formAssign.get('fixed').value };
   get multiple() { return this.formAssign.get('multiple').value };
   get porcent() { return this.formAssign.get('porcent').value };
-  set fixedSet(value: any) { this.formAssign.get('fixed')?.setValue(value); };
 }
