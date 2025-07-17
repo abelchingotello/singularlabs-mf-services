@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { expand, filter, forkJoin, of, reduce, scan, startWith } from 'rxjs';
@@ -10,6 +10,11 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { ChangeDetectorRef } from '@angular/core';
 //
 import * as XLSX from 'xlsx';
+import { MasterInterface } from 'src/app/interfaces/masterInterface';
+import { ServiceTableInterface } from 'src/app/interfaces/serviceTableInterface';
+import { PageEvent } from '@angular/material/paginator';
+import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
+import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
 //
 
 @Component({
@@ -49,6 +54,29 @@ export class AssignComponent implements OnInit {
 
   public data: any;
   public serviceName: any;
+
+  //Variables para la tabla 
+  public dataServiceTable: ServiceTableInterface[] = []; // Datos de la tabla de servicios
+  public dataTableFilter: ServiceTableInterface[] = []; // Datos filtrados de servicios(acumulados)
+  public count: number = null; // Variable para el total de elementos
+  public pageSize: any = 5;
+  public pageKey: any[];
+  private pagUtils: PaginationUtils;
+  public functionDataCurrent: (pageSize: any) => any;
+  @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
+  public columnsTableService: any[] = [
+    { 'name': 'NUM', 'attribute': 'index' },
+    { 'name': 'Nombre', 'attribute': 'name' },
+    { 'name': 'Proveedor', 'attribute': 'nameProvider' },
+    {
+      'name': 'Estado', 'attribute': 'status', 'config': {
+        'styleClass': true
+      }
+    },
+  ];
+  //------------------------
+
+
   public filteredServices: any[] = []; // Lista filtrada que se mostrará
   public serviceFilter: string = '';
   public typeComission: any[] = [];
@@ -70,6 +98,7 @@ export class AssignComponent implements OnInit {
   public disableServiceAll: boolean = false;
   public disableServiceOption: boolean = false;
   public dataRegisterService: any;
+  public categoriesService: MasterInterface[] = [];//Categorias de los servicios
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -93,12 +122,17 @@ export class AssignComponent implements OnInit {
   ngOnInit(): void {
     this.listData();
     this.initialForm();
-    this.loadAllServices().subscribe(allItems => {
-      // Filtrar solo los servicios habilitados
-      this.allItems = allItems.filter(service => service.status === "HABILITADO");
-      this.filteredServices = this.allItems;
-    });
+    this.functionDataCurrent = this.searchService.bind(this);
+    this.functionDataCurrent(this.pageSize);
+
+    // this.loadAllServices().subscribe(allItems => {
+    //   // Filtrar solo los servicios habilitados
+    //   this.allItems = allItems.filter(service => service.status === "HABILITADO");
+    //   this.filteredServices = this.allItems;
+    // });
   }
+
+
 
   //Primero hacer que se registre uno por uno
   //Probar que me traigan los 58 actuales y que se puedan asignar
@@ -130,6 +164,7 @@ export class AssignComponent implements OnInit {
 
   initialForm() {
     this.formAssign = this.fb.group({
+      categoryService: [''],
       service: [''],
       entity: [''],
       comission: ['FIJO', Validators.required],
@@ -144,11 +179,13 @@ export class AssignComponent implements OnInit {
     forkJoin([
       this.masterService.getItemsMasterTable('15'), // tipoComission
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
+      this.masterService.getItemsMasterTable('14') // CategoriaService
     ]).subscribe({
       next: (response) => {
-        const [typeComission, person] = response;
+        const [typeComission, person, categoryService] = response;
         this.typeComission = typeComission;
         this.persons = person.data;
+        this.categoriesService = categoryService;
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
@@ -177,7 +214,7 @@ export class AssignComponent implements OnInit {
     })
   }
 
-  selectEntity(event) {
+  selectEntity(event: any) {
     if (event.value == 'TODOS') {
       this.disableEntities = true
       this.getRecaudador();
@@ -203,7 +240,7 @@ export class AssignComponent implements OnInit {
 
 
 
-  selectedServiceAssing(event) {
+  selectedServiceAssing(event: any) {
     if (event.value == 'TODOS') {
       this.disableServiceOption = true;
       this.dataServicesEntity = this.allItems;
@@ -219,11 +256,11 @@ export class AssignComponent implements OnInit {
 
   }
 
-  listEntitySelect(list) {
-    this.data = this.convertData(list)
+  listEntitySelect(list: any[]) {
+    this.data = this.convertData(list);
   }
 
-  convertDataService(data) {
+  convertDataService(data: any[]) {
     return data.map((value) => ({
       business: value.business,
       description: value.description,
@@ -240,7 +277,7 @@ export class AssignComponent implements OnInit {
     }))
   }
 
-  convertData(data) {
+  convertData(data: any[]) {
     return data.map((value) => ({
       nameAlias: value.servicePerson.nameAlias,
       status: value.servicePerson.status,
@@ -345,14 +382,13 @@ export class AssignComponent implements OnInit {
     this.registerServiceRequest(this.dataRegister)
   }
 
- 
+
 
   clearRegister() {
     this.data = [];
     this.dataRegister = [];
     this.dataServicesEntity = [];
     this.selectedPerson = ''
-    this.serviceAssign.setValue('');
     this.service.setValue('');
     this.entity.setValue('');
   }
@@ -590,9 +626,99 @@ export class AssignComponent implements OnInit {
     this.selectedFile = null;
   }
 
-  /*************************************** METODOS GET DEL FORMULARIO ******************************************/
+  /******************************************** METODOS PARA LOS BOTONES ******************************************/
+
+  searchService(pageSize: any) {
+    this.spinner.spinnerOnOff();
+    //Obtenemos los servicios que se encuentran habilitados
+    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value, this.count, pageSize, this.pageKey).subscribe({
+      next: (data) => {
+        if (data.statusCode == 201) {
+          this.mytoastr.showWarning(data.messages, '');
+          return
+        }
+        this.dataTableFilter = [...this.dataTableFilter, ...data.data.Items]; // Acumula los datos en dataTableFilter
+        this.dataServiceTable = this.dataTableFilter.map((item, index) => ({
+          ...item,
+          index: index + 1, // Añadir un índice para la tabla
+          serviceTypeName: item.serviceType?.name || ''
+        }));
+        console.log('dataServiceTable', this.dataServiceTable);
+        this.pageKey = data.data.nextPageKey ?? null;
+        this.count = data.data.Count ?? 0;
+      },
+      error: (err) => {
+        console.log(err);
+        this.spinner.spinnerOnOff();
+      },
+      complete: () => {
+        this.spinner.spinnerOnOff();
+      }
+    })
+  }
+
+
+  clearFormAndData() {
+    this.count = null;
+    this.pageKey = undefined;
+    this.dataServiceTable = [];
+    this.dataTableFilter = [];
+    this.categoryService.setValue('');
+    this.service.setValue('');
+    this.searchService(this.pageSize);
+  }
+
+  /*********************************************** METODOS PARA EL PAGINADO Y OTROS *****************************************/
+  onPageChange(event: PageEvent) {
+    this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
+    this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
+  }
+
+  handleSelectedIds(selectedIds: any[]) {
+    // this.disabledEditOption = selectedIds.length !== 1;
+    // this.editOption = selectedIds.length == 1;
+    // this.selectedIds = selectedIds;
+    // if (this.selectedIds.length === 1) {
+
+    //   this.getIdService(selectedIds)
+
+    // }
+  }
+
+  selectedHandle(event: any) {
+    console.log('event', event);
+    // if (this.selectedIds.length === 1) {
+    //   this.spinner.spinnerOnOff();
+    //   let completedRequests = 0; // Contador para peticiones completadas
+
+    //   const checkAndStopSpinner = () => {
+    //     completedRequests++;
+    //     if (completedRequests === 2) {
+    //       this.spinner.spinnerOnOff(); // Desactivar spinner cuando ambas peticiones terminen
+    //     }
+    //   };
+    //   this.getIdPerson(event[0].idClient, null, checkAndStopSpinner)
+    //   this.getIdPerson(null, event[0].idProvider, checkAndStopSpinner)
+    // }
+  }
+
+
+  reload() {
+    this.dynamic.clearSelection();
+    this.searchService(this.pageSize);
+  }
+
+  /************************************** METODOS PARA VALIDACIONES **************************************************/
+
+  disabledBtnRegister(): boolean {
+    return !this.dataService || !this.data || this.data.length === 0;
+  }
+
+
+
+  /*************************************** METODOS GET DEL FORMULARIO ********************************************/
+  get categoryService() { return this.formAssign.get('categoryService') };
   get service() { return this.formAssign.get('service') };
-  get serviceAssign() { return this.formAssign.get('service') };
   get entity() { return this.formAssign.get('entity') };
   get comission() { return this.formAssign.get('comission').value };
   get fixed() { return this.formAssign.get('fixed').value };

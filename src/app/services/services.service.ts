@@ -2,8 +2,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ServiceByIdInterface } from '../interfaces/ServiceByIdInterface';
-import { ResponseDTO } from '../interfaces/ResponseInterface';
+import { ServiceByIdInterface } from '../interfaces/serviceByIdInterface';
+import { ResponseDTO } from '../interfaces/responseInterface';
+import { ServiceTableInterface } from '../interfaces/serviceTableInterface';
+import { PageInterface } from '../interfaces/PageInterface';
+
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +40,7 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string,type:string, count:number, limit?: any, pageKey?: any[]): Observable<any> {
+  getServices(name: string, status: string,type:string,category:string, count:number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
@@ -47,6 +50,10 @@ export class ServicesService {
     }
     if (type) {
       params = params.set('type', type);
+    }
+
+    if (category) {
+      params = params.set('category', category);
     }
 
     if (limit !== undefined) {
@@ -59,10 +66,10 @@ export class ServicesService {
     if (count != null) {
       params = params.set('count', count);
     }
-    return this.httpClient.get<any>(`${this.url}/services`, { params: params });
+    return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
-  getServicesPageKey(limit?:number,pageKey?: any[]): Observable<any> {
+  getServicesPageKey(limit?:number,pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams();
     if (limit !== undefined) {
       params = params.set('limit', limit);
@@ -70,7 +77,7 @@ export class ServicesService {
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
-    return this.httpClient.get<any>(`${this.url}/services`, { params: params });
+    return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
   getTypeServices(name?: string): Observable<any> {

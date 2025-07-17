@@ -46,6 +46,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() pageKey: any;
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
+  @Input() viewOptionsTable: boolean = true; //Si se muestran las opciones de la tabla(por defecto estara en true)
+
   @Input() lengthTable: any;
 
   @Output() pageChange = new EventEmitter<PageEvent>();
@@ -231,7 +233,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     const from = event.pageIndex * event.pageSize; // 1 * 5 = 5
     const to = from + event.pageSize;              // 5 + 5 = 10
 
-    console.log(`FROM: ${ from } TO: ${ to } LENGTH: ${ event.length }`);
+    console.log(`FROM: ${from} TO: ${to} LENGTH: ${event.length}`);
 
     if (from < event.length) {
       console.log('Datos disponibles para esta página');

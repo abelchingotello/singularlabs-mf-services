@@ -1,4 +1,4 @@
-export interface ServiceByIdInterface {
+export interface ServiceByIdInterface {//Interface para el servicio de obtener un servicio por id
     id: string;//id
     idProvider: string;//idProvider
     idClient: string;//idClient

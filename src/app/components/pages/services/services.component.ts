@@ -95,7 +95,7 @@ export class ServicesComponent implements OnInit {
 
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, inputStatus,inputType, this.count, pageSize, this.pageKey).subscribe({
+    this.services.getServices(input, inputStatus,inputType,null, this.count, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
