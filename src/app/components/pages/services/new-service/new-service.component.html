@@ -7,12 +7,12 @@
 
         <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight backgroundColor="primary">
             <mat-tab label="Datos de Servicio">
-                <mat-card >
+                <mat-card>
                     <mat-card-content>
                         <div class="p-4">
                             <ng-container>
                                 <form [formGroup]="serviceForm">
-        
+
                                     <mat-form-field appearance="outline" fxFlex="25%" class="col-md-4">
                                         <mat-label>Nombre de Servicio</mat-label>
                                         <input formControlName="service_name" type="text" matInput />
@@ -20,8 +20,9 @@
                                 Este campo es requerido
                             </mat-error> -->
                                     </mat-form-field>
-        
-                                    <mat-form-field *ngIf="editAsigService" appearance="outline" fxFlex="75%" class="col-md-4 ">
+
+                                    <mat-form-field *ngIf="editAsigService" appearance="outline" fxFlex="75%"
+                                        class="col-md-4 ">
                                         <mat-label>Seleccionar proveedor</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_prov">
@@ -33,8 +34,9 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
-                                    <mat-form-field *ngIf="editClient" appearance="outline" fxFlex="75%" class="col-md-4 ">
+
+                                    <mat-form-field *ngIf="editClient" appearance="outline" fxFlex="75%"
+                                        class="col-md-4 ">
                                         <mat-label>Seleccionar cliente</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_client">
@@ -46,7 +48,7 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="25%" class="col-md-4">
                                         <mat-label>Código de convenio</mat-label>
                                         <input formControlName="service_convenio" type="text" matInput />
@@ -55,7 +57,7 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Seleccionar Tipo</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
@@ -68,7 +70,7 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Negocio</mat-label>
                                         <input formControlName="service_type_business" type="text" matInput
@@ -78,7 +80,7 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Estado</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
@@ -91,8 +93,8 @@
                         </mat-error> -->
                                         <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
-        
+
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Seleccionar Zona </mat-label>
                                         <!-- <input formControlName="service_zone" type="text"  matInput placeholder="Ingresa nombre" > -->
@@ -116,21 +118,21 @@
 
                                     </mat-form-field>
 
-        
+
                                 </form>
                                 <!-- <div class="btn-guardar button-container">
                         <button  routerLink="/service" class="btn btn-primary">CANCELAR</button>
                         <button  (click)="saveService()" class="btn btn-primary">GUARDAR</button>
                     </div> -->
                             </ng-container>
-        
+
                         </div>
                     </mat-card-content>
                 </mat-card>
             </mat-tab>
-        
-            <mat-tab label="Datos de Comisiones" [disabled]="tab2" >
-                <mat-card >
+
+            <mat-tab label="Datos de Comisiones" [disabled]="tab2">
+                <mat-card>
                     <mat-card-content>
                         <div class="p-4 row-container">
                             <!-- Comisión de Proveedor -->
@@ -150,9 +152,11 @@
                     </mat-error> -->
                                         <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
-                                    <mat-form-field *ngIf="comissionFixed" appearance="outline" fxFlex="25%" class="col-md-6">
+                                    <mat-form-field *ngIf="comissionFixed" appearance="outline" fxFlex="25%"
+                                        class="col-md-6">
                                         <mat-label>Comisión fija</mat-label>
-                                        <input formControlName="comission_fixed" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="comission_fixed" type="number" min="0" step="0.01"
+                                            matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -161,7 +165,8 @@
                                     <mat-form-field *ngIf="comissionCriterio" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión de criterio</mat-label>
-                                        <input formControlName="comission_criterion" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="comission_criterion" type="number" min="0" step="0.01"
+                                            matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -170,13 +175,14 @@
                                     <mat-form-field *ngIf="comissionPercentage" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión porcentual </mat-label>
-                                        <input formControlName="comission_percentage" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="comission_percentage" type="number" min="0" step="0.01"
+                                            matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
                                         <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
-        
+
                                 </form>
                             </div>
                             <!-- COMISION DE CLIENTE -->
@@ -198,7 +204,8 @@
                                     <mat-form-field *ngIf="owncomissionFixed" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión fija</mat-label>
-                                        <input formControlName="ownCommission_fixed" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="ownCommission_fixed" (blur)="validComissionFixed()" type="number" min="0" step="0.01"
+                                            matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -207,7 +214,8 @@
                                     <mat-form-field *ngIf="owncomissionCriterio" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión de criterio</mat-label>
-                                        <input formControlName="ownCommission_criterion" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="ownCommission_criterion" type="number" min="0"
+                                            step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -216,7 +224,8 @@
                                     <mat-form-field *ngIf="owncomissionPercentage" appearance="outline" fxFlex="25%"
                                         class="col-md-6">
                                         <mat-label>Comisión porcentual </mat-label>
-                                        <input formControlName="ownCommission_percentage" type="number" min="0" step="0.01" matInput />
+                                        <input formControlName="ownCommission_percentage" type="number" min="0"
+                                            step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                         Este campo es requerido
                     </mat-error> -->
@@ -229,17 +238,18 @@
                     </mat-card-content>
                 </mat-card>
             </mat-tab>
-        
-        
-            <mat-tab label="Datos Pagos-Adicionales" *ngIf="disableTab3" [disabled]="tab3" >
-                <mat-card >
+
+
+            <mat-tab label="Datos Pagos-Adicionales" *ngIf="disableTab3" [disabled]="tab3">
+                <mat-card>
                     <mat-card-content>
                         <div class="p-4">
                             <ng-container>
                                 <form [formGroup]="paymentFieldsForm">
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>ID</mat-label>
-                                        <input formControlName="paymentFields_id" type="text" matInput placeholder="Ingresa ID">
+                                        <input formControlName="paymentFields_id" type="text" matInput
+                                            placeholder="Ingresa ID">
                                         <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
                                 Este campo es requerido
                             </mat-error> -->
@@ -254,7 +264,7 @@
                             </mat-error> -->
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Tipo de campo</mat-label>
                                         <input formControlName="paymentFields_fieldType" type="text" matInput
@@ -264,7 +274,7 @@
                             </mat-error> -->
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Máscara de campo</mat-label>
                                         <input formControlName="paymentFields_fieldMask" type="text" matInput
@@ -274,7 +284,7 @@
                             </mat-error> -->
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4 ">
                                         <mat-label>Longitud máxima</mat-label>
                                         <input formControlName="paymentFields_max" type="text" matInput
@@ -284,13 +294,13 @@
                             </mat-error> -->
                                         <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-        
+
 
                                     <mat-checkbox formControlName="paymentFields_mandatory" class="col-md-4">
                                         <mat-label>Es obligatorio</mat-label>
                                     </mat-checkbox>
                                     <mat-checkbox formControlName="paymentFields_edit" class="col-md-4">
-                                        <mat-label>Es Editable</mat-label>    
+                                        <mat-label>Es Editable</mat-label>
                                     </mat-checkbox>
 
                                 </form>
@@ -299,9 +309,9 @@
                                         Agregar <mat-icon>save</mat-icon>
                                     </button>
                                 </div>
-        
-                                <uni-dynamic-table [columns]="columns" [data]="dataPayment" element_id="paymentFields_id"
-                                    [pageKey]="pageKey">
+
+                                <uni-dynamic-table [columns]="columns" [data]="dataPayment"
+                                    element_id="paymentFields_id" [pageKey]="pageKey">
                                 </uni-dynamic-table>
                             </ng-container>
                         </div>
