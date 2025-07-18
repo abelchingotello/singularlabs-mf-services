@@ -107,6 +107,7 @@ export class AssignComponent implements OnInit {
   public isProcessingExcel: boolean = false;
   public requiredIdClient: string = '';
   public showIdClientDialog: boolean = false;
+  public disableFile: boolean = false;
   //------------------
 
   constructor(
@@ -473,6 +474,7 @@ export class AssignComponent implements OnInit {
       this.mytoastr.showWarning('Error', 'Debe ingresar un ID Cliente válido');
       return;
     }
+    this.disableEntities = true; // Deshabilitar la selección de entidades
     this.showIdClientDialog = false;
     this.showExcelUpload = true;
   }
@@ -540,7 +542,8 @@ export class AssignComponent implements OnInit {
       console.error('Error procesando archivo Excel:', error);
       this.mytoastr.showError('Error', 'Error al procesar el archivo Excel');
     } finally {
-      this.isProcessingExcel = false;
+      this.isProcessingExcel = true;
+      this.disableFile = true;
       this.spinner.spinnerOnOff();
     }
   }
@@ -614,6 +617,8 @@ export class AssignComponent implements OnInit {
   // Método para cancelar la carga de Excel
   cancelExcelUpload() {
     this.showExcelUpload = false;
+    this.isProcessingExcel = false;
+    this.disableFile = false;
     this.selectedFile = null;
     this.excelData = [];
     this.data = [];
@@ -624,6 +629,8 @@ export class AssignComponent implements OnInit {
     this.excelData = [];
     this.data = [];
     this.selectedFile = null;
+    this.isProcessingExcel = false;
+    this.disableFile = false;
   }
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
