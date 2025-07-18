@@ -20,7 +20,7 @@
             </mat-card-content>
           </div>
           <mat-card-actions align="end" class="button-asign">
-            <button mat-raised-button color="primary" (click)="serviceEntity()">
+            <button mat-raised-button color="primary" (click)="redirectAsign(1)">
               <span>Ingresar</span>
               <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
@@ -40,7 +40,7 @@
             </mat-card-content>
           </div>
           <mat-card-actions align="end" class="button-asign">
-            <button mat-raised-button color="primary" (click)="entityService()">
+            <button mat-raised-button color="primary" (click)="redirectAsign(2)">
               <span>Ingresar</span>
               <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
@@ -65,7 +65,7 @@
                 </mat-select>
               </mat-form-field>
 
-              <mat-form-field appearance="outline" *ngIf="comissionFixed">
+              <mat-form-field appearance="outline">
                 <mat-label>Nombre de Servicio</mat-label>
                 <input formControlName="service" matInput type="text" />
               </mat-form-field>

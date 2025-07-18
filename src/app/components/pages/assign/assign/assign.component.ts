@@ -119,7 +119,7 @@ export class AssignComponent implements OnInit {
     private masterService: MasterService,
     private personService: PersonService,
     private fb: FormBuilder,
-    private router : Router,
+    private router: Router,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private cookies: CookieService
@@ -232,29 +232,9 @@ export class AssignComponent implements OnInit {
     this.requiredIdClient = event.value;
   }
 
-  selectedPerson
-  selectAsignService(event) {
-    this.selectedPerson = event.value
-  }
 
 
 
-
-  selectedServiceAssing(event: any) {
-    if (event.value == 'TODOS') {
-      this.disableServiceOption = true;
-      this.dataServicesEntity = this.allItems;
-    } else {
-      this.disableServiceOption = false
-      this.disableServiceAll = true
-      this.dataServicesEntity = this.convertDataService(event.value)
-    }
-
-    if (event.value.length === 0) {
-      this.disableServiceAll = false;
-    }
-
-  }
 
   listEntitySelect(list: any[]) {
     this.data = this.convertData(list);
@@ -289,7 +269,7 @@ export class AssignComponent implements OnInit {
   }
 
 
-  typeComissionService(event) {
+  typeComissionService(event: any) {
     switch (event.value) {
       case 'FIJO':
         this.comissionFixed = true;
@@ -376,7 +356,7 @@ export class AssignComponent implements OnInit {
       ownFixedComission: this.fixed.value ?? 0, //numeber
       ownCriterionComission: this.multiple ?? 0, //number
       ownPCTComission: this.porcent ?? 0, //number
-      ownComissionType: this.comission,
+      ownComissionType: this.comission.value,
       indicators: this.dataServiceSelected.indicators,
       additionalPaymentFields: this.dataServiceSelected.additional,
       comissionFixed: this.dataServiceSelected.fixedcomission, //number
@@ -391,7 +371,6 @@ export class AssignComponent implements OnInit {
     this.data = [];
     this.dataRegister = [];
     this.dataServicesEntity = [];
-    this.selectedPerson = ''
     this.service.setValue('');
     this.entity.setValue('');
   }
@@ -648,8 +627,6 @@ export class AssignComponent implements OnInit {
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
 
-
-
   searchService(pageSize: any) {
     this.dataServiceSelected = null;//Limpiar el servicio seleccionado
     this.dataServiceSelectedIds = []; // Limpiar los IDs seleccionados
@@ -699,6 +676,16 @@ export class AssignComponent implements OnInit {
     this.dataTableFilter = [];
     this.dynamicTable.clearSelection(); // Limpiar la selección de la tabla dinámica(y ids)
     this.searchService(this.pageSize);
+  }
+
+  //Redireccionar a asignación individual(1) o masiva(2)
+  redirectAsign(type: number) {
+    if (type === 1) {
+      this.router.navigate(['../assign/individual']);
+    } else if (type === 2) {
+      this.router.navigate(['../assign/massive']);
+    }
+
   }
 
   /*********************************************** METODOS PARA EL PAGINADO Y OTROS *****************************************/
@@ -752,8 +739,8 @@ export class AssignComponent implements OnInit {
   get categoryService() { return this.formAssign.get('categoryService') };
   get service() { return this.formAssign.get('service') };
   get entity() { return this.formAssign.get('entity') };
-    get fixed() { return this.formAssign.get('fixed') };
-  get comission() { return this.formAssign.get('comission').value };
+  get fixed() { return this.formAssign.get('fixed') };
+  get comission() { return this.formAssign.get('comission') };
   get multiple() { return this.formAssign.get('multiple').value };
   get porcent() { return this.formAssign.get('porcent').value };
 }
