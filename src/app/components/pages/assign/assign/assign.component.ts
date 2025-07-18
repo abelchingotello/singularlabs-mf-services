@@ -452,6 +452,7 @@ export class AssignComponent implements OnInit {
       },
       complete: () => {
         this.clearRegister()
+        
         this.spinner.spinnerOnOff();
 
       }

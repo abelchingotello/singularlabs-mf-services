@@ -221,8 +221,8 @@ export class ImportServicesComponent implements OnInit {
       }
 
       // Filtrar registros que estén Activos
-      const filteredData = jsonData.filter(value => value['Estado del convenio T'] == 'Activo');
-
+      //const filteredData = jsonData.filter(value => value['Estado del convenio T'] == 'Activo');
+      const filteredData = jsonData;
       // Transformar los registros filtrados
       return filteredData.map(value => {
         const pk = uuidv4();
@@ -313,7 +313,6 @@ export class ImportServicesComponent implements OnInit {
         this.isProcessingExcel = true;
         this.showSendServices = true;
         this.spinner.spinnerOnOff();
-        
       }
     }
   
