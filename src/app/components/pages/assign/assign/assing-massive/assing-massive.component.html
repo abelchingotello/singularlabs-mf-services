@@ -7,33 +7,6 @@
 
         <div>
 
-            <!-- Diálogo para solicitar el id client -->
-            <div *ngIf="showIdClientDialog" class="overlay">
-                <mat-card class="dialog-card animate-dialog">
-                    <mat-card-header>
-                        <mat-card-title>ID Cliente Requerido</mat-card-title>
-                        <mat-card-subtitle>Ingrese el ID del cliente para las asignaciones</mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>ID Cliente</mat-label>
-                            <input matInput type="text" [(ngModel)]="requiredIdClient" placeholder="Ejem: 39926100">
-                            <!-- <mat-hint>Este ID de cliente se aplicará a todas las asignaciones del archivo</mat-hint> -->
-                        </mat-form-field>
-                    </mat-card-content>
-                    <mat-card-actions align="end" class="dialog-actions">
-                        <button mat-button (click)="cancelIdClientDialog()">
-                            <mat-icon>close</mat-icon>
-                            Cancelar
-                        </button>
-                        <button mat-raised-button color="primary" (click)="confirmIdClient()">
-                            <mat-icon>check</mat-icon>
-                            Continuar
-                        </button>
-                    </mat-card-actions>
-                </mat-card>
-            </div>
-
 
             <div class="excel-upload-section">
                 <mat-card>

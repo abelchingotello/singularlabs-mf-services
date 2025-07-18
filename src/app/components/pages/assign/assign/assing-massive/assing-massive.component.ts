@@ -28,7 +28,6 @@ export class AssingMassiveComponent implements OnInit {
   public excelData: any[] = [];
   public isProcessingExcel: boolean = false;
   public requiredIdClient: string = '';
-  public showIdClientDialog: boolean = false;
   public disableFile: boolean = false;
   //------------------
 
@@ -55,7 +54,7 @@ export class AssingMassiveComponent implements OnInit {
       this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
     ]).subscribe({
       next: (response) => {
-        const [ person] = response;
+        const [person] = response;
         this.persons = person.data;
       },
       error: (error) => {
@@ -70,12 +69,6 @@ export class AssingMassiveComponent implements OnInit {
 
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
-  // Método para cancelar el diálogo
-  cancelIdClientDialog() {
-    this.showIdClientDialog = false;
-    this.requiredIdClient = '';
-  }
-
   // Método para confirmar el ID Cliente e iniciar la carga
   confirmIdClient() {
     if (!this.requiredIdClient.trim()) {
@@ -83,7 +76,6 @@ export class AssingMassiveComponent implements OnInit {
       return;
     }
     this.disableEntities = true; // Deshabilitar la selección de entidades
-    this.showIdClientDialog = false;
     this.showExcelUpload = true;
   }
 
