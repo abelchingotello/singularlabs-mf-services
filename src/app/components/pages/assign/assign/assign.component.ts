@@ -377,7 +377,7 @@ export class AssignComponent implements OnInit {
       status: this.dataServiceSelected.status,
       zone: 'MULTIDEPARTAMENTAL',
       collectorName: "",//vacio cuando son clientes // somos proveedores
-      ownFixedComission: this.fixed ?? 0, //numeber
+      ownFixedComission: this.fixed.value ?? 0, //numeber
       ownCriterionComission: this.multiple ?? 0, //number
       ownPCTComission: this.porcent ?? 0, //number
       ownComissionType: this.comission,
@@ -721,6 +721,17 @@ export class AssignComponent implements OnInit {
     this.searchService(this.pageSize);
   }
 
+  /********************************* METODOS PARA INPUTS ****************************************************/
+  validComissionFixed(): void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
+    if (this.dataServiceSelected?.fixedcomission && this.fixed.value) {
+      if (Number(this.fixed.value) > this.dataServiceSelected.fixedcomission) {
+        this.mytoastr.showWarning('La comisión fija debe ser menor que la comisión fija del servicio: ', this.dataServiceSelected.fixedcomission.toString());
+        this.fixed.setValue('');
+      }
+    }
+  }
+
+
   /************************************** METODOS PARA VALIDACIONES **************************************************/
 
   disabledBtnRegister(): boolean {
@@ -729,12 +740,13 @@ export class AssignComponent implements OnInit {
 
 
 
+
   /*************************************** METODOS GET DEL FORMULARIO ********************************************/
   get categoryService() { return this.formAssign.get('categoryService') };
   get service() { return this.formAssign.get('service') };
   get entity() { return this.formAssign.get('entity') };
+    get fixed() { return this.formAssign.get('fixed') };
   get comission() { return this.formAssign.get('comission').value };
-  get fixed() { return this.formAssign.get('fixed').value };
   get multiple() { return this.formAssign.get('multiple').value };
   get porcent() { return this.formAssign.get('porcent').value };
 }
