@@ -15,7 +15,7 @@ export class MasterService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getItemsMasterTable(group) : Observable <MasterInterface[]> {
+  getItemsMasterTable(group:string) : Observable <MasterInterface[]> {
     let params = new HttpParams()
     .set('group', group);
     return this.httpClient.get<MasterInterface[]>(`${this.url}/group`, {params: params});

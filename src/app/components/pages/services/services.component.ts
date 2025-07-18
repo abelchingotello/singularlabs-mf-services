@@ -102,12 +102,10 @@ export class ServicesComponent implements OnInit {
           return
         }
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
-        // this.dataFilter = data;
         this.dataService = this.dataFilter.map(item => ({
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
-        console.log('dataService', this.dataService);
         this.pageKey = data.data.nextPageKey ?? null;
         this.count = data.data.Count ?? 0;
       },
@@ -196,7 +194,7 @@ export class ServicesComponent implements OnInit {
 
 
   dataMaster() {
-    this.master.getItemsMasterTable(1).subscribe({
+    this.master.getItemsMasterTable('1').subscribe({
       next: (data) => {
         this.stateMaster = data;
       },
