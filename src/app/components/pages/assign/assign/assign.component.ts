@@ -15,6 +15,7 @@ import { ServiceTableInterface } from 'src/app/interfaces/serviceTableInterface'
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
+import { Router } from '@angular/router';
 //
 
 @Component({
@@ -118,6 +119,7 @@ export class AssignComponent implements OnInit {
     private masterService: MasterService,
     private personService: PersonService,
     private fb: FormBuilder,
+    private router : Router,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private cookies: CookieService
@@ -128,12 +130,6 @@ export class AssignComponent implements OnInit {
     this.initialForm();
     this.functionDataCurrent = this.searchService.bind(this);
     this.functionDataCurrent(this.pageSize);
-
-    // this.loadAllServices().subscribe(allItems => {
-    //   // Filtrar solo los servicios habilitados
-    //   this.allItems = allItems.filter(service => service.status === "HABILITADO");
-    //   this.filteredServices = this.allItems;
-    // });
   }
 
 
@@ -424,6 +420,9 @@ export class AssignComponent implements OnInit {
     this.cancel = false;
     this.showIdClientDialog = false;
     this.showExcelUpload = false;
+    this.clearExcelData();
+    this.clearRegister();
+    this.cancelExcelUpload();
   }
 
   chunkArray(array: any[], size: number): any[][] {
@@ -457,8 +456,10 @@ export class AssignComponent implements OnInit {
         console.error(error)
       },
       complete: () => {
-        this.clearRegister()
-        
+        this.clearRegister();
+        this.clearExcelData();
+        this.cancelExcelUpload();
+        //this.router.navigate(['../assign/list'])
         this.spinner.spinnerOnOff();
 
       }
@@ -573,7 +574,9 @@ export class AssignComponent implements OnInit {
         ownFixedComission: "",
         ownCriterionComission: "",
         ownPCTComission: "",
-        ownComissionType: ""
+        ownComissionType: "",
+        comissionFixed: "",
+        comissionPCT: "",
       };
 
       const tipoComision = row["TIPO DE COMISION"] || "";
@@ -582,11 +585,13 @@ export class AssignComponent implements OnInit {
       // Lógica de comisiones del script original
       if (tipoComision === "Comisión fija") {
         jsonObj.ownComissionType = "FIJO";
+        jsonObj.comissionFixed = valorComision;
         jsonObj.ownFixedComission = valorComision;
       } else if (tipoComision === "Comsión porcentual sobre el monto" ||
         tipoComision === "Comisión porcentual sobre el monto") {
         jsonObj.ownComissionType = "PORCENTUAL";
         jsonObj.ownPCTComission = valorComision;
+        jsonObj.comissionPCT = valorComision;
       } else if (tipoComision === "Comisión Múltiple") {
         jsonObj.ownComissionType = "MULTIPLE";
       }
@@ -626,6 +631,7 @@ export class AssignComponent implements OnInit {
     this.showExcelUpload = false;
     this.isProcessingExcel = false;
     this.disableFile = false;
+    this.disableEntities = false;
     this.selectedFile = null;
     this.excelData = [];
     this.data = [];

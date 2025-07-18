@@ -86,26 +86,6 @@
 
             <div class="grid-container">
 
-              <!-- <mat-form-field appearance="outline">
-                <mat-label>Servicio</mat-label>
-                <mat-select (selectionChange)="selectedService($event)" formControlName="service" disableOptionCentering
-                  panelClass="custom-select-panel">
-                  <mat-option disabled class="search-option">
-                    <input matInput placeholder="Buscar servicio..." [(ngModel)]="serviceFilter"
-                      [ngModelOptions]="{standalone: true}" (ngModelChange)="filterServices()"
-                      (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
-                      (keydown.enter)="$event.stopPropagation()" autocomplete="off" />
-                  </mat-option>
-
-                  <mat-option *ngFor="let service of filteredServices" [value]="service">
-                    {{ service.name }}
-                  </mat-option>
-
-                </mat-select>
-              </mat-form-field> -->
-
-
-
               <mat-form-field appearance="outline">
                 <mat-label>Entidad</mat-label>
                 <mat-select formControlName="entity" (selectionChange)="selectEntity($event)" multiple>
@@ -116,7 +96,6 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
-
 
 
               <mat-form-field appearance="outline">
@@ -297,13 +276,10 @@
         </mat-card>
       </div>
 
-
-      <mat-card>
-
+      <!-- <mat-card>
         <uni-dynamic-table element_id="idPerson" [columns]="columnsService" [data]="dataServicesEntity">
-
         </uni-dynamic-table>
-      </mat-card>
+      </mat-card> -->
     </div>
 
 
