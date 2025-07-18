@@ -47,6 +47,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
   @Input() viewOptionsTable: boolean = true; //Si se muestran las opciones de la tabla(por defecto estara en true)
+  @Input() viewCheckboxHeader: boolean = true; //Si se muestra el checkbox en el encabezado(por defecto estara en true)
 
   @Input() lengthTable: any;
 

@@ -61,9 +61,9 @@ export class AssignComponent implements OnInit {
   public count: number = null; // Variable para el total de elementos
   public pageSize: any = 5;
   public pageKey: any[];
-  private pagUtils: PaginationUtils;
+  private pagUtils: PaginationUtils = new PaginationUtils();
   public functionDataCurrent: (pageSize: any) => any;
-  @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
+  @ViewChild(DynamicTableComponent) dynamicTable!: DynamicTableComponent;
   public columnsTableService: any[] = [
     { 'name': 'NUM', 'attribute': 'index' },
     { 'name': 'Nombre', 'attribute': 'name' },
@@ -74,6 +74,8 @@ export class AssignComponent implements OnInit {
       }
     },
   ];
+  public dataServiceSelected: ServiceTableInterface = null;//Información del servicio seleccionado
+  public dataServiceSelectedIds: string[] = []; // IDs de los servicios seleccionados(solo deberia ser 1)
   //------------------------
 
 
@@ -87,7 +89,8 @@ export class AssignComponent implements OnInit {
   public comissionFixed: boolean = true;
   public comissionPorcent: boolean = false;
   public comissionMultiple: boolean = false;
-  public dataService: any;
+  // public dataService: any;
+
   public oneView: boolean = false;
   public twoView: boolean = false;
   public zeroView: boolean = true;
@@ -335,10 +338,10 @@ export class AssignComponent implements OnInit {
         break;
     }
   }
-  selectedService(event) {
-    // Usar directamente el servicio seleccionado sin hacer llamada HTTP
-    this.dataService = event.value;
-  }
+  // selectedService(event) {
+  //   // Usar directamente el servicio seleccionado sin hacer llamada HTTP
+  //   this.dataService = event.value;
+  // }
 
   filterServices() {
     const value = this.serviceFilter?.toLowerCase() || '';
@@ -349,36 +352,39 @@ export class AssignComponent implements OnInit {
 
   // De una persona a varios servicios
   registerServiceAssign() {
-    // Comprobar si existe un servicio seleccionado
-    if (!this.dataService) {
-      this.mytoastr.showWarning('Error', 'Debe seleccionar un servicio válido primero');
+    //Comprobar si existe al menos un servicio seleccionado
+    if (!this.dataServiceSelectedIds || this.dataServiceSelectedIds.length === 0) {
+      this.mytoastr.showWarning('Error', 'Debe seleccionar un servicio para asignar.');
       return;
     }
+    // Comprobar si existe un solo servicio seleccionado
+    if (this.dataServiceSelectedIds.length > 1) {
+      this.mytoastr.showWarning('Error', 'Debe seleccionar un solo servicio para asignar.');
+      return;
+    }
+    //Si pasa a esta parte es pq existe un solo servicio seleccionado(dataServiceSelected)
 
-    // Comprobar si existen entidades seleccionadas
-    if (!this.data || this.data.length === 0) {
-      this.mytoastr.showWarning('Error', 'Debe seleccionar al menos una entidad');
-      return;
-    }
     //Limpiar cuando se cambie de tipo de comisión
     this.dataRegister = this.data.map(value => ({
       idProvider: '00000100',// ID ´PROVEEDOR
       idClient: value.idPerson, //ID DE RECAUDADORA
-      idServiceProv: this.dataService.id_serviceProv, //id de convenio
-      serviceName: this.dataService.name, //nnomb de servicio
+      idServiceProv: this.dataServiceSelected.id_serviceProv, //id de convenio
+      serviceName: this.dataServiceSelected.name, //nnomb de servicio
       userRegistration: this.cookies.get('person_id') || 'desconocido',
-      idTypeService: this.dataService.serviceType.id,
-      typeService: this.dataService.serviceType.name,//master
-      business: this.dataService.business, //nombre de negocio
-      status: this.dataService.status,
+      idTypeService: this.dataServiceSelected.serviceType.id,
+      typeService: this.dataServiceSelected.serviceType.name,//master
+      business: this.dataServiceSelected.business, //nombre de negocio
+      status: this.dataServiceSelected.status,
       zone: 'MULTIDEPARTAMENTAL',
       collectorName: "",//vacio cuando son clientes // somos proveedores
       ownFixedComission: this.fixed ?? 0, //numeber
       ownCriterionComission: this.multiple ?? 0, //number
       ownPCTComission: this.porcent ?? 0, //number
       ownComissionType: this.comission,
-      indicators: this.dataService.indicators,
-      additionalPaymentFields: this.dataService['additional-payment-fields']
+      indicators: this.dataServiceSelected.indicators,
+      additionalPaymentFields: this.dataServiceSelected.additional,
+      comissionFixed: this.dataServiceSelected.fixedcomission, //number
+      comissionPCT: this.dataServiceSelected.pctcomission, //number
     }))
     this.registerServiceRequest(this.dataRegister)
   }
@@ -636,10 +642,15 @@ export class AssignComponent implements OnInit {
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
 
+
+
   searchService(pageSize: any) {
+    this.dataServiceSelected = null;//Limpiar el servicio seleccionado
+    this.dataServiceSelectedIds = []; // Limpiar los IDs seleccionados
+
     this.spinner.spinnerOnOff();
     //Obtenemos los servicios que se encuentran habilitados
-    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value, this.count, pageSize, this.pageKey).subscribe({
+    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value?.master_name, this.count, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '');
@@ -651,7 +662,6 @@ export class AssignComponent implements OnInit {
           index: index + 1, // Añadir un índice para la tabla
           serviceTypeName: item.serviceType?.name || ''
         }));
-        console.log('dataServiceTable', this.dataServiceTable);
         this.pageKey = data.data.nextPageKey ?? null;
         this.count = data.data.Count ?? 0;
       },
@@ -676,50 +686,46 @@ export class AssignComponent implements OnInit {
     this.searchService(this.pageSize);
   }
 
+  searchBtn() {
+    this.count = null;
+    this.pageKey = undefined;
+    this.dataServiceTable = [];
+    this.dataTableFilter = [];
+    this.dynamicTable.clearSelection(); // Limpiar la selección de la tabla dinámica(y ids)
+    this.searchService(this.pageSize);
+  }
+
   /*********************************************** METODOS PARA EL PAGINADO Y OTROS *****************************************/
   onPageChange(event: PageEvent) {
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
   }
 
-  handleSelectedIds(selectedIds: any[]) {
-    // this.disabledEditOption = selectedIds.length !== 1;
-    // this.editOption = selectedIds.length == 1;
-    // this.selectedIds = selectedIds;
-    // if (this.selectedIds.length === 1) {
-
-    //   this.getIdService(selectedIds)
-
-    // }
+  handleSelectedIds(selectedIds: string[]) {
+    this.dataServiceSelectedIds = selectedIds; // Asignar los IDs seleccionados a dataServiceSelectedIds
   }
 
   selectedHandle(event: any) {
-    console.log('event', event);
-    // if (this.selectedIds.length === 1) {
-    //   this.spinner.spinnerOnOff();
-    //   let completedRequests = 0; // Contador para peticiones completadas
-
-    //   const checkAndStopSpinner = () => {
-    //     completedRequests++;
-    //     if (completedRequests === 2) {
-    //       this.spinner.spinnerOnOff(); // Desactivar spinner cuando ambas peticiones terminen
-    //     }
-    //   };
-    //   this.getIdPerson(event[0].idClient, null, checkAndStopSpinner)
-    //   this.getIdPerson(null, event[0].idProvider, checkAndStopSpinner)
-    // }
+    if (event && event.length > 0) {//Verificar si hay almenos uno seleccionado, sino limpiamos la seleccion
+      if (this.dataServiceSelected) {
+        this.dataServiceSelected = null;
+      }
+      this.dataServiceSelected = event[0];
+    } else {
+      this.dataServiceSelected = null;
+    }
   }
 
 
   reload() {
-    this.dynamic.clearSelection();
+    this.dynamicTable.clearSelection();
     this.searchService(this.pageSize);
   }
 
   /************************************** METODOS PARA VALIDACIONES **************************************************/
 
   disabledBtnRegister(): boolean {
-    return !this.dataService || !this.data || this.data.length === 0;
+    return !this.dataServiceSelected || !this.data || this.data.length == 0;
   }
 
 

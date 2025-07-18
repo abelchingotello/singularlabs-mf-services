@@ -8,8 +8,12 @@ export interface ServiceTableInterface {//Interface para el servicio de obtener 
     name: string;
     description: string;
     serviceType: any;
+    serviceTypeName: string;//Este valor lo suelen llenar en el front
     status: string;
     indicators: any[];
     additional: any[];
     id_serviceProv: string;
+    fixedcomission: number;//fixedcomission
+    pctcomission: number;//pctcomission
+
 }

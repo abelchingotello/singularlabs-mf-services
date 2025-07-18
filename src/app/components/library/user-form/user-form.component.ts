@@ -93,14 +93,14 @@ export class UserFormComponent implements OnInit {
 
     this.onSelectDocumentType(this.typeDoc)
     // TRAER ESTADOS
-    this.masterService.getItemsMasterTable(1).subscribe({
+    this.masterService.getItemsMasterTable('1').subscribe({
       next: (data) => {
         this.stateMaster = data;
         console.log("DATAMASTER", data)
       }
     });
 
-    this.masterService.getItemsMasterTable(4).subscribe({
+    this.masterService.getItemsMasterTable('4').subscribe({
       next: (role) => {
         this.roleMaster = role;
         console.log("ROLES", role)
