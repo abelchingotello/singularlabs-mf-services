@@ -27,7 +27,7 @@
               </mat-form-field>
 
               <div class="action-buttons">
-                <button mat-raised-button color="accent" (click)="confirmIdClient()" [disabled]="requiredIdClient==''|| disableCargar">
+                <button mat-raised-button class="color-button" (click)="confirmIdClient()" [disabled]="requiredIdClient==''|| disableCargar">
                   <mat-icon>upload_file</mat-icon>
                     Cargar desde Excel
                 </button>
@@ -60,13 +60,13 @@
               </div>
             </div>
             <div class="action-buttons">
-              <button mat-raised-button color="primary" [disabled]="!selectedFile || isProcessingExcel"
+              <button mat-raised-button class="color-button" [disabled]="!selectedFile || isProcessingExcel"
                 (click)="processExcelFile()">
                 <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
                 <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
                 {{isProcessingExcel ? 'Validado' : 'Validar Archivo'}}
               </button>
-              <button mat-button color="warn" (click)="cancelExcelUpload()">Cancelar</button>
+              <button mat-button class="color-button" (click)="cancelExcelUpload()">Cancelar</button>
             </div>
           </mat-card-content>
         </mat-card>
@@ -92,11 +92,11 @@
             ¿Está seguro de que desea enviar los servicios validados?
           </p>
           <div class="action-buttons">
-            <button mat-raised-button color="accent" (click)="sendServices()">
+            <button mat-raised-button class="color-button" (click)="sendServices()">
               <mat-icon>send</mat-icon>
               Enviar
             </button>
-            <button mat-button color="warn" (click)="cancelSend()">Cancelar</button>
+            <button mat-button class="color-button" (click)="cancelSend()">Cancelar</button>
           </div>
         </mat-card-content>
       </mat-card>

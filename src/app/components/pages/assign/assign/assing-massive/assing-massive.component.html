@@ -33,7 +33,7 @@
                     </mat-card-content>
 
                     <mat-card-actions>
-                        <button mat-raised-button color="accent" (click)="confirmIdClient()"
+                        <button mat-raised-button class="color-button" (click)="confirmIdClient()"
                             [disabled]="requiredIdClient=='' ">
                             <mat-icon>upload_file</mat-icon>
                             Cargar desde Excel
@@ -66,13 +66,13 @@
                             </div>
                         </div>
                         <div class="action-buttons">
-                            <button mat-raised-button color="primary" [disabled]="!selectedFile || isProcessingExcel"
+                            <button mat-raised-button class="color-button" [disabled]="!selectedFile || isProcessingExcel"
                                 (click)="processExcelFile()">
                                 <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
                                 <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
                                 {{isProcessingExcel ? 'Procesando...' : 'Procesar Archivo'}}
                             </button>
-                            <button mat-button (click)="cancelExcelUpload()">Cancelar</button>
+                            <button mat-button class="color-button" (click)="cancelExcelUpload()">Cancelar</button>
                         </div>
                     </mat-card-content>
                 </mat-card>
@@ -100,11 +100,11 @@
                         </uni-dynamic-table>
                     </mat-card-content>
                     <mat-card-actions align="end">
-                        <button mat-button color="warn" (click)="clearExcelData()">
+                        <button mat-button class="color-button" (click)="clearExcelData()">
                             <mat-icon>clear</mat-icon>
                             Limpiar
                         </button>
-                        <button mat-raised-button color="primary" (click)="confirmExcelAssignments()">
+                        <button mat-raised-button class="color-button" (click)="confirmExcelAssignments()">
                             <mat-icon>check</mat-icon>
                             Confirmar Asignaciones
                         </button>

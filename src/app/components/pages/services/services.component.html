@@ -49,20 +49,6 @@
         <form [formGroup]="serviceForm" class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3">
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="service_name">
-          </mat-form-field>
-
-
-
-          <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Tipo de servicio</mat-label>
-            <input matInput formControlName="service_type">
-          </mat-form-field>
-
-
-
-          <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado</mat-label>
             <mat-select formControlName="status">
               <mat-option *ngFor="let status of stateMaster" [value]="status">
@@ -70,6 +56,20 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Tipo de Servicio</mat-label>
+            <mat-select formControlName="service_type">
+              <mat-option *ngFor="let category of categoriesService"
+                [value]="category.master_name">{{category.master_name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="service_name">
+          </mat-form-field>
+
         </form>
 
       </mat-card-content>

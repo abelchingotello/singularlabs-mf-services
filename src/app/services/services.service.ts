@@ -40,7 +40,7 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string,type:string,category:string, count:number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServices(name: string, status: string,type:string,category:string, count:number, limit?: any, pageKey?: any[], getAssignAll?: boolean): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
@@ -65,6 +65,9 @@ export class ServicesService {
     }
     if (count != null) {
       params = params.set('count', count);
+    }
+    if (getAssignAll !== undefined) {
+      params = params.set('getAssignAll', getAssignAll);
     }
     return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }

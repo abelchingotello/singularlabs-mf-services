@@ -11,6 +11,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'uni-services',
@@ -52,6 +53,7 @@ export class ServicesComponent implements OnInit {
   public idProvider: any;
   public dataIdService: any;
   public optionId: any
+  public categoriesService: any[] = [];
   private pagUtils: PaginationUtils | undefined;
   public page: number = -1; // Variable para la página actual
   public count: number = null; // Variable para el total de elementos
@@ -63,7 +65,6 @@ export class ServicesComponent implements OnInit {
     private services: ServicesService,
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private service: ServicesService,
     private master: MasterService,
     private person: PersonService,
     private spinner: SpinnerService,
@@ -75,7 +76,7 @@ export class ServicesComponent implements OnInit {
   ngOnInit(): void {
     this.formService();
     this.dataMaster();
-
+    this.listData();
     // Suscribirse a cambios y convertir a mayúsculas
     this.service_name?.valueChanges.subscribe(value => {
       if (value) {
@@ -95,7 +96,7 @@ export class ServicesComponent implements OnInit {
 
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, inputStatus,inputType,null, this.count, pageSize, this.pageKey).subscribe({
+    this.services.getServices(input, inputStatus, inputType, null, this.count, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
@@ -175,8 +176,8 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  selectedHandle(event:any) {
-    console.log('event',event);
+  selectedHandle(event: any) {
+    console.log('event', event);
     if (this.selectedIds.length === 1) {
       this.spinner.spinnerOnOff();
       let completedRequests = 0; // Contador para peticiones completadas
@@ -204,9 +205,28 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  listData() {
+    this.spinner.spinnerOnOff();
+    forkJoin([
+      this.master.getItemsMasterTable('14') // CategoriaService
+    ]).subscribe({
+      next: (response) => {
+        const [categoryService] = response;
+        this.categoriesService = categoryService;
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error("Error loading master table data:", error);
+      },
+      complete: () => {
+        this.spinner.spinnerOnOff();
+      },
+    });
+  }
+
   getIdService(idService) {
     console.log('idService', idService);
-    this.service.getIdServices(idService).subscribe({
+    this.services.getIdServices(idService).subscribe({
       next: (response) => {
         this.dataIdService = response
       },
@@ -234,7 +254,7 @@ export class ServicesComponent implements OnInit {
     const id = idClient || idProvider
     this.person.postIdPerson(id).subscribe({
       next: (response) => {
-        
+
         // this.spinner.spinnerOnOff();
         if (idClient) this.idClient = response.data[0];
         if (idProvider) this.idProvider = response.data[0];
@@ -294,7 +314,7 @@ export class ServicesComponent implements OnInit {
     return this.serviceForm.get('service_name')
   }
 
-   get service_type() {
+  get service_type() {
     return this.serviceForm.get('service_type')
   }
 
