@@ -4,17 +4,22 @@ import { PagesRoutingModule } from './pages.routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { LibraryModule } from '../library/library.module';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ImportServicesComponent } from './services/import-service/import-services.component';
+import { MaterialModule } from 'src/app/modules/material/material.module';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    ImportServicesComponent
+  ],
   imports: [
     CommonModule,
     PagesRoutingModule,
     HttpClientModule,
     LibraryModule,
-    MatDialogModule
+    MatDialogModule,
+    MaterialModule
   ]
 })
 export class PagesModule { }

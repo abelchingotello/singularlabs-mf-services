@@ -2,6 +2,7 @@ import { Attribute, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { MasterInterface } from '../interfaces/masterInterface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,10 @@ export class MasterService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getItemsMasterTable(group) : Observable <any> {
+  getItemsMasterTable(group:string) : Observable <MasterInterface[]> {
     let params = new HttpParams()
     .set('group', group);
-    return this.httpClient.get<any>(`${this.url}/group`, {params: params});
+    return this.httpClient.get<MasterInterface[]>(`${this.url}/group`, {params: params});
   }
   
 

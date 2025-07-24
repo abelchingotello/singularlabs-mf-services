@@ -22,7 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './dynamic-table.component.html',
   styleUrls: ['./dynamic-table.component.scss'],
   standalone: true,
-  imports:[
+  imports: [
     CommonModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -46,6 +46,10 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() pageKey: any;
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
+  @Input() viewOptionsTable: boolean = true; //Si se muestran las opciones de la tabla(por defecto estara en true)
+  @Input() viewCheckboxHeader: boolean = true; //Si se muestra el checkbox en el encabezado(por defecto estara en true)
+
+  @Input() lengthTable: any;
 
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
@@ -99,21 +103,29 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         this.dataSource.data = this.data;
         this.dataPrint.data = this.data;
       }
-  
+
       // Verificar si se ha modificado pageKey o si ha cambiado el tamaño de los datos
       if (this.pageKey) {
         // Si hay un pageKey válido o los datos han aumentado de tamaño, activamos hasNextPage
-        this.paginator.hasNextPage = () => true;
-      }else{
+        //this.paginator.hasNextPage = () => true;
+      } else {
         // this.paginator.hasNextPage = () => false;
       }
-  
+
       // Actualizar el tamaño anterior de los datos para futuras comparaciones
-  
+
+      setTimeout(() => {
+        if (this.paginator) {
+          this.paginator.length = this.lengthTable;
+          this.changeDetectorRef.detectChanges();
+          console.log('paginator', this.paginator.length);
+        }
+      });
+
       // Iniciar o reiniciar la tabla
       this.initTable();
     }
-  
+
     if (changes['columns']) {
       // Actualizamos las columnas visibles y los atributos de las columnas cuando cambien
       this.displayedColumns = this.columns.map(column => column.name);
@@ -177,32 +189,32 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   getSelectedIds() {
     // Verificar que `element_id` está definido
     if (!this.element_id) {
-        console.warn("element_id no está definido");
-        return;
+      console.warn("element_id no está definido");
+      return;
     }
-  
-    if(this.element_id === 'ALL'){
+
+    if (this.element_id === 'ALL') {
       this.selectedIds = this.selection.selected;
     }
     // Si `element_id` es un string, manejarlo como un solo campo
     else if (typeof this.element_id === 'string') {
-        this.selectedIds = this.selection.selected.map(row => row[this.element_id.toString()]);
+      this.selectedIds = this.selection.selected.map(row => row[this.element_id.toString()]);
     }
     // Si `element_id` es un array de strings, extraer múltiples campos
     else if (Array.isArray(this.element_id)) {
       let element: any[] = this.element_id
-        this.selectedIds = this.selection.selected.map(row => {
-            let result: { [key: string]: any } = {};
-            element.forEach(field => {
-                if (row[field]) {
-                    result[field] = row[field];  // Extraer el valor de cada campo
-                }
-            });
-            return result;
+      this.selectedIds = this.selection.selected.map(row => {
+        let result: { [key: string]: any } = {};
+        element.forEach(field => {
+          if (row[field]) {
+            result[field] = row[field];  // Extraer el valor de cada campo
+          }
         });
+        return result;
+      });
     } else {
-        console.warn("Formato de element_id no reconocido");
-        return;
+      console.warn("Formato de element_id no reconocido");
+      return;
     }
 
     // Activar o desactivar opciones del encabezado según el resultado
@@ -211,20 +223,25 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     // Emitir los IDs seleccionados
     this.selectedIdsChange.emit(this.selectedIds);
     this.selectedChange.emit(this.selection.selected);
-}
+  }
 
   onSelectionChange() {
     this.updateSort();
   }
 
   onPageChange(event: PageEvent) {
-    if (event.pageSize * (event.pageIndex + 1) >= event.length) {
+    console.log('onPageChange::::::::', event);
+    const from = event.pageIndex * event.pageSize; // 1 * 5 = 5
+    const to = from + event.pageSize;              // 5 + 5 = 10
+    console.log(`FROM: ${from} TO: ${to} LENGTH: ${event.length}`);
 
-      if (this.pageKey) {
-        this.pageChange.emit(event);
-      }
+    if (from < event.length) {
+      console.log('Datos disponibles para esta página');
+      this.pageChange.emit(event);
+      console.log('paso emit');
+    } else {
+      console.log('No hay datos para esta página');
     }
-    delete this.paginator.hasNextPage;
     this.pageSize = event.pageSize;
   }
 
@@ -282,7 +299,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   formatDate(date, format, locale) {
-    if(!date){
+    if (!date) {
       return '';
     }
     return formatDate(date, format, locale);
@@ -363,8 +380,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         // Obtiene la configuración de la columna de forma eficiente
         const columnConfig = columnConfigMap.get(attribute);
         let value = item[attribute];
-        
-        if(!value){ //Evitar errores cuando el elemento no contiene el atributo
+
+        if (!value) { //Evitar errores cuando el elemento no contiene el atributo
           newObj[attribute] = '';
           break;
         }

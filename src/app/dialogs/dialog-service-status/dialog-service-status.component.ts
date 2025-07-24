@@ -30,7 +30,7 @@ export class DialogServiceStatusComponent implements OnInit {
    ngOnInit(): void {
     console.log("respuesta de servicio",this.data)
     this.initializaForms();
-
+    
     if(this.data.id=='2') this.stateIdEntity = true
     if(this.data.id=='3') {
       this.stateIdClient = true
@@ -40,11 +40,11 @@ export class DialogServiceStatusComponent implements OnInit {
 
     this.service_entity.setValue(this.data.idProvider.person.name)
     this.service_client.setValue(this.data.idClient.person.name)
-    this.service_id.setValue(this.data.resp.data[0].id)
-    this.service_business.setValue(this.data.resp.data[0].business)
-    this.service_description.setValue(this.data.resp.data[0].description)
+    this.service_id.setValue(this.data.resp.data.id)
+    this.service_business.setValue(this.data.resp.data.business)
+    this.service_description.setValue(this.data.resp.data.description)
     // this.service_collectingEntity.setValue(this.data.resp.collectingEntity)
-    this.service_serviceType.setValue(this.data.resp.data[0].serviceType.name);
+    this.service_serviceType.setValue(this.data.resp.data.serviceType.name);
     this.stateMaster = this.data.state;
     this.formEntity.disable();
 

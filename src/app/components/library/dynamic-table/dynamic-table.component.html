@@ -1,4 +1,4 @@
-<div class="buttons row d-flex pt-2">
+<div class="buttons row d-flex pt-2" *ngIf="viewOptionsTable">
     <div class="col-12 col-lg-7 d-flex justify-content-between align-items-center">
         <div *ngIf="headerOptions || alwaysShowHeaderOptions" class="container-fluid d-flex flex-wrap align-items-center ps-4">
             <div class="d-flex align-items-center me-auto me-md-0">
@@ -49,7 +49,7 @@
             <table mat-table [dataSource]="dataSource" matSort class="table-custom">
                 <ng-container *ngIf="actionsOptions == true" matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef class="custom-headercell-dynamictable">
-                        <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                        <mat-checkbox *ngIf="viewCheckboxHeader" (change)="$event ? toggleAllRows() : null"
                             [checked]="selection.hasValue() && isAllSelected()"
                             [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
                         </mat-checkbox>
