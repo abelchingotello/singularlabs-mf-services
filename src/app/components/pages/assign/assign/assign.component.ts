@@ -51,7 +51,9 @@ export class AssignComponent implements OnInit {
     private masterService: MasterService,
     private services: ServicesService,
     private mytoastr: MytoastrService
-  ) { }
+  ) {
+    this.pagUtils = new PaginationUtils();
+   }
 
   ngOnInit(): void {
     this.formService();
@@ -64,6 +66,7 @@ export class AssignComponent implements OnInit {
     this.assignServiceForm = this.fb.group({
       service_name: [''],
       service_type: [''],
+      client: [''],
     })
   }
 
@@ -88,13 +91,14 @@ export class AssignComponent implements OnInit {
       });
     }
 
-  dataInitial(pageSize: any) {
+  dataInitial(pageSize: any): void {
     const input = this.service_name.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
+    const idClient = this.client.value;
 
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, null, inputType, null, this.count, pageSize, this.pageKey, true).subscribe({
+    this.services.getServices(input, null, inputType, null, this.count, idClient, pageSize, this.pageKey, true).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
@@ -106,7 +110,7 @@ export class AssignComponent implements OnInit {
           serviceTypeName: item.serviceType?.name || ''
         }));
         this.pageKey = data.data.nextPageKey ?? null;
-        this.count = data.data.Count ?? 0;
+        this.count = data.data.Count ?? this.count;
       },
       error: (err) => {
         console.log(err);
@@ -130,7 +134,7 @@ export class AssignComponent implements OnInit {
 
 
   searchData() {
-    if (!this.service_name.value && !this.service_type.value) {
+    if (!this.service_name.value && !this.service_type.value && !this.client.value) {
       this.mytoastr.showWarning('Ingrese un valor válido', '')
       return
     }
@@ -148,14 +152,15 @@ export class AssignComponent implements OnInit {
   reload() {
     // this.clearData();
     this.dynamic.clearSelection();
+    this.dataInitial(this.pageSize);
     //this.dataInitial(this.pageSize);
     // this.functionDataCurrent(this.pageSize);
   }
 
   onPageChange(event: PageEvent) {
-    this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
-    this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
-  }
+    this.pageSize = this.pagUtils.updatePageSize(event.pageSize, this.pageSize);
+    this.pagUtils.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
+}
 
   /************************************* METODOS DE BOTONES ***********************************/
   clearFormAndData() {
@@ -172,6 +177,10 @@ export class AssignComponent implements OnInit {
 
   get service_type() {
     return this.assignServiceForm.get('service_type')
+  }
+
+  get client() {
+    return this.assignServiceForm.get('client')
   }
 
 }

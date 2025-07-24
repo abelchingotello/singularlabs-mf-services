@@ -303,6 +303,9 @@ export class ServicesComponent implements OnInit {
 
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
+    console.log('onPageChange', event);
+    console.log('pageKey', this.pageKey);
+    console.log('pageSize', this.pageSize);
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
   }

@@ -10,6 +10,8 @@ export class PaginationUtils {
     // Método para manejar el cambio de página
     onPageChange(event: any, pageSize: any, functionCurrent: (pageSize: any) => void, pageKey: any) {
         pageSize = this.updatePageSize(event.pageSize, pageSize);
+        console.log('onPageChange - pageKey:', pageKey);
+        console.log('onPageChange - pageSize:', pageSize);
         this.paginationPage(pageSize, functionCurrent, pageKey);  // Pasamos pageKey a la función
     }
 
@@ -20,12 +22,17 @@ export class PaginationUtils {
 
     // Método que ejecuta la paginación
     paginationPage(pageSize: any, functionCurrent: (pageSize: any) => void, pageKey: any) {
+        console.log('paginationPage - pageKey:', pageKey);
+        console.log('paginationPage - pageSize:', pageSize);
         if (pageKey) {  // Validamos pageKey en lugar de pageSize
+            console.log('Ejecutando functionCurrent');
             functionCurrent(pageSize);
         }
     }
 
     updatePageSize(newPageSize: any, currentPageSize: any): any {
-        return newPageSize > parseInt(currentPageSize, 10) ? newPageSize : currentPageSize;
+        const newSize = Number(newPageSize);
+        const currentSize = Number(currentPageSize);
+        return newSize > currentSize ? newSize : currentSize;
     }
 }
