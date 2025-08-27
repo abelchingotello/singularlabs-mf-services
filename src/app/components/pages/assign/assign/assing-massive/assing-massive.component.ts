@@ -238,10 +238,8 @@ export class AssingMassiveComponent implements OnInit {
   // Método para convertir datos de Excel al formato de asignación
   convertExcelToAssignmentFormat(excelData: any[]): any[] {
     const idProvider = "00000100"; // ID fijo del proveedor
-    const REQUIRED_COLUMNS = [  "ITEM",  "ID SERVICIO",  "ID CATEGORIA",  "CATEGORIA AGENTE CASH",  "Descripción del convenio",
-    "Estado del convenio T",    "Modalidad de Recaudo",    "Pago Parcial",    "Deuda más antigua primero T",    "Referencia 1",
-    "Tipo de campo de referencia 1",    "Longitud de campo referencia 1",    "Referencia 2",    "Tipo de campo de referencia 2",
-    "Longitud de campo referencia 2",    "Referencia 3",    "Tipo de campo de referencia 3",    "Longitud de campo referencia 3",
+    const REQUIRED_COLUMNS = [  "CÓDIGO DE SERVICIO",  "NOMBRE DE SERVICIO",  "CODIGO DE SERVICIO DEL PROVEEDOR",  "CODIGO DEL PROVEEDOR",  
+      "ESTADO", "TIPO DE COMISION", "VALOR DE COMISION"
     ];
 
       // Validar que haya datos
