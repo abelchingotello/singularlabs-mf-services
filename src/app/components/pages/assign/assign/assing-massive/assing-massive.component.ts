@@ -103,7 +103,7 @@ export class AssingMassiveComponent implements OnInit {
       // Procesar los datos usando la lógica del script original
       const processedData = this.convertExcelToAssignmentFormat(excelData);
       if (processedData.length === 0) {
-        this.mytoastr.showWarning('Error', 'No se encontraron datos válidos en el archivo');
+        this.mytoastr.showError('Error', 'No se encontraron datos válidos en el archivo');
         return;
       }
 
@@ -246,14 +246,16 @@ export class AssingMassiveComponent implements OnInit {
 
       // Validar que haya datos
       if (!excelData || excelData.length === 0) {
-        throw new Error("El archivo Excel está vacío.");
+        this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
+        return [];
       }
 
       // Validar que todas las columnas requeridas estén presentes
       const headers = Object.keys(excelData[0]);
       const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
       if (missingColumns.length > 0) {
-        throw new Error(`Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+        this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+        return [];
       }
     return excelData.map(row => {
       const jsonObj = {

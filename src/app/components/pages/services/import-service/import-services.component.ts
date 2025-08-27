@@ -210,14 +210,16 @@ export class ImportServicesComponent implements OnInit {
 
       // Validar que haya datos
       if (!jsonData || jsonData.length === 0) {
-        throw new Error("El archivo Excel está vacío.");
+        this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
+        return [];
       }
 
       // Validar que todas las columnas requeridas estén presentes
       const headers = Object.keys(jsonData[0]);
       const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
       if (missingColumns.length > 0) {
-        throw new Error(`Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+        this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+        return [];
       }
 
       // Filtrar registros que estén Activos
@@ -300,18 +302,21 @@ export class ImportServicesComponent implements OnInit {
         // Procesar los datos usando la lógica del script original
 
         this.finalData = this.transformExcelData(excelData);
-  
+
+        if (this.finalData.length === 0) {
+          this.mytoastr.showError('Error', 'No se encontraron datos válidos en el archivo');
+          return;
+        }
         console.log("Primer objeto de importacion construido", JSON.stringify(this.finalData[0], null, 2));
-        
+        this.disableFile = true;
+        this.isProcessingExcel = true;
+        this.showSendServices = true;
         this.mytoastr.showSuccess('Archivo validado correctamente', `Se encontraron ${this.finalData.length} registros`);
 
       } catch (error) {
         console.error('Error procesando archivo Excel:', error);
         this.mytoastr.showError('Error', 'Error al procesar el archivo Excel');
       } finally {
-        this.disableFile = true;
-        this.isProcessingExcel = true;
-        this.showSendServices = true;
         this.spinner.spinnerOnOff();
       }
     }
