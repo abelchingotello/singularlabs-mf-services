@@ -350,6 +350,11 @@ export class ImportServicesComponent implements OnInit {
           this.mytoastr.showSuccess('Servicios importados con éxito', '')
           this.router.navigate(['../service'])
         }
+        if (response.statusCode == 500) {
+          this.mytoastr.showError('Importación no se proceso correctamente', '')
+          this.router.navigate(['../service'])
+          return
+        }
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
