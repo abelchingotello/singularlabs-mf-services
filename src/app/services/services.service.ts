@@ -30,8 +30,8 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/assign`, data);
   }
 
-  registerServiceImport(data: any): Observable<any> {
-    return this.httpClient.post<any>(`${this.url}/services/register/massive`, data);
+  registerServiceImport(data: any, valueImport: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.url}/services/register/massive?import=${valueImport}`, data);
   }
 
   // getServices(name:string): Observable<any>{

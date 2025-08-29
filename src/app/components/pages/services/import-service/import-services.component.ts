@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PersonService } from 'src/app/services/person.service';
@@ -20,6 +20,7 @@ export class ImportServicesComponent implements OnInit {
   public persons: any;
   public disableProvider = false;
   public cancel: boolean = false;
+  public valueImport: any;
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -36,12 +37,15 @@ export class ImportServicesComponent implements OnInit {
  constructor(
     private personService: PersonService,
     private router : Router,
+    private route: ActivatedRoute,
     private serviceServ: ServicesService,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
   ) { }
 
   ngOnInit(): void {
+    const valueImport = this.route.snapshot.paramMap.get('value');
+    this.valueImport = valueImport;
     this.listData();
   }
 
@@ -326,9 +330,9 @@ export class ImportServicesComponent implements OnInit {
     this.spinner.spinnerOnOff();
     // Convertir el objeto `data` a string y luego a base64
     const base64Data = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-    
-    
-    this.serviceServ.registerServiceImport({ payload: base64Data }).subscribe({
+
+
+    this.serviceServ.registerServiceImport({ payload: base64Data }, this.valueImport).subscribe({
       next: (response) => {
         console.log("RESPUESTA DE IMPORTACION: ", response)
         if (response.statusCode == 207) {
