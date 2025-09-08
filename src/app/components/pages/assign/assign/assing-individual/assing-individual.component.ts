@@ -195,6 +195,8 @@ export class AssingIndividualComponent implements OnInit {
       idProvider: '00000100',// ID ´PROVEEDOR
       idClient: value.idPerson, //ID DE RECAUDADORA
       idServiceProv: this.dataServiceSelected.id_serviceProv, //id de convenio
+      codProveedor: this.dataServiceSelected.idProvider,//codigo proveedor origen
+      idService: this.dataServiceSelected.id, //id del servicio
       serviceName: this.dataServiceSelected.name, //nnomb de servicio
       userRegistration: this.cookies.get('person_id') || 'desconocido',
       idTypeService: this.dataServiceSelected.serviceType.id,
@@ -321,7 +323,7 @@ export class AssingIndividualComponent implements OnInit {
         }
         if (response.statusCode == 400) {
           // this.spinner.spinnerOnOff();
-          this.mytoastr.showWarning('No se registro ningun item', '')
+          this.mytoastr.showWarning('No se asignó ningún ítem o ya fueron asignados anteriormente', '')
           return
         }
         if (response.statusCode == 200) {

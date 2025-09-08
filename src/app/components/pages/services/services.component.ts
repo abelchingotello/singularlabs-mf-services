@@ -135,7 +135,11 @@ export class ServicesComponent implements OnInit {
   }
 
   updateService() {
-    this.router.navigate(['service/import'])
+    this.router.navigate(['service/import', 'update']);
+  }
+
+  createService() {
+    this.router.navigate(['service/import', 'create']);
   }
 
   searchData() {

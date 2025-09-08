@@ -1,6 +1,8 @@
 <div class="content bg-gray-3">
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
-    <uni-image-card title="Importación de servicios">
+    <uni-image-card title="Importación de servicios"
+      externImage="https://static.vecteezy.com/system/resources/previews/010/186/154/non_2x/import-and-export-document-line-icon-illustration-vector.jpg"
+      size="7%" >
     </uni-image-card>
 
     <div>
@@ -121,7 +123,7 @@
             { 'name': 'Comisión Fija', 'attribute': 'COMISSION_FIXED' },
             { 'name': 'Comisión Porcentual', 'attribute': 'COMISSION_PCT' },
             { 'name': 'Criterio de comisión', 'attribute': 'COMISSION_CRITERION' }
-          ]" [data]="excelData" [actionsOptions]="false">
+          ]" [data]="excelData" [actionsOptions]="false" [lengthTable]="excelData.length">
             </uni-dynamic-table>
           </mat-card-content>
     </mat-card>
