@@ -2,13 +2,16 @@
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
     <uni-image-card title="Importación de servicios"
       externImage="https://static.vecteezy.com/system/resources/previews/010/186/154/non_2x/import-and-export-document-line-icon-illustration-vector.jpg"
-      size="7%" >
+      size="8%" >
     </uni-image-card>
 
     <div>
       <div class="excel-upload-section">
         <mat-card class="custom-border-radius-1-25">
-          <mat-card-header class="text-default">
+          <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 5px !important;
+              padding-bottom: 0px !important;">
             <mat-card-title>
               <mat-icon>cloud_upload</mat-icon>
               Carga Masiva desde Excel
@@ -47,7 +50,10 @@
       <!-- Sección de carga de Excel -->
       <div *ngIf="showExcelUpload" class="excel-upload-container">
         <mat-card class="custom-border-radius-1-25">
-          <mat-card-header class="text-default">
+          <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 5px !important;
+              padding-bottom: 0px !important;">
             <mat-card-title >
               <mat-icon>description</mat-icon>
               Cargar Archivo Excel
@@ -91,7 +97,10 @@
     <!-- Sección de envio de servicios luego de validar el archivo Excel -->
     <div *ngIf="showSendServices" class="excel-upload-section">
       <mat-card class="custom-border-radius-1-25">
-        <mat-card-header class="text-default">
+        <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 5px !important;
+              padding-bottom: 0px !important;">
           <mat-card-title>
             <mat-icon>upload</mat-icon>
             <span class="title-text">Importar Servicios</span>
@@ -123,7 +132,10 @@
     <div class="excel-upload-section">
       
     <mat-card *ngIf="excelData.length > 0" class="custom-border-radius-1-25">
-          <mat-card-header class="text-default">
+          <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 5px !important;
+              padding-bottom: 0px !important;">
             <mat-card-title>
               <mat-icon>error</mat-icon>
               Datos no procesados: ({{excelData.length}} registros)

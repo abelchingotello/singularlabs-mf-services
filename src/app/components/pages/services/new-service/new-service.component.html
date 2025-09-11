@@ -6,8 +6,15 @@
         </uni-image-card>
 
         <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight >
-            <mat-tab label="Datos de Servicio">
-                <mat-card class="custom-border-radius-1-25 mat-tab-group-prueba">
+            <mat-tab >
+                <ng-template mat-tab-label>
+                    <span class="material-symbols-outlined">assignment</span>Datos de Servicio
+                </ng-template>
+                <mat-card style="
+                    border-top-left-radius: 0rem !important; 
+                    border-top-right-radius: 0rem !important;
+                    border-bottom-left-radius: 1.25rem !important;
+                    border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 ">
                             <ng-container>
@@ -131,8 +138,15 @@
                 </mat-card>
             </mat-tab>
 
-            <mat-tab label="Datos de Comisiones" [disabled]="tab2">
-                <mat-card>
+            <mat-tab  [disabled]="tab2">
+                <ng-template mat-tab-label>
+                    <span class="material-symbols-outlined">attach_money</span>Datos de Comisiones
+                </ng-template>
+                <mat-card style="
+                    border-top-left-radius: 0rem !important; 
+                    border-top-right-radius: 0rem !important;
+                    border-bottom-left-radius: 1.25rem !important;
+                    border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 row-container">
                             <!-- Comisión de Proveedor -->
@@ -240,8 +254,16 @@
             </mat-tab>
 
 
-            <mat-tab label="Datos Pagos-Adicionales" *ngIf="disableTab3" [disabled]="tab3">
-                <mat-card>
+            <mat-tab  *ngIf="disableTab3" [disabled]="tab3">
+                <ng-template mat-tab-label>
+                    <span class="material-symbols-outlined">paid</span>Datos Pagos-Adicionales
+                </ng-template>
+                
+                <mat-card style="
+                    border-top-left-radius: 0rem !important; 
+                    border-top-right-radius: 0rem !important;
+                    border-bottom-left-radius: 1.25rem !important;
+                    border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 ">
                             <ng-container>
