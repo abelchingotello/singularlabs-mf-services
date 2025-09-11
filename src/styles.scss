@@ -43,7 +43,11 @@
     --breakpoint-xl: 1200px;
     --font-family-sans-serif: Open Sans, sans-serif;
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --default: #001542;
+    --default2: #001F3F;
+    --default3: #0072A9;
 }
+
 
 *,
 *::before,
@@ -442,8 +446,8 @@ h6,
     line-height: 1.5;
 
     margin-bottom: .5rem;
-
-    color: #000000;
+    //    color: #000000;
+    //color: --default !important; //cambiar por #
 }
 
 h1,
@@ -20447,4 +20451,63 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
     gap: 1rem 3rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.custom-title-responsive-1{
+    color: var(--default) !important;
+}
+
+
+.mat-tab-group-prueba {
+  border-top-left-radius: 0rem !important; /* Ajusta el valor según lo que necesites */
+  border-top-right-radius: 0rem !important;
+}
+
+.mat-tab-group-prueba2 {
+  border-bottom-left-radius: 0rem !important; /* Ajusta el valor según lo que necesites */
+}
+
+
+.color-button-3 {
+  background-color: var(--default3);
+  color: white;
+}
+
+.btn-default2 , .btn-default3{
+    justify-content: center!important;
+    display: flex!important;
+    align-items: center!important;
+    padding: 12px 16px 12px 13px!important;
+}
+
+.btn-default2{
+    background-color: var(--default2) !important;
+    border-color: var(--default2) !important;
+    color: #fff!important;
+
+}
+
+.btn-default3{
+    background-color: var(--default3) !important;
+    border-color: var(--default3) !important;
+    color: #fff!important;
+
+}
+.btn-default3:hover{
+    color: #fff !important;
+}
+.btn-default2:hover{
+    color: #fff !important;
+}
+
+.btn-color-default3{
+    background-color: var(--default3) !important;
+    border-color: var(--default3) !important;
+    color: #fff !important;
+}
+
+.mat-card .mat-card-header {
+    padding-top: 23px !important;
+    padding-left: 5px !important;
+    padding-bottom: 0px !important;
 }

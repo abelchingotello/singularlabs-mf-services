@@ -68,7 +68,9 @@ export class ImportServicesComponent implements OnInit {
       }
     });
   }
-
+  onCancel() {
+    this.router.navigate(['../../service']);
+  }
   selectClient(event) {
     console.log("evento ttiy: ", event.value)
     this.requiredIdClient = event.value;

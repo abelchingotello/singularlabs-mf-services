@@ -3,18 +3,18 @@
     <uni-image-card title="Servicios"
       externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
 
-      <div class="align-content-center">
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark me-2" (click)="addService()">
+      <div >
+        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn btn-color-default3 me-2" (click)="addService()">
           <mat-icon>add</mat-icon>
           <span class="custom-span-icon-responsive">Añadir</span>
         </button>
 
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark me-2" (click)="createService()">
+        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn btn-color-default3 me-2" (click)="createService()">
           <mat-icon>upload_file</mat-icon>
           <span class="custom-span-icon-responsive">Importar-Crear</span>
         </button>
 
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="updateService()">
+        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn btn-color-default3" (click)="updateService()">
           <mat-icon>upload_file</mat-icon>
           <span class="custom-span-icon-responsive">Importar-Actualizar</span>
         </button>
@@ -50,8 +50,8 @@
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <h2 style="margin-top: 23px; margin-left: 20px;"> Datos de Búsqueda </h2>
-        <form [formGroup]="serviceForm" class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3">
+        <h2 style="margin-top: 23px; margin-left: 20px;" class="text-default"> Datos de Búsqueda </h2>
+        <form [formGroup]="serviceForm" class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3 mb-0">
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado</mat-label>
@@ -76,22 +76,22 @@
           </mat-form-field>
 
         </form>
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="margin-top: 0px;">
 
+            <button type="button" class="btn btn-default2" (click)="clearFormAndData()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn btn-default3" (click)="searchData()">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+        </div>
+        </div>
       </mat-card-content>
 
-      <div style="display: flex;
-                        padding-right: 15px;
-                        flex-direction: row;
-                        justify-content: flex-end;
-                        margin-bottom: 10px;">
-
-        <button type="button" class="btn-primary btn" (click)="clearFormAndData()">
-          Limpiar
-        </button>
-        <button type="button" class="btn-primary btn" (click)="searchData()">
-          Buscar
-        </button>
-      </div>
+      
     </mat-card>
 
     <mat-card class="custom-border-radius-1-25">

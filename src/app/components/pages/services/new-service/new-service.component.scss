@@ -110,11 +110,15 @@
 }
 
 ::ng-deep .mat-tab-header {
-  background-color: #1d1d1d8c !important;
-  border-radius: 8px !important;
+  background-color: white !important;
+  border-radius: 1.25rem !important; //original 8px
+  border-bottom-left-radius: 0rem !important;
+  border-bottom-right-radius: 0rem !important;
+  padding-top: 15px; //no existia
 }
 
 // habilitar el color de las letras cuando están deshabilitadas
 ::ng-deep .mat-tab-label{
   opacity: 1 !important ;
+  color: #172b4d !important;
 }
