@@ -5,27 +5,26 @@
       size="8%">
 
       <div class="row"> 
-        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-        <button type="button" class=" mb-2 mb-md-0 custom-button btn btn-color-default3 me-2 btn-default4"
-          (click)="redirectAsign(1)">
-          <mat-icon>add</mat-icon>
-          <span class="custom-span-icon-responsive">Añadir</span>
-        </button>
+        <div class="col lg-6 d-flex justify-content-end align-items-end mr-3">
+          <button type="button" class=" mb-2 mb-md-0 custom-button btn me-2 btn-default4"
+            (click)="redirectAsign(1)">
+            <mat-icon>add</mat-icon>
+            <span class="custom-span-icon-responsive">Añadir</span>
+          </button>
 
-        <button type="button" class="mb-2 mb-md-0 custom-button btn btn-color-default3 btn-default4" (click)="redirectAsign(2)">
-          <mat-icon>upload_file</mat-icon>
-          <span class="custom-span-icon-responsive">Importar</span>
-        </button>
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="redirectAsign(2)">
+            <mat-icon>upload_file</mat-icon>
+            <span class="custom-span-icon-responsive">Importar</span>
+          </button>
         </div>
       </div>
     </uni-image-card>
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <h2 style="margin-top: 23px; margin-left: 20px;" class="text-default"> Datos de Búsqueda </h2>
+        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
         <form [formGroup]="assignServiceForm"
-          class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3">
-
+          class="d-flex align-items-center justify-content-space-evenly flex-wrap">
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Cliente</mat-label>
             <mat-select formControlName="client">
@@ -50,21 +49,18 @@
 
         </form>
         <div class="row">
-          
-        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-          <button type="button" class=" btn btn-default2 " (click)="clearFormAndData()">
-            <mat-icon>filter_alt_off</mat-icon>
-              Limpiar
-          </button>
-          <button type="button" class="btn btn-default3 " (click)="searchData()">
-            <mat-icon>search</mat-icon>
-              Buscar
-          </button>
-        </div>
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+            <button type="button" class=" btn btn-default2 " (click)="clearFormAndData()">
+              <mat-icon>filter_alt_off</mat-icon>
+                Limpiar
+            </button>
+            <button type="button" class="btn btn-default3 " (click)="searchData()">
+              <mat-icon>search</mat-icon>
+                Buscar
+            </button>
+          </div>
         </div>
       </mat-card-content>
-
-      
     </mat-card>
 
     <mat-card class="custom-border-radius-1-25">

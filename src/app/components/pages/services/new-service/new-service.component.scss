@@ -117,8 +117,10 @@
   padding-top: 15px; //no existia
 }
 
-// habilitar el color de las letras cuando están deshabilitadas
-::ng-deep .mat-tab-label{
-  opacity: 1 !important ;
-  color: #7b7d7eff !important;
+//Mantiene el label de la pestaña seleccionada resaltada
+::ng-deep .mat-tab-label.mat-tab-label-active {
+  color: rgba(0, 0, 0, .87);
+  background-color: transparent; /* evita el color opaco por defecto */
+  opacity: 1;  /* evita que se oscurezca */
 }
+  

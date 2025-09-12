@@ -4,27 +4,23 @@
             externImage="https://img.freepik.com/vector-gratis/red-social-servicio-citas-online-chat-comunicacion-internet-personaje-dibujos-animados-nina-mirando-perfiles-foto-ilustracion-concepto-redes-sociales_335657-2041.jpg?semt=ais_hybrid&w=740"
             size="8%">
         </uni-image-card>
-
         <div>
-
-
             <div class="excel-upload-section">
                 <mat-card class="custom-border-radius-1-25 ">
-                    <mat-card-header class="text-default " 
+                    <mat-card-header class="text-default" 
                         style="padding-top: 23px !important;
-                        padding-left: 5px !important;
+                        padding-left: 0px !important;
                         padding-bottom: 0px !important;">
-                        <mat-card-title>
+                        <mat-card-title style="font-weight: bold;">
                             <mat-icon>cloud_upload</mat-icon>
                             Carga Masiva desde Excel
                         </mat-card-title>
-                        <mat-card-subtitle>
+                        <mat-card-subtitle class="text-default" >
                             Cargar múltiples asignaciones desde un archivo Excel
                         </mat-card-subtitle>
                     </mat-card-header>
-
                     <mat-card-content>
-                        <mat-form-field appearance="outline" class="col-md-3">
+                        <mat-form-field appearance="outline" class="col-12 col-md-3">
                             <mat-label>Cliente</mat-label>
                             <mat-select (selectionChange)="selectClient($event)">
                                 <mat-option *ngFor="let entity of persons" [value]="entity.servicePerson.idPerson"
@@ -34,22 +30,20 @@
                             </mat-select>
                         </mat-form-field>
                         <div class="row">
-
-                        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                            <button class="btn btn-default2" (click)="onCancel()">
-                                 <mat-icon>clear</mat-icon>
-                                 Cancelar
-                            </button>
-                            <button class="btn btn-default3" (click)="confirmIdClient()" [disabled]="requiredIdClient=='' ">
-                                <mat-icon>upload_file</mat-icon>
-                                Cargar desde Excel
-                            </button>
-                        </div>
+                            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+                                <button class="btn btn-default2" (click)="onCancel()">
+                                    <mat-icon>clear</mat-icon>
+                                    Cancelar
+                                </button>
+                                <button class="btn btn-default3" (click)="confirmIdClient()" [disabled]="requiredIdClient=='' ">
+                                    <mat-icon>upload_file</mat-icon>
+                                    Cargar desde Excel
+                                </button>
+                            </div>
                         </div>
                     </mat-card-content>
                 </mat-card>
             </div>
-
 
             <!-- Sección de carga de Excel -->
             <div *ngIf="showExcelUpload" class="excel-upload-container">
@@ -77,26 +71,26 @@
                             </div>
                         </div>
                         <div class="row">
-                        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="padding: 0 0 16px 0;">
-                            <button class="btn btn-default2" (click)="cancelExcelUpload()">
-                                <mat-icon>clear</mat-icon>
-                                Cancelar
-                            </button>
-                            <button class="btn btn-default3" [disabled]="!selectedFile || isProcessingExcel"
-                                (click)="processExcelFile()">
-                                <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
-                                <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
-                                {{isProcessingExcel ? 'Procesando...' : 'Procesar Archivo'}}
-                            </button>
-                        </div>
+                            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="padding: 0 0 16px 0;">
+                                <button class="btn btn-default2" (click)="cancelExcelUpload()">
+                                    <mat-icon>clear</mat-icon>
+                                    Cancelar
+                                </button>
+                                <button class="btn btn-default3" [disabled]="!selectedFile || isProcessingExcel"
+                                    (click)="processExcelFile()">
+                                    <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
+                                    <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
+                                    {{isProcessingExcel ? 'Procesando...' : 'Procesar Archivo'}}
+                                </button>
+                            </div>
                         </div>
                     </mat-card-content>
                 </mat-card>
                 <mat-card *ngIf="excelData.length > 0" class="custom-border-radius-1-25">
                     <mat-card-header class="text-default"  
-              style="padding-top: 23px !important;
-              padding-left: 5px !important;
-              padding-bottom: 0px !important;">
+                        style="padding-top: 23px !important;
+                        padding-left: 5px !important;
+                        padding-bottom: 0px !important;">
                         <mat-card-title>
                             <mat-icon>table_view</mat-icon>
                             Datos Procesados ({{excelData.length}} registros)
@@ -107,32 +101,31 @@
                     </mat-card-header>
                     <mat-card-content>
                         <uni-dynamic-table element_id="idService" [columns]="[
-            { 'name': 'Código Servicio', 'attribute': 'idService' },
-            { 'name': 'Nombre del Servicio', 'attribute': 'serviceName' },
-            { 'name': 'Estado', 'attribute': 'status' },
-            { 'name': 'Tipo Comisión', 'attribute': 'ownComissionType' },
-            { 'name': 'Comisión Fija', 'attribute': 'ownFixedComission' },
-            { 'name': 'Comisión Porcentual', 'attribute': 'ownPCTComission' },
-            { 'name': 'Criterio de comisión', 'attribute': 'ownCriterionComission' },
-            { 'name': 'Zona', 'attribute': 'zone' }
-          ]" [data]="data" [actionsOptions]="false">
+                                { 'name': 'Código Servicio', 'attribute': 'idService' },
+                                { 'name': 'Nombre del Servicio', 'attribute': 'serviceName' },
+                                { 'name': 'Estado', 'attribute': 'status' },
+                                { 'name': 'Tipo Comisión', 'attribute': 'ownComissionType' },
+                                { 'name': 'Comisión Fija', 'attribute': 'ownFixedComission' },
+                                { 'name': 'Comisión Porcentual', 'attribute': 'ownPCTComission' },
+                                { 'name': 'Criterio de comisión', 'attribute': 'ownCriterionComission' },
+                                { 'name': 'Zona', 'attribute': 'zone' }
+                            ]" [data]="data" [actionsOptions]="false">
                         </uni-dynamic-table>
                         <div class="row">
-                        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                            <button class="btn btn-default2" (click)="clearExcelData()">
-                                <mat-icon>filter_alt_off</mat-icon>
-                                Limpiar
-                            </button>
-                            <button class="btn btn-default3" (click)="confirmExcelAssignments()">
-                                <mat-icon>check</mat-icon>
-                                Confirmar Asignaciones
-                            </button>
-                        </div>
+                            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+                                <button class="btn btn-default2" (click)="clearExcelData()">
+                                    <mat-icon>filter_alt_off</mat-icon>
+                                    Limpiar
+                                </button>
+                                <button class="btn btn-default3" (click)="confirmExcelAssignments()">
+                                    <mat-icon>check</mat-icon>
+                                    Confirmar Asignaciones
+                                </button>
+                            </div>
                         </div>
                     </mat-card-content>
                 </mat-card>
             </div>
-
             <!-- <mat-card>
         <uni-dynamic-table element_id="idPerson" [columns]="columnsService" [data]="dataServicesEntity">
         </uni-dynamic-table>
