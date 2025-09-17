@@ -1,18 +1,15 @@
 <div class="content bg-gray-3">
     <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
-
         <uni-image-card title="Asignación de servicio"
             externImage="https://img.freepik.com/vector-gratis/red-social-servicio-citas-online-chat-comunicacion-internet-personaje-dibujos-animados-nina-mirando-perfiles-foto-ilustracion-concepto-redes-sociales_335657-2041.jpg?semt=ais_hybrid&w=740"
             size="8%">
         </uni-image-card>
-
-        <mat-card>
-            <form [formGroup]="formAssign" class="form-grid" style="margin: 22px 22px 0px 22px;">
+        <form [formGroup]="formAssign" class="form-grid mt-3 mb-0" >
+            <mat-card class="custom-border-radius-1-25">
                 <mat-card-content>
-
-                    <div class="grid-container">
-
-                        <mat-form-field appearance="outline">
+                    <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+                    <div class="d-flex flex-wrap">
+                        <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Categoria de Servicio</mat-label>
                             <mat-select formControlName="categoryService">
                                 <mat-option *ngFor="let category of categoriesService"
@@ -20,28 +17,39 @@
                             </mat-select>
                         </mat-form-field>
 
-                        <mat-form-field appearance="outline">
+                        <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Nombre de Servicio</mat-label>
                             <input formControlName="service" matInput type="text" />
                         </mat-form-field>
-
-                    </div>
-                    <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-primary" (click)="clearFormAndData()">Limpiar</button>
-                        <button type="button" class="btn btn-primary" (click)="searchBtn()">Buscar</button>
                     </div>
 
+                    <div class="row">
+                        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+                            <button type="button" class="btn-default2 btn" (click)="clearFormAndData()">
+                                <mat-icon>filter_alt_off</mat-icon>
+                                Limpiar
+                            </button>
+
+                            <button type="button" class="btn-default3 btn" (click)="searchBtn()">
+                                <mat-icon>search</mat-icon>
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
                     <uni-dynamic-table [columns]="columnsTableService" [data]="dataServiceTable" [actionsOptions]="true"
                         [viewOptionsTable]="false" [viewCheckboxHeader]="false" element_id="id" [pageKey]="pageKey"
                         (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)"
                         [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)"
-                        [lengthTable]="count"></uni-dynamic-table>
+                        [lengthTable]="count">
+                    </uni-dynamic-table>
+                </mat-card-content>
+            </mat-card>
 
-
-
-                    <div class="grid-container">
-
-                        <mat-form-field appearance="outline">
+            <mat-card class="custom-border-radius-1-25">
+                <mat-card-content>
+                    <h2 class="mt-4 ml-3 text-default"> Datos de Asignación </h2>
+                    <div class="d-flex flex-wrap">
+                        <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Entidad</mat-label>
                             <mat-select formControlName="entity" (selectionChange)="selectEntity($event)" multiple>
                                 <!-- <mat-option [value]="">NINGUNO</mat-option> -->
@@ -53,8 +61,7 @@
                             </mat-select>
                         </mat-form-field>
 
-
-                        <mat-form-field appearance="outline">
+                        <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Tipo Comisión</mat-label>
                             <mat-select formControlName="comission">
                                 <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
@@ -62,38 +69,38 @@
                             </mat-select>
                         </mat-form-field>
 
-                        <mat-form-field appearance="outline" *ngIf="isComisionFixed()">
+                        <mat-form-field appearance="outline" *ngIf="isComisionFixed()" class="col-md-3">
                             <mat-label>Comisión Fija</mat-label>
                             <input formControlName="fixed" (blur)="validComissionFixed()" matInput type="number" min="0"
                                 step="0.01" />
                         </mat-form-field>
-
 
                         <mat-form-field appearance="outline" *ngIf="isComisionPorcent()">
                             <mat-label>Comisión Porcentual</mat-label>
                             <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
                         </mat-form-field>
 
-
                         <mat-form-field appearance="outline" *ngIf="isComisionMultiple()">
                             <mat-label>Comisión Múltiple</mat-label>
                             <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
                         </mat-form-field>
                     </div>
-
-
-
+                    
+                    <div class="row">
+                        <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+                            <button type="button" class="btn btn-default2" (click)="onCancel()">
+                                <mat-icon>clear</mat-icon>
+                                Cancelar
+                            </button>
+                            <button type="button" class="btn btn-default3" [disabled]="disabledBtnRegister()"
+                                (click)="registerServiceAssign()">
+                                <mat-icon>save</mat-icon>
+                                Registrar
+                            </button>
+                        </div>
+                    </div>   
                 </mat-card-content>
-            </form>
-            <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
-                <button type="button" class="btn btn-primary" [disabled]="disabledBtnRegister()"
-                    (click)="registerServiceAssign()">Registrar</button>
-            </div>
-        </mat-card>
-
-        <div style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-primary" (click)="onCancel()">Cancelar</button>
-        </div>
-
+            </mat-card>
+        </form>
     </div>
 </div>

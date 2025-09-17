@@ -1,23 +1,26 @@
 <div class="content bg-gray-3">
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
     <uni-image-card title="Servicios"
-      externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
-
-      <div class="align-content-center">
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark me-2" (click)="addService()">
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png"
+      size="10%" >
+      <div class="row"> 
+        <div class="col  d-flex justify-content-end align-items-end ">
+       
+        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2 " (click)="addService()">
           <mat-icon>add</mat-icon>
           <span class="custom-span-icon-responsive">Añadir</span>
         </button>
 
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark me-2" (click)="createService()">
+        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
           <mat-icon>upload_file</mat-icon>
           <span class="custom-span-icon-responsive">Importar-Crear</span>
         </button>
 
-        <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="updateService()">
+        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
           <mat-icon>upload_file</mat-icon>
           <span class="custom-span-icon-responsive">Importar-Actualizar</span>
         </button>
+      </div>
       </div>
     </uni-image-card>
     <!-- <mat-card class="custom-border-radius-1-25">
@@ -50,8 +53,8 @@
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <h2 style="margin-top: 23px; margin-left: 20px;"> Datos de Búsqueda </h2>
-        <form [formGroup]="serviceForm" class="d-flex align-items-center justify-content-space-evenly flex-wrap mt-3">
+        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+        <form [formGroup]="serviceForm" class="d-flex flex-wrap ">
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado</mat-label>
@@ -76,22 +79,22 @@
           </mat-form-field>
 
         </form>
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="margin-top: 0px;">
 
+            <button title="Limpiar" type="button" class="btn btn-default2" (click)="clearFormAndData()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn btn-default3" (click)="searchData()">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+        </div>
+        </div>
       </mat-card-content>
 
-      <div style="display: flex;
-                        padding-right: 15px;
-                        flex-direction: row;
-                        justify-content: flex-end;
-                        margin-bottom: 10px;">
-
-        <button type="button" class="btn-primary btn" (click)="clearFormAndData()">
-          Limpiar
-        </button>
-        <button type="button" class="btn-primary btn" (click)="searchData()">
-          Buscar
-        </button>
-      </div>
+      
     </mat-card>
 
     <mat-card class="custom-border-radius-1-25">
@@ -104,7 +107,7 @@
 
             <div class="d-flex">
               <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()">
-                <mat-icon matTooltip="Asignar">assignment_ind</mat-icon>
+                <mat-icon matTooltip="Asignar" matTooltipPosition="above">assignment_ind</mat-icon>
               </button>
               <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;">
                 <mat-label>Actualizar</mat-label>

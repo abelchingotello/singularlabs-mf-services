@@ -349,10 +349,10 @@
 // Botones de acción
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 0px; //12px
   justify-content: flex-end;
   margin-top: 16px;
-  padding: 0 32px 32px 32px;
+  padding: 0 15px 16px 0; // 0 32px 16px 32px;
 
   button {
     display: flex;

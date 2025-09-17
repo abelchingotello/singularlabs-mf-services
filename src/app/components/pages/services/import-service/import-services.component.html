@@ -2,24 +2,26 @@
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
     <uni-image-card title="Importación de servicios"
       externImage="https://static.vecteezy.com/system/resources/previews/010/186/154/non_2x/import-and-export-document-line-icon-illustration-vector.jpg"
-      size="7%" >
+      size="8%" >
     </uni-image-card>
-
     <div>
       <div class="excel-upload-section">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
+        <mat-card class="custom-border-radius-1-25">
+          <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 0px !important;
+              padding-bottom: 0px !important;">
+            <mat-card-title style="font-weight: bold;">
               <mat-icon>cloud_upload</mat-icon>
               Carga Masiva desde Excel
             </mat-card-title>
-            <mat-card-subtitle>
+            <mat-card-subtitle class="text-default">
               Cargar múltiples servicios desde un archivo Excel
             </mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content>
-              <mat-form-field>
+              <mat-form-field appearance="outline" class="col-md-3">
                 <mat-label>Proveedor</mat-label>
                 <mat-select (selectionChange)="selectClient($event)">
                   <mat-option *ngFor="let entity of persons" [value]="entity.servicePerson.idPerson" [disabled]="disableProvider">
@@ -27,27 +29,35 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
-
-              <div class="action-buttons">
-                <button mat-raised-button class="color-button" (click)="confirmIdClient()" [disabled]="requiredIdClient==''|| disableCargar">
-                  <mat-icon>upload_file</mat-icon>
-                    Cargar desde Excel
-                </button>
+              <div class="row">
+                <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+                  <button class="btn btn-default2" (click)="onCancel()">
+                    <mat-icon>clear</mat-icon>
+                    Cancelar
+                  </button>
+                  <button class="btn btn-default3" (click)="confirmIdClient()" [disabled]="requiredIdClient==''|| disableCargar">
+                    <mat-icon>upload_file</mat-icon>
+                      Cargar desde Excel
+                  </button>
+                </div>
               </div>
           </mat-card-content>
         </mat-card>
       </div>
 
-
       <!-- Sección de carga de Excel -->
       <div *ngIf="showExcelUpload" class="excel-upload-container">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
+        <mat-card class="custom-border-radius-1-25">
+          <mat-card-header class="text-default"  
+              style="padding-top: 23px !important;
+              padding-left: 0px !important;
+              padding-bottom: 0px !important;">
+            <mat-card-title style="font-weight: bold;">
               <mat-icon>description</mat-icon>
               Cargar Archivo Excel
             </mat-card-title>
           </mat-card-header>
+
           <mat-card-content class="upload-content">
             <div class="file-upload-section">
               <input type="file" [disabled]="disableFile" #fileInput (change)="onFileSelected($event)" accept=".xlsx,.xls"
@@ -61,77 +71,98 @@
                 </p>
               </div>
             </div>
-            <div class="action-buttons">
-              <button mat-raised-button class="color-button" [disabled]="!selectedFile || isProcessingExcel"
-                (click)="processExcelFile()">
-                <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
-                <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
-                {{isProcessingExcel ? 'Validado' : 'Validar Archivo'}}
-              </button>
-              <button mat-button class="color-button" (click)="cancelExcelUpload()">Cancelar</button>
+
+            <div class="row">
+              <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3"  style="padding: 0 0 16px 0;">  
+                <button class="btn btn-default2" (click)="cancelExcelUpload()">
+                  <mat-icon>clear</mat-icon>
+                  Cancelar
+                </button>
+
+                <button class="btn btn-default3" [disabled]="!selectedFile || isProcessingExcel"
+                  (click)="processExcelFile()">
+                  <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
+                  <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
+                  {{isProcessingExcel ? 'Validado' : 'Validar Archivo'}}
+                </button>
+              </div>              
             </div>
           </mat-card-content>
         </mat-card>
       </div>
-      
     </div>
 
     <!-- Sección de envio de servicios luego de validar el archivo Excel -->
-    <div *ngIf="showSendServices" class="send-services-section">
-      <mat-card class="send-services-card">
-        <mat-card-header>
-          <mat-card-title>
+    <div *ngIf="showSendServices" class="excel-upload-section">
+      <mat-card class="custom-border-radius-1-25">
+        <mat-card-header class="text-default"  
+            style="padding-top: 23px !important;
+            padding-left: 0px !important;
+            padding-bottom: 0px !important;">
+          <mat-card-title style="font-weight: bold;">
             <mat-icon>upload</mat-icon>
             <span class="title-text">Importar Servicios</span>
           </mat-card-title>
-          <mat-card-subtitle class="subtitle-text">
+          <mat-card-subtitle class="text-default">
             Se importara los servicios validados al proveedor seleccionado
           </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <p class="confirmation-text">
+          <p class="ml-3 pt-0 text-default">
             ¿Está seguro de que desea enviar los servicios validados?
           </p>
-          <div class="action-buttons">
-            <button mat-raised-button class="color-button" (click)="sendServices()">
-              <mat-icon>send</mat-icon>
-              Enviar
-            </button>
-            <button mat-button class="color-button" (click)="cancelSend()">Cancelar</button>
+          <div class="row">
+            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+              <button class="btn btn-default2" (click)="cancelSend()">
+                <mat-icon>clear</mat-icon>
+                Cancelar</button>
+              <button class="btn btn-default3" (click)="sendServices()">
+                <mat-icon>send</mat-icon>
+                Enviar
+              </button>
+            </div>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
     
-    <mat-card *ngIf="excelData.length > 0" class="excel-upload-container">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>error</mat-icon>
-              Datos no procesados: ({{excelData.length}} registros)
-            </mat-card-title>
-            <mat-card-subtitle>
-              Revise los registros que no se han procesado correctamente
-            </mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <uni-dynamic-table  [columns]="[
-            { 'name': 'Código Servicio', 'attribute': 'ID_SERVICE_PROV' },
-            { 'name': 'Nombre del Servicio', 'attribute': 'SERVICE_NAME' },
-            { 'name': 'Estado', 'attribute': 'STATUS' },
-            { 'name': 'Tipo Comisión', 'attribute': 'TYPE_COMISSION' },
-            { 'name': 'Comisión Fija', 'attribute': 'COMISSION_FIXED' },
-            { 'name': 'Comisión Porcentual', 'attribute': 'COMISSION_PCT' },
-            { 'name': 'Criterio de comisión', 'attribute': 'COMISSION_CRITERION' }
-          ]" [data]="excelData" [actionsOptions]="false" [lengthTable]="excelData.length">
-            </uni-dynamic-table>
-          </mat-card-content>
-    </mat-card>
-  
+    <div class="excel-upload-section">
+      <mat-card *ngIf="excelData.length > 0" class="custom-border-radius-1-25">
+        <mat-card-header class="text-default"  
+            style="padding-top: 23px !important;
+            padding-left: 0px !important;
+            padding-bottom: 0px !important;">
+          <mat-card-title style="font-weight: bold;">
+            <mat-icon>error</mat-icon>
+            Datos no procesados: ({{excelData.length}} registros)
+          </mat-card-title>
+          <mat-card-subtitle class="text-default">
+            Revise los registros que no se han procesado correctamente
+          </mat-card-subtitle>
+        </mat-card-header>
 
-
-    <div *ngIf="excelData.length>0" style="padding-right: 15px; padding-bottom: 15px;" class="d-flex justify-content-end mt-3">
-      <button type="button" class="btn btn-primary" (click)="cancelData()">Cancelar</button>
+        <mat-card-content>
+          <uni-dynamic-table  [columns]="[
+              { 'name': 'Código Servicio', 'attribute': 'ID_SERVICE_PROV' },
+              { 'name': 'Nombre del Servicio', 'attribute': 'SERVICE_NAME' },
+              { 'name': 'Estado', 'attribute': 'STATUS' },
+              { 'name': 'Tipo Comisión', 'attribute': 'TYPE_COMISSION' },
+              { 'name': 'Comisión Fija', 'attribute': 'COMISSION_FIXED' },
+              { 'name': 'Comisión Porcentual', 'attribute': 'COMISSION_PCT' },
+              { 'name': 'Criterio de comisión', 'attribute': 'COMISSION_CRITERION' }
+            ]" [data]="excelData" [actionsOptions]="false" [lengthTable]="excelData.length">
+          </uni-dynamic-table>
+          <div class="row">
+            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+              <button type="button" class="btn btn-default2" (click)="cancelData()">
+                <mat-icon>clear</mat-icon>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 </div>
