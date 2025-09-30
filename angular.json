@@ -3,6 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    
     "singularlabs-mf-services": {
       "projectType": "application",
       "schematics": {
