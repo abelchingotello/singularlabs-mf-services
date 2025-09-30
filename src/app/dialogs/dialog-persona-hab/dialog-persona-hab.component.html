@@ -1,0 +1,22 @@
+<div mat-dialog-content>
+  <p>¿Actualizar estado del usuario?</p>
+  <mat-form-field class="col-md-6" appearance="outline">
+    <mat-label>Persona</mat-label>
+    <input type="text" matInput [(ngModel)]="person" disabled>
+  </mat-form-field>
+  <mat-form-field class="col-md-6" appearance="outline">
+    <mat-label>Seleccionar estado</mat-label>
+    <mat-select (selectionChange)="stateType($event)">
+      <mat-option *ngFor="let state of stateMaster" [value]="state">
+        {{state.master_name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div class="d-flex justify-content-end">
+  <!-- <button mat-button (click)="onNoClick()" class="btn btn-primary" >Cancelar</button> -->
+  <button mat-button [mat-dialog-close]="" class="btn btn-default3" cdkFocusInitial (click)="updatestate()">
+    <mat-icon>update</mat-icon>
+    Actualizar
+  </button>
+</div>

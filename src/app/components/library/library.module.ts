@@ -54,7 +54,7 @@ import { ContactFormComponent } from './contact-form/contact-form.component';
     InputPhoneComponent,
     UserFormComponent,
     ContactFormComponent,
-    DynamicTableComponent
+    DynamicTableComponent,
   ],
   exports:[
     SpinnerComponent,

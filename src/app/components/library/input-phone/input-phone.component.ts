@@ -1,11 +1,11 @@
-import { Component, ContentChild, EventEmitter, Input, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges, TemplateRef } from '@angular/core';
 import { FormBuilder, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
-import * as libphonenumber from 'awesome-phonenumber';
+import { parsePhoneNumber, ParsedPhoneNumber, getExample } from 'awesome-phonenumber';
 import { ISO_3166_1_CODES } from './country-codes';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormGroupDirective, NgForm } from '@angular/forms';
@@ -31,7 +31,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule
   ]
 })
-export class InputPhoneComponent implements OnInit {
+export class InputPhoneComponent implements OnInit, OnChanges {
 
   @Output() phoneChanged = new EventEmitter<any>();
   @Input() disabled?: boolean;
@@ -65,7 +65,7 @@ export class InputPhoneComponent implements OnInit {
 
   private updatePhoneNumber() {
     if (this.value) {
-      const parsedPhone = libphonenumber.parsePhoneNumber(this.value);
+      const parsedPhone = parsePhoneNumber(this.value);
 
       // Evita sobrescribir si los valores ya coinciden
       if (this.phoneCountryControl.value !== parsedPhone.regionCode) {
@@ -96,8 +96,8 @@ export class InputPhoneComponent implements OnInit {
   }
 
   //Generar un json con las validaciones correspondientes
-  get phoneNumber(): libphonenumber.ParsedPhoneNumber {
-    return libphonenumber.parsePhoneNumber(this.phoneNumberDigits, { regionCode: this.phoneCountryControl.value });
+  get phoneNumber(): ParsedPhoneNumber {
+    return parsePhoneNumber(this.phoneNumberDigits, { regionCode: this.phoneCountryControl.value });
   }
 
   //Exponer el formato nacional, sin codigo de pais
@@ -110,7 +110,7 @@ export class InputPhoneComponent implements OnInit {
 
   //Crear ejemplo con el pais seleccionado y tipo mobile
   get phoneHint(): string {
-    return libphonenumber.getExample(this.phoneCountryControl.value, 'mobile')?.number.national || '';
+    return getExample(this.phoneCountryControl.value, 'mobile')?.number.national || '';
   }
 
   //Formato sin espacios y codigo de pais
@@ -139,11 +139,11 @@ export function phoneValidator(acceptMobileOnly: boolean): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const country = control.get('country');
     const num = control.get('number');
-    if (num?.value && country?.value && !(libphonenumber.parsePhoneNumber(num.value, { regionCode: country.value }).valid)) {
+    if (num?.value && country?.value && !(parsePhoneNumber(num.value, { regionCode: country.value }).valid)) {
       return { invalidPhone: true };
     }
 
-    if (acceptMobileOnly && (libphonenumber.parsePhoneNumber(num.value, { regionCode: country.value }).type !== 'mobile')) {
+    if (acceptMobileOnly && (parsePhoneNumber(num.value, { regionCode: country.value }).type !== 'mobile')) {
       return { notMobile: true };
     }
     return null;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
@@ -8,7 +8,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
   templateUrl: './detail-service.component.html',
   styleUrls: ['./detail-service.component.scss']
 })
-export class DetailServiceComponent implements OnInit {
+export class DetailServiceComponent {
 
   public dataDetail : any
   public searchAct : boolean = false;
@@ -20,16 +20,11 @@ export class DetailServiceComponent implements OnInit {
     value:'Servicio BBVA',cod:'SAC0000001'
   }]
   
-  
   constructor(
     private service : ServicesService,
     private spinner : SpinnerService,
     private router: Router,
   ) { }
-
-  ngOnInit(): void {
-    
-  }
 
   detailDataService(){
     this.spinner.spinnerOnOff();

@@ -15,7 +15,9 @@ export class ServicesService {
 
   public servicePayment = new BehaviorSubject<any[]>([]);
 
+  
   private url = `${environment.URL_API_GATEWAY}`;
+  //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
     private httpClient: HttpClient

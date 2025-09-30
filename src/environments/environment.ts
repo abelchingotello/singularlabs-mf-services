@@ -6,7 +6,9 @@ export const environment = {
   production: false,
   HOST:'http://localhost:8082',
   // URL_API_GATEWAY:'https://butdn2x1g7.execute-api.us-east-1.amazonaws.com/stage'
-  URL_API_GATEWAY:'https://gduoe53smj.execute-api.us-east-1.amazonaws.com/stage'
+  URL_API_GATEWAY:'https://rrmnpgfzii.execute-api.us-east-1.amazonaws.com/sandbox',
+   // rr es apigateway de desarrollo y gdu de produccion
+  URL_API_LOCAL:'http://localhost:3000/stage'
 };
 
 /*

@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CommonModule, formatDate } from '@angular/common';
-import * as XLSX from 'xlsx';
+import { utils, writeFile, WorkBook } from 'xlsx';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, NgModel } from '@angular/forms';
@@ -18,6 +18,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 @Component({
   selector: 'uni-dynamic-table',
   templateUrl: './dynamic-table.component.html',
@@ -37,10 +38,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatPaginatorModule,
     MatCardModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSlideToggleModule
   ]
 })
 export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
+ 
+  
   @Input() columns: any[] = [];
   @Input() data: any[] = [];
   @Input() actionsOptions?: boolean;
@@ -48,11 +52,25 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() pageKey: any;
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
+  //------------
+  @Input() customExportFunction: ((fileType: 'xlsx' | 'csv') => void) | null = null;
+  //------------
+  
+
   @Input() viewOptionsTable: boolean = true; //Si se muestran las opciones de la tabla(por defecto estara en true)
   @Input() viewCheckboxHeader: boolean = true; //Si se muestra el checkbox en el encabezado(por defecto estara en true)
 
   @Input() lengthTable: any;
+  @Input() paginationinFrontend: any;
+  @Input() getDataForExport!: () => void;
+  @Input() shouldExport: boolean = false;
 
+  @Output() toggleChange = new EventEmitter<any>();
+
+  onToggleChange(element: any, event: any): void {
+    this.toggleChange.emit({ element, checked: event.checked });
+  }
+  
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
   @Output() selectedChange = new EventEmitter<any[]>();
@@ -100,32 +118,44 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] || changes['pageKey']) {
-      // Actualiza el dataSource si los datos han cambiado
       if (changes['data']) {
         this.dataSource.data = this.data;
         this.dataPrint.data = this.data;
       }
-
+      console.log("this.pageKey ngonchanges");
+      console.log(this.pageKey);
       // Verificar si se ha modificado pageKey o si ha cambiado el tamaño de los datos
       if (this.pageKey) {
         // Si hay un pageKey válido o los datos han aumentado de tamaño, activamos hasNextPage
+        
+        //evaluar para que sirve
         //this.paginator.hasNextPage = () => true;
       } else {
         // this.paginator.hasNextPage = () => false;
       }
 
       // Actualizar el tamaño anterior de los datos para futuras comparaciones
-
-      setTimeout(() => {
-        if (this.paginator) {
-          this.paginator.length = this.lengthTable;
-          this.changeDetectorRef.detectChanges();
-          console.log('paginator', this.paginator.length);
-        }
-      });
-
+      if (this.paginationinFrontend) {
+        //paginacion se realiza desde el Frontend, considerando que lengthTable no se recibe
+      }else{
+        //paginacion se realiza desde el Backend, lengthTable si se recibe
+        setTimeout(() => {
+          if (this.paginator) {
+            this.paginator.length = this.lengthTable;
+            this.changeDetectorRef.detectChanges();
+            console.log('paginator', this.paginator.length);
+          }
+        });
+      }
+      
       // Iniciar o reiniciar la tabla
       this.initTable();
+
+     // Exportar solo si el padre lo pidió
+      if (this.shouldExport) {
+        this.exportarDataExcel();
+        this.shouldExport = false; // 🔹 reset automático
+      }
     }
 
     if (changes['columns']) {
@@ -134,11 +164,14 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
       this.attributeNames = this.columns.map(column => column.attribute);
     }
   }
+  
 
   initTable() {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.obs = this.dataSource.connect();
+    //console.log("this.sort: " + this.sort.length);
+    //console.log("this.paginator: "+ this.paginator.length);
   }
 
   updateSort(callback?: () => void) {
@@ -204,9 +237,9 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     }
     // Si `element_id` es un array de strings, extraer múltiples campos
     else if (Array.isArray(this.element_id)) {
-      let element: any[] = this.element_id
+      const element: any[] = this.element_id
       this.selectedIds = this.selection.selected.map(row => {
-        let result: { [key: string]: any } = {};
+        const result: { [key: string]: any } = {};
         element.forEach(field => {
           if (row[field]) {
             result[field] = row[field];  // Extraer el valor de cada campo
@@ -307,27 +340,32 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     return formatDate(date, format, locale);
   }
 
-  private createWorkbook(sheetName: string, isCsv: boolean = false): XLSX.WorkBook {
+  private createWorkbook(sheetName: string, isCsv: boolean = false): WorkBook {
     const headers = [this.displayedColumns];
-    const wb = XLSX.utils.book_new();
-    const ws: any = XLSX.utils.json_to_sheet([]);
+    const wb = utils.book_new();
+    const ws: any = utils.json_to_sheet([]);
 
     // Agrega los encabezados
-    XLSX.utils.sheet_add_aoa(ws, headers);
+    utils.sheet_add_aoa(ws, headers);
 
     // Agrega los datos filtrados
-    XLSX.utils.sheet_add_json(ws, this.filterAttributes(), {
+    utils.sheet_add_json(ws, this.filterAttributes(), {
       origin: 'A2',
       skipHeader: true
     });
 
     // Agrega la hoja al libro de trabajo
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    utils.book_append_sheet(wb, ws, sheetName);
 
     return wb;
   }
 
   exportExcel() {
+    this.getDataForExport();    
+  }
+  exportarDataExcel(){
+    //exportar excel
+    console.log("exportarDataExcel");
     const wb = this.createWorkbook('Users');
     const ws = wb.Sheets['Users'];
 
@@ -343,7 +381,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     // Establece los anchos de las columnas
     ws['!cols'] = columnWidths;
 
-    XLSX.writeFile(wb, 'Excel tabla.xlsx');
+    writeFile(wb, 'Excel tabla.xlsx');
   }
 
   exportCsv() {
@@ -351,7 +389,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     const ws = wb.Sheets['Users'];
 
     // Convierte la hoja a CSV con cada valor entre comillas
-    const csv = XLSX.utils.sheet_to_csv(ws, {
+    const csv = utils.sheet_to_csv(ws, {
       FS: ',',
       RS: '\n',
       // Envolver cada campo en comillas dobles
@@ -373,7 +411,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     const columnConfigMap = new Map<string, any>(
       this.columns.map(column => [column.attribute, column.config])
     );
-
+    
     return this.data.map(item => {
       const newObj: { [key: string]: any } = {};
 
@@ -394,6 +432,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         }
 
         newObj[attribute] = value; // Asignar el valor (formateado o no) al nuevo objeto
+      
+        //console.log("this.dataaA:"+item[attribute]);
       }
 
       return newObj;

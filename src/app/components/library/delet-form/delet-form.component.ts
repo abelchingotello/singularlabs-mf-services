@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'uni-delet-form',
   templateUrl: './delet-form.component.html',
   styleUrls: ['./delet-form.component.scss']
 })
-export class DeletFormComponent implements OnInit {
+export class DeletFormComponent  {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

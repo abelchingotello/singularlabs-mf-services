@@ -23,33 +23,6 @@
       </div>
       </div>
     </uni-image-card>
-    <!-- <mat-card class="custom-border-radius-1-25">
-      <form [formGroup]="serviceForm">
-        <mat-card-content>
-          <div class="template-container custom-border-radius-1-25 bg-white p-3">
-            <mat-form-field  appearance="outline" class="col-md-4">
-              <mat-label>Buscar</mat-label>
-              <input matInput placeholder="Por nombre" formControlName="service_name">
-              <button *ngIf="close" mat-icon-button matSuffix (click)="cleanSearch()">
-                <mat-icon>close</mat-icon>
-              </button>
-
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="col-md-3">
-              <mat-label>Estado</mat-label>
-              <mat-select formControlName="status">
-                <mat-option *ngFor="let status of stateMaster" [value]="status">{{status.master_name}}</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          <button class="btn btn-primary" matSuffix (click)="searchData()">
-            <mat-icon>search</mat-icon>
-            Buscar
-          </button>
-        </mat-card-content>
-      </form> 
-      </mat-card> -->
-
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
@@ -93,8 +66,6 @@
         </div>
         </div>
       </mat-card-content>
-
-      
     </mat-card>
 
     <mat-card class="custom-border-radius-1-25">
@@ -103,7 +74,7 @@
           <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"
             [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
             (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)"
-            (pageChange)="onPageChange($event)" [lengthTable]="count">
+            (pageChange)="onPageChange($event)" [lengthTable]="count" [getDataForExport]="dataInitialForExport.bind(this)">
 
             <div class="d-flex">
               <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()">
@@ -113,7 +84,6 @@
                 <mat-label>Actualizar</mat-label>
 
                 <mat-select (selectionChange)="selectOption($event)">
-                  <!-- <mat-option>Ninguno</mat-option> -->
                   <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -122,8 +92,5 @@
         </div>
       </mat-card-content>
     </mat-card>
-
-
-
   </div>
 </div>

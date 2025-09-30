@@ -66,14 +66,27 @@
                         class="custom-headercell-dynamictable">
                         {{ column.name }}
                     </th>
-                    <td mat-cell *matCellDef="let element" [class.checked-class]="selection.isSelected(element)">
-                        <span (click)="column.config?.clickable ? onCellClick(element) : null" [ngClass]="[column.config?.styleClass ? (element[column.attribute] || '') : '',  column.config?.clickable? 'link':'']">
-                            {{ column.config?.formatDate ? formatDate(element[column.attribute],
-                            column.config.formatDate.format, column.config.formatDate.locale) :
-                            element[column.attribute] }}
-                        </span>
+                    <td mat-cell *matCellDef="let element" [class.checked-class]="selection.isSelected(element)">                
+                        <!-- Si la columna está configurada como toggle -->
+                        <ng-container *ngIf="column.config?.isToggle; else normalCell">
+                            <mat-slide-toggle 
+                            [checked]="element[column.attribute] === 'HABILITADO'" 
+                            (change)="onToggleChange(element, $event)">
+                            </mat-slide-toggle>
+                        </ng-container>
+
+                        <!-- Caso normal -->
+                        <ng-template #normalCell>
+                            <span (click)="column.config?.clickable ? onCellClick(element) : null" [ngClass]="[column.config?.styleClass ? (element[column.attribute] || '') : '',  column.config?.clickable? 'link':'']">
+                            {{ column.config?.formatDate ? 
+                                formatDate(element[column.attribute], column.config.formatDate.format, column.config.formatDate.locale) : 
+                                element[column.attribute] }}
+                            </span>
+                        </ng-template>
                     </td>
+                    
                 </ng-container>
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"
                     class="custom-header-row-dynamic-table">
                 </tr>

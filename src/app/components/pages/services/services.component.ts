@@ -60,6 +60,7 @@ export class ServicesComponent implements OnInit {
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
+
   constructor(
     private router: Router,
     private services: ServicesService,
@@ -83,31 +84,42 @@ export class ServicesComponent implements OnInit {
         this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
       }
     });
-    this.functionDataCurrent = this.dataInitial.bind(this);
+    this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
     this.functionDataCurrent(this.pageSize);
-
-
   }
 
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
     const inputStatus = this.status.value?.master_name?.toUpperCase();
-
+    
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, inputStatus, inputType, null, this.count, pageSize, this.pageKey).subscribe({
+    console.log("pag key:");
+    console.log(this.pageKey);
+    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
+        //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
+        //console.log(...data.data.Items);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
+        
         this.dataService = this.dataFilter.map(item => ({
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
-        this.pageKey = data.data.nextPageKey ?? null;
+        //console.log("this.dataFilter: "+this.dataFilter);
+        //console.log("this.dataService: "+this.dataService);
+        console.log("data.data.nextPageKey:");
+        console.log(data.data.nextPageKey);
+        if(this.dataService.length==this.count){//se recuperaron todos los datos
+          this.pageKey = null;
+        }else{
+          this.pageKey = data.data.nextPageKey ?? null;
+        }
         this.count = data.data.Count ?? 0;
       },
       error: (err) => {
@@ -121,6 +133,16 @@ export class ServicesComponent implements OnInit {
     })
   }
 
+  dataInitialForExport() {
+    if (this.pageKey) {  // Validamos pageKey en lugar de pageSize, si la tabla aun no esta llena
+      console.log('Tabla incompleta, cargando más datos antes de exportar...');
+      this.dynamic.shouldExport = true; // 🔹 decimos al hijo: “exporta después de cargar”
+      this.functionDataCurrent(this.count);
+    }else{//si tabla ya esta llena, llamar la fn exportar del hijo
+      console.log('Tabla completa, exportando directamente...');
+      this.dynamic.exportarDataExcel();
+    }
+  }
 
   formService() {
     this.serviceForm = this.fb.group({
@@ -248,7 +270,7 @@ export class ServicesComponent implements OnInit {
   }
 
   reload() {
-    // this.clearData();
+    this.clearData();
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
     // this.functionDataCurrent(this.pageSize);
@@ -288,7 +310,7 @@ export class ServicesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.clearData();
+      //this.clearData();
       this.reload();//Aqui ya se vuelve a llamar a data initial
     });
   }
