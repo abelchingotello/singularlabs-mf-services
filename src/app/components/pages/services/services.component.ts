@@ -115,6 +115,10 @@ export class ServicesComponent implements OnInit {
         //console.log("this.dataService: "+this.dataService);
         console.log("data.data.nextPageKey:");
         console.log(data.data.nextPageKey);
+        console.log("this.count:");
+        console.log(this.count);
+        console.log("data.data.Count:");
+        console.log(data.data.Count);
         if(this.dataService.length==this.count){//se recuperaron todos los datos
           this.pageKey = null;
         }else{

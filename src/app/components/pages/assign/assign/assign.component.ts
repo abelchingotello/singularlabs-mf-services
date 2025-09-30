@@ -109,7 +109,20 @@ export class AssignComponent implements OnInit {
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
-        this.pageKey = data.data.nextPageKey ?? null;
+        //this.pageKey = data.data.nextPageKey ?? null;
+        //this.count = data.data.Count ?? this.count;
+      
+        console.log("data.data.nextPageKey:");
+        console.log(data.data.nextPageKey);
+        console.log("this.count:");
+        console.log(this.count);
+        console.log("data.data.Count:");
+        console.log(data.data.Count);
+        if(this.dataService.length==this.count){//se recuperaron todos los datos
+          this.pageKey = null;
+        }else{
+          this.pageKey = data.data.nextPageKey ?? null;
+        }
         this.count = data.data.Count ?? this.count;
       },
       error: (err) => {
@@ -123,6 +136,16 @@ export class AssignComponent implements OnInit {
     })
   }
 
+  dataInitialForExport() {
+    if (this.pageKey) {  // Validamos pageKey en lugar de pageSize, si la tabla aun no esta llena
+      console.log('Tabla incompleta, cargando más datos antes de exportar...');
+      this.dynamic.shouldExport = true; // 🔹 decimos al hijo: “exporta después de cargar”
+      this.functionDataCurrent(this.count);
+    }else{//si tabla ya esta llena, llamar la fn exportar del hijo
+      console.log('Tabla completa, exportando directamente...');
+      this.dynamic.exportarDataExcel();
+    }
+  }
   //Redireccionar a asignación individual(1) o masiva(2)
   redirectAsign(type: number) {
     if (type === 1) {
@@ -150,7 +173,7 @@ export class AssignComponent implements OnInit {
   }
   
   reload() {
-    // this.clearData();
+     this.clearData();
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
     //this.dataInitial(this.pageSize);
@@ -164,9 +187,9 @@ export class AssignComponent implements OnInit {
 
   /************************************* METODOS DE BOTONES ***********************************/
   clearFormAndData() {
-    //this.clearData();
+    this.clearData();
     this.assignServiceForm.reset();
-    //this.dataInitial(this.pageSize);
+    this.dataInitial(this.pageSize);
   }
 
 

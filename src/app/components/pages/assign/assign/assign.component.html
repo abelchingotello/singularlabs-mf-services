@@ -68,7 +68,7 @@
         <div>
           <uni-dynamic-table [columns]="columns" [data]="dataService" [pageKey]="pageKey" 
             [refreshFunction]="reload.bind(this)"
-            (pageChange)="onPageChange($event)" [lengthTable]="count">
+            (pageChange)="onPageChange($event)" [lengthTable]="count" [getDataForExport]="dataInitialForExport.bind(this)">
           </uni-dynamic-table>
         </div>
       </mat-card-content>
