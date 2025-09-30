@@ -1,0 +1,6 @@
+projectKey=singularlabs-mf-services
+serverUrl=http://localhost:9015
+serverVersion=25.9.0.112764
+dashboardUrl=http://localhost:9015/dashboard?id=singularlabs-mf-services
+ceTaskId=0c31055d-e8f4-439f-8a16-95458a4e115d
+ceTaskUrl=http://localhost:9015/api/ce/task?id=0c31055d-e8f4-439f-8a16-95458a4e115d

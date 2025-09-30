@@ -182,7 +182,7 @@ export class UserFormComponent implements OnInit {
     } else {
       this.email_verif.disable();
     }
-    if(!this.email.value) this.email_verif.disable()
+    if(!this.email.value) {this.email_verif.disable();}
   }
 
   validateOnlyNumber1(event: any) {
@@ -191,9 +191,9 @@ export class UserFormComponent implements OnInit {
 
   // Sólo números al pegar
   onPasteOnlyNumber(event: ClipboardEvent) {
-    let valor = event.clipboardData?.getData('text');
-    let respt = this.validateNumeric(valor);
-    if (respt === false) event.preventDefault();
+    const valor = event.clipboardData?.getData('text');
+    const respt = this.validateNumeric(valor);
+    if (respt === false) { event.preventDefault();}
   }
 
   validateOnlyNumber(num: any) {
@@ -209,8 +209,8 @@ export class UserFormComponent implements OnInit {
   // Validar números
   validateNumeric(caracter: any) {
     const exprReg = /^[0-9]*$/; //pendiente en investigación
-    if (exprReg.test(caracter))
-      return true;
+    if (exprReg.test(caracter)){ return true; }
+      
 
     return false;
   }
@@ -232,10 +232,9 @@ export class UserFormComponent implements OnInit {
     console.log("role", role)
     if (event.isUserInput) {
       if (event.source.selected) {
-        if (!this.listRole.includes(role.SK))
-          this.listRole.push(role.SK)
+        if (!this.listRole.includes(role.SK)) { this.listRole.push(role.SK) }      
       } else {
-        let index = this.listRole.indexOf(role.SK)
+        const index = this.listRole.indexOf(role.SK)
         if (index > -1) {
           this.listRole.splice(index, 1) //remover rol seleccionado
           console.log("eliminado")
@@ -490,9 +489,9 @@ export class UserFormComponent implements OnInit {
 
   //  Letras y carácteres especiales al pegar
   onPasteOnlyLetterAndSpecial(event: ClipboardEvent) {
-    let valor = event.clipboardData?.getData('text');
-    let respt = this.validateOnlyLetterAndSpecial(valor);
-    if (respt === false) event.preventDefault();
+    const valor = event.clipboardData?.getData('text');
+    const respt = this.validateOnlyLetterAndSpecial(valor);
+    if (respt === false) { event.preventDefault(); }
   }
 
   // Letras y carácteres especiales al escibir
@@ -503,7 +502,7 @@ export class UserFormComponent implements OnInit {
   // Para validar letras y caracteres especiales
   validateOnlyLetterAndSpecial(caracter: any) {
     const exprReg = /^[a-zA-Z_áéíóúäëïöüÁÉÍÓÚñÑÄËÏÖÜ".,'`-\s]*$/;
-    if (exprReg.test(caracter)) return true;
+    if (exprReg.test(caracter)) { return true; }
     return false;
   }
 

@@ -1,0 +1,66 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Estado de Conciliaciones"
+      externImage="https://media.istockphoto.com/id/1347728962/es/vector/pr%C3%A9stamo-de-consumo-bancario-pr%C3%A9stamo-bancario-concepto-de-inversiones-financiaci%C3%B3n-y-cr%C3%A9dito.jpg?s=612x612&w=0&k=20&c=EcujMxDw0dfJqNol_KbW2Ahdtzd8OdJ-5hFfV1qmf8c="
+      size="100px">
+
+      <div class="align-content-center">
+        <button mat-flat-button type="button" class="custom-button btn btn-default4" (click)="addPerson()">
+          <mat-icon>add</mat-icon>
+          <span class="custom-span-icon-responsive">Añadir</span>
+        </button>
+      </div>
+    </uni-image-card>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+
+        <form [formGroup]="listpersonForm" class="mt-3">
+          <mat-form-field appearance="outline" class="col-xl-3">
+            <mat-label>Buscar Tipo entidad</mat-label>
+            <mat-select formControlName="typeEntity" (selectionChange)="selectedEntity($event)">
+              <mat-option *ngFor="let entity of typeEntity" [value]="entity">
+                {{entity.master_relativeName}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-xl-3">
+            <mat-label>Buscar por nombre</mat-label>
+            <mat-select formControlName="person" (selectionChange)="selectAlias($event)">
+              <mat-option *ngFor="let name of nameAlias" [value]="name">
+                {{name.nameAlias}}
+              </mat-option>
+            </mat-select>
+            <mat-hint class="text-danger" *ngIf="listpersonForm.get('person')?.touched && listpersonForm.get('typeEntity')?.value == ''" >
+              Primero selecciona un Tipo de Entidad.
+            </mat-hint>
+          </mat-form-field>
+         
+        </form>
+      </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <div>
+          <uni-dynamic-table [columns]="columns" [data]="dataPerson"   
+              (toggleChange)="onToggleChange($event)" [actionsOptions]="false" element_id="id"
+              (pageChange)="onPageChange($event)" [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
+              [refreshFunction]="reload.bind(this)" (selectedChange)="selectedHandle($event)"  [paginationinFrontend]="true">
+            <div class="action-buttons d-inline-block">
+              <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="assignUser()">
+                <mat-icon matTooltip="Asignar Usuario" matTooltipPosition="above">assignment_ind</mat-icon>
+              </button>
+
+              <button [disabled]="disabledEditOption" mat-icon-button (click)="openDialog()">
+                <mat-icon matTooltip="Actualizar Estado" matTooltipPosition="above">edit</mat-icon>
+              </button>
+            </div>
+          </uni-dynamic-table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

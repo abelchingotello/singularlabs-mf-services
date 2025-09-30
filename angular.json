@@ -45,15 +45,16 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "4mb",
+                  "maximumError": "4mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
+              "deployUrl":"https://d2m1ue0tbianp0.cloudfront.net/singularlabs-mf-services/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
