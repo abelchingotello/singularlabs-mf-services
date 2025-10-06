@@ -8,8 +8,8 @@ import { environment } from 'src/environments/environment';
 })
 export class PersonService {
 
-  //private url = `${environment.URL_API_GATEWAY}`;
-  private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
+  private url = `${environment.URL_API_GATEWAY}`;
+  //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
     private httpClient: HttpClient,
