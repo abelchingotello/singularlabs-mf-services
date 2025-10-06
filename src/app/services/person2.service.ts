@@ -32,7 +32,7 @@ export class PersonService {
     return this.httpClient.get(`${this.url}/person`,{params});
   }
 
-  getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {
+  getPersonAll(typeEntity?:string,nameAlias?:string):Observable<any> {
     let params = new HttpParams();
     if(typeEntity) params = params.set('typeEntity', typeEntity);
     
@@ -60,7 +60,7 @@ export class PersonService {
   patchStatePerson(data:any):Observable<any> {
     return this.httpClient.patch(`${this.url}/person/entity/statusAudit`, data);
   }
-
+ //no se usa
   registerAudit(data: any): Observable<any> {
     return this.httpClient.post<any>(`${this.url}/person/entity/audit`, data);
   }

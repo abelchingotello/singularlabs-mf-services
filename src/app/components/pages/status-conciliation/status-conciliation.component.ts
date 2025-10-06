@@ -3,16 +3,16 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { MasterService } from 'src/app/services/master2.service';
+import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
-import { PersonService } from 'src/app/services/person2.service';//aqui se hizo cambio
+import { PersonService } from 'src/app/services/person.service';//aqui se hizo cambio
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { DynamicTableComponent } from '../../library/dynamic-table/dynamic-table.component';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTabChangeEvent } from '@angular/material/tabs';
-import { UserService } from 'src/app/services/user2.service';
+import { UserService } from 'src/app/services/user.service';
 import { DialogPersonaHabComponent } from 'src/app/dialogs/dialog-persona-hab/dialog-persona-hab.component';
 import { DialogPersonEntityTypeComponent } from 'src/app/dialogs/dialog-person-entity-type/dialog-person-entity-type.component';
 import { DialogPersonaStatusComponent } from 'src/app/dialogs/dialog-persona-status/dialog-persona-status.component';
@@ -196,7 +196,7 @@ export class StatusConciliationComponent implements OnInit {
     console.log("typo:" + type);
     
     this.spinner.spinnerOnOff();
-    this.personService.getPerson(type).subscribe({
+    this.personService.getPersonAll(type).subscribe({
       next:(value)=> {
           if(value.statusCode !== 200){
             this.myToastr.showError('Error al cargar datos..','');
@@ -254,7 +254,7 @@ export class StatusConciliationComponent implements OnInit {
     this.selectedAlias = event.value.nameAlias.toUpperCase();
     console.log("VALOR ALIAS1: ",this.selectedAlias)
     this.spinner.spinnerOnOff();
-    this.personService.getPerson(null,this.selectedAlias).subscribe({
+    this.personService.getPersonAll(null,this.selectedAlias).subscribe({
       next:(value)=> {
         console.log("V=ALOR ALIAS2: ",value.data)
         //this.reload();
@@ -498,7 +498,7 @@ export class StatusConciliationComponent implements OnInit {
     console.log("selectedAlias:" + this.selectedAlias);
     
     this.spinner.spinnerOnOff();
-    this.personService.getPerson(this.entitySelect, this.selectedAlias).subscribe({
+    this.personService.getPersonAll(this.entitySelect, this.selectedAlias).subscribe({
       next:(value)=> {
           if(value.statusCode !== 200){
             this.myToastr.showError('Error al cargar datos..','');

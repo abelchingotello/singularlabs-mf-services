@@ -91,7 +91,7 @@ export class AssignComponent implements OnInit {
       });
     }
 
-  dataInitial(pageSize: any): void {
+  dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
     const idClient = this.client.value;
@@ -104,6 +104,9 @@ export class AssignComponent implements OnInit {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
+        
+        console.log("data.data.nextPageKey ver Items:");
+        //console.log(data.data.nextPageKey);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
         this.dataService = this.dataFilter.map(item => ({
           ...item,
@@ -112,12 +115,12 @@ export class AssignComponent implements OnInit {
         //this.pageKey = data.data.nextPageKey ?? null;
         //this.count = data.data.Count ?? this.count;
       
-        console.log("data.data.nextPageKey:");
-        console.log(data.data.nextPageKey);
-        console.log("this.count:");
-        console.log(this.count);
-        console.log("data.data.Count:");
-        console.log(data.data.Count);
+        //console.log("data.data.nextPageKey:");
+        //console.log(data.data.nextPageKey);
+        //console.log("this.count:");
+        //console.log(this.count);
+        //console.log("data.data.Count:");
+       // console.log(data.data.Count);
         if(this.dataService.length==this.count){//se recuperaron todos los datos
           this.pageKey = null;
         }else{
