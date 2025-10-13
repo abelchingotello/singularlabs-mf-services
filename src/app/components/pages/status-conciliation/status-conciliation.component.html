@@ -48,7 +48,8 @@
           <uni-dynamic-table [columns]="columns" [data]="dataPerson"   
               (toggleChange)="onToggleChange($event)" [actionsOptions]="false" element_id="id"
               (pageChange)="onPageChange($event)" [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
-              [refreshFunction]="reload.bind(this)" (selectedChange)="selectedHandle($event)"  [paginationinFrontend]="true">
+              [refreshFunction]="reload.bind(this)" (selectedChange)="selectedHandle($event)"  [paginationinFrontend]="true"
+              [customExportFunction]="exportDataViaAPI.bind(this)">
             <div class="action-buttons d-inline-block">
               <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="assignUser()">
                 <mat-icon matTooltip="Asignar Usuario" matTooltipPosition="above">assignment_ind</mat-icon>

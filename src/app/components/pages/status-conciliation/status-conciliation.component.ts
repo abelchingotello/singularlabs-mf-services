@@ -26,7 +26,7 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./status-conciliation.component.scss']
 })
 export class StatusConciliationComponent implements OnInit {
-  funcionDelPadre(){
+  funcionDelPadre() {
     console.log("Funcion del padre ejecutado desde el hijo");
   }
 
@@ -34,79 +34,81 @@ export class StatusConciliationComponent implements OnInit {
 
   public columns: any[] = [
     { 'name': 'Nombre Alias', 'attribute': 'nameAlias' },
-    { 'name': 'Tipo Entidad', 'attribute': 'typeService'},
-    { 'name': 'Estado', 'attribute': 'status','config':{
-        'styleClass': true 
-    }},
+    { 'name': 'Tipo Entidad', 'attribute': 'typeService' },
+    {
+      'name': 'Estado', 'attribute': 'status', 'config': {
+        'styleClass': true
+      }
+    },
     { //boton deslizador
-      name: 'Estado Toggle', 
-      attribute: 'status', 
-      config: { isToggle: true } 
+      name: 'Estado Toggle',
+      attribute: 'status',
+      config: { isToggle: true }
     }
   ];
 
 
   public options: any[] = [
-    { value: 'Persona', id:'1'},
+    { value: 'Persona', id: '1' },
     // { value: 'Tipo de Cliente', id:'2'}
   ]
-  public currentStep : number = 0;
+  public currentStep: number = 0;
   //public dataPerson = [];
   public dataUser = [];
   public pageSize: any = 5;
   public pageKey: any[];
-  public close : boolean = false;
-  public nameAlias : any []
-  public selectedAlias : string;
+  public close: boolean = false;
+  public nameAlias: any[]
+  public selectedAlias: string;
   public functionDataCurrent: (pageSize: any) => any;
   public disabledEditOption: any
   public selectedIds: any;
-  public typeEntity : any;
-  public optionsType : any;
-  public viewData : boolean = true
+  public typeEntity: any;
+  public optionsType: any;
+  public viewData: boolean = true
   public listpersonForm!: FormGroup;
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
   public nombre: string = 'Paul';
-  
+
   dataPerson: any[] = [];
-  
+
   constructor(
-    private router : Router,
-    private personService : PersonService,
+    private router: Router,
+    private personService: PersonService,
     private fb: FormBuilder,
-    private masterService : MasterService,
-    private myToastr : MytoastrService,
-    private spinner : SpinnerService,
+    private masterService: MasterService,
+    private myToastr: MytoastrService,
+    private spinner: SpinnerService,
     public dialog: MatDialog,
-    private userService : UserService
-  ) { 
+    private userService: UserService
+  ) {
     this.pagUtils = new PaginationUtils();
   }
 
   ngOnInit(): void {
-    this.formlistperson(); 
+    this.formlistperson();
     this.itemMaster();// UTIL | carga los tipos de entidades
     this.functionDataCurrent = this.getPersonData.bind(this);// UTIL | la fn guarda por primera vez algo en la tabla de personans
     this.functionDataCurrent(this.pageSize);
     this.getUser();
   }
 
-  getUser(){
+  getUser() {
     this.userService.getUsers().subscribe({
       next: (response) => {
         this.dataUser = response.Items
-        console.log("repuesta: ",response)
+        console.log("repuesta: ", response)
       }
     })
   }
- formlistperson(){
+  formlistperson() {
     this.listpersonForm = this.fb.group({
-     
+
       typeEntity: [''],
       person: [''],
     })
   }
-  addPerson(){
+  addPerson() {
     this.router.navigate(['/persons/add'])
   }
 
@@ -141,18 +143,18 @@ export class StatusConciliationComponent implements OnInit {
     this.router.navigate([`/persons/edit/${this.selectedIds}`]);
   }
 
-  getPersonData(pageSize?: any){
+  getPersonData(pageSize?: any) {
     this.spinner.spinnerOnOff();
     this.resetUser(this.getPersonData)
     // return
-    this.personService.getPersons(pageSize,this.pageKey).subscribe({
-      next: (value:any) => {
-        if(value.statusCode === 201){
-          this.myToastr.showWarning(value.messages || 'No se encontraron clientes','');
+    this.personService.getPersons(pageSize, this.pageKey).subscribe({
+      next: (value: any) => {
+        if (value.statusCode === 201) {
+          this.myToastr.showWarning(value.messages || 'No se encontraron clientes', '');
           return
         }
         console.log("prueba salidaaa ", value);
-        
+
         let personData = value.data.map(item => ({
           nameAlias: item.servicePerson?.nameAlias || '-',
           zone: item.servicePerson?.zone || '-',
@@ -161,12 +163,12 @@ export class StatusConciliationComponent implements OnInit {
           typeService: item.servicePerson?.typeService.typeEntity || '-',
           id: item.servicePerson?.id || '-'
         }));
-        this.dataPerson = [...this.dataPerson,...personData];// carga datos de personas
+        this.dataPerson = [...this.dataPerson, ...personData];// carga datos de personas
         this.pageKey = value.nextPageKey ?? null
-        console.log("DATA DE TRANSACTION: " ,value.data)//dataPerson
+        console.log("DATA DE TRANSACTION: ", value.data)//dataPerson
       },
       error: (error: any) => {
-        console.error('ERROR',error);
+        console.error('ERROR', error);
         this.spinner.spinnerOnOff();
       },
       complete: () => {
@@ -187,84 +189,84 @@ export class StatusConciliationComponent implements OnInit {
   selectedValue
   stringFilter
 
-  selection(event ){
+  selection(event) {
     this.selectedValue = event.value.attribute
-    console.log("seleccionar valor: ",this.selectedValue)
+    console.log("seleccionar valor: ", this.selectedValue)
   }
   //busca la data de personas por entidad
-  getData(type){
+  getData(type) {
     console.log("typo:" + type);
-    
+
     this.spinner.spinnerOnOff();
     this.personService.getPersonAll(type).subscribe({
-      next:(value)=> {
-          if(value.statusCode !== 200){
-            this.myToastr.showError('Error al cargar datos..','');
-            this.spinner.spinnerOnOff();
-            return
-          }
-          console.log(value.data)
-          //this.reload();
-          this.dataPerson = value.data.map(item => ({
-            nameAlias: item.servicePerson?.nameAlias || '-',
-            zone: item.servicePerson?.zone || '-',
-            typeDoc: item.servicePerson?.typeDoc || '-',
-            status: item.servicePerson?.status || '-',
-            typeService: item.servicePerson?.typeService.typeEntity || '-',
-            id: item.servicePerson?.idPerson || '-'
-          }));
-          //FILTRAR ALIAS SIN REPETIR
-          this.nameAlias=this.dataPerson.filter(
-            (item, index, self) =>
-              item.nameAlias && self.findIndex((t) => t.nameAlias === item.nameAlias) === index
-          );
+      next: (value) => {
+        if (value.statusCode !== 200) {
+          this.myToastr.showError('Error al cargar datos..', '');
           this.spinner.spinnerOnOff();
-          console.log("DATA name : ",this.nameAlias)
+          return
+        }
+        console.log(value.data)
+        //this.reload();
+        this.dataPerson = value.data.map(item => ({
+          nameAlias: item.servicePerson?.nameAlias || '-',
+          zone: item.servicePerson?.zone || '-',
+          typeDoc: item.servicePerson?.typeDoc || '-',
+          status: item.servicePerson?.status || '-',
+          typeService: item.servicePerson?.typeService.typeEntity || '-',
+          id: item.servicePerson?.idPerson || '-'
+        }));
+        //FILTRAR ALIAS SIN REPETIR
+        this.nameAlias = this.dataPerson.filter(
+          (item, index, self) =>
+            item.nameAlias && self.findIndex((t) => t.nameAlias === item.nameAlias) === index
+        );
+        this.spinner.spinnerOnOff();
+        console.log("DATA name : ", this.nameAlias)
       },
-      error(error){
-        console.error("ERROR: ",error)
+      error(error) {
+        console.error("ERROR: ", error)
         this.spinner.spinnerOnOff();
       }
     })
   }
 
-  optionId:any
-  selectOption(event){
-    this.optionId=event.value
-    console.log("option",this.optionId)
-    if(this.optionId.id == '1'){
+  optionId: any
+  selectOption(event) {
+    this.optionId = event.value
+    console.log("option", this.optionId)
+    if (this.optionId.id == '1') {
       this.openDialog();
-    } else if(this.optionId.id =='2'){
+    } else if (this.optionId.id == '2') {
       this.openDialogType();
     }
   }
 
-  entitySelect:string
+  entitySelect: string
 
   //FUNCION DE BUSQUEDA DE PERSONAS POR TIPO DE ENTIDAD
-  selectedEntity(event){
-    console.log("BUSQUEDA: ",event.value.master_relativeName)
-    this.entitySelect=event.value.master_relativeName.toUpperCase();
-    console.log("select",this.entitySelect)
+  selectedEntity(event) {
+    console.log("BUSQUEDA: ", event.value.master_relativeName)
+    this.entitySelect = event.value.master_relativeName.toUpperCase();
+    console.log("select", this.entitySelect)
     this.getData(this.entitySelect) //FUNCION DE BUSQUEDA DE PERSONAS POR TIPO DE ENTIDAD
     this.selectedIds = null
   }
 
-  selectAlias(event){
+  selectAlias(event) {
     this.selectedAlias = event.value.nameAlias.toUpperCase();
-    console.log("VALOR ALIAS1: ",this.selectedAlias)
+    console.log("VALOR ALIAS1: ", this.selectedAlias)
     this.spinner.spinnerOnOff();
-    this.personService.getPersonAll(null,this.selectedAlias).subscribe({
-      next:(value)=> {
-        console.log("V=ALOR ALIAS2: ",value.data)
+    this.personService.getPersonAll(null, this.selectedAlias).subscribe({
+      next: (value) => {
+        console.log("V=ALOR ALIAS2: ", value.data)
         //this.reload();
-        this.dataPerson = value.data.map(item=>({
-          nameAlias:item.name,
+        this.dataPerson = value.data.map(item => ({
+          nameAlias: item.name,
           typeService: item.typeEntity,
-          zone : item.zone,
-          typeDoc:'-',
-          status :item.status,
-          id:item.idPerson
+          zone: item.zone,
+          typeDoc: '-',
+          status: item.status,
+          id: item.idPerson
         }))
         this.spinner.spinnerOnOff();
         // const data[] = {
@@ -277,9 +279,9 @@ export class StatusConciliationComponent implements OnInit {
         // this.dataUser = data 
       },
       error(err) {
-          this.myToastr.showError('Error al cargar datos..','');
-          this.spinner.spinnerOnOff();
-          console.error("Error: ",err)
+        this.myToastr.showError('Error al cargar datos..', '');
+        this.spinner.spinnerOnOff();
+        console.error("Error: ", err)
       },
     })
     this.handleSelectedIds(null)
@@ -287,12 +289,12 @@ export class StatusConciliationComponent implements OnInit {
   }
 
   dataDialog
-  selectedHandle(event){
-    this.dataDialog=event[0] //id de la persona seleccionada
+  selectedHandle(event) {
+    this.dataDialog = event[0] //id de la persona seleccionada
   }
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogPersonaHabComponent, {
-      width:'600px',
+      width: '600px',
       data: {
         id: this.dataDialog,
       },
@@ -307,7 +309,7 @@ export class StatusConciliationComponent implements OnInit {
 
   openDialogType(): void {
     const dialogRef = this.dialog.open(DialogPersonEntityTypeComponent, {
-      width:'600px',
+      width: '600px',
       data: {
         state: this.typeEntity,
         options: this.optionsType
@@ -315,31 +317,31 @@ export class StatusConciliationComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed',result);
+      console.log('The dialog was closed', result);
       // this.animal = result;
       this.dynamic.clearSelection();
     });
   }
   stateOption
-  stateType(event){
-    console.log("data de dialog: ",event)
-    this.stateOption= event.value.master_relativeName
+  stateType(event) {
+    console.log("data de dialog: ", event)
+    this.stateOption = event.value.master_relativeName
   }
   stateOptionSelect
-  stateTypeEntity(event){
-    console.log("data de status: ",event)
-    this.stateOptionSelect= event.value.master_name
+  stateTypeEntity(event) {
+    console.log("data de status: ", event)
+    this.stateOptionSelect = event.value.master_name
   }
 
-  searchData(){
+  searchData() {
     // this.spinner.spinnerOnOff();
-    if(this.stringFilter == ''){
-      this.myToastr.showWarning('Ingrese un valor para la búsqueda','');
+    if (this.stringFilter == '') {
+      this.myToastr.showWarning('Ingrese un valor para la búsqueda', '');
       return;
     }
     //VALIDACION PARA ATRIBUTO
-    if(this.selectedValue== null){
-      this.myToastr.showWarning('Seleccione un atributo para la búsqueda','');
+    if (this.selectedValue == null) {
+      this.myToastr.showWarning('Seleccione un atributo para la búsqueda', '');
       return;
     }
 
@@ -353,16 +355,16 @@ export class StatusConciliationComponent implements OnInit {
     this.clearSelection();
     this.resetIfFunctionChanged(this.searchConctactsByFilter)
     // const filter = this.stringFilter.new.toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").trimEnd()
-    this.userService.getFilterData(this.stringFilter,this.selectedValue, pageSize, this.pageKey).subscribe({
+    this.userService.getFilterData(this.stringFilter, this.selectedValue, pageSize, this.pageKey).subscribe({
       next: (contacts) => {
-        if(contacts.Items.length<1){
-          this.myToastr.showWarning(`No se encontraron coincidencias con: ${this.stringFilter} `,'')
+        if (contacts.Items.length < 1) {
+          this.myToastr.showWarning(`No se encontraron coincidencias con: ${this.stringFilter} `, '')
           this.spinner.spinnerOnOff();
           this.cleanSearch();
           return;
         }
         this.updateContacts(contacts.Items, contacts.lastEvaluatedKey);
-        console.log('Resultado de searchContactsByFilter' , contacts);
+        console.log('Resultado de searchContactsByFilter', contacts);
         // this.spinner.spinnerOnOff();
         this.close = true
       },
@@ -371,8 +373,8 @@ export class StatusConciliationComponent implements OnInit {
         console.log('spinner oculto error');
         this.spinner.spinnerOnOff();
       },
-      complete:()=> {
-          this.spinner.spinnerOnOff();
+      complete: () => {
+        this.spinner.spinnerOnOff();
       },
     });
     this.functionDataCurrent = this.searchConctactsByFilter;
@@ -384,7 +386,7 @@ export class StatusConciliationComponent implements OnInit {
     this.dataUser = [...this.dataUser, ...newContacts];
     this.pageKey = lastEvaluatedKey || null;
   }
-  private clearSelection(){
+  private clearSelection() {
     this.dynamic.clearSelection();
   }
 
@@ -397,26 +399,26 @@ export class StatusConciliationComponent implements OnInit {
     }
   }
 
-  cleanSearch(){
+  cleanSearch() {
     this.stringFilter = ''
     this.getUser();
   }
 
-  updatestate(){
+  updatestate() {
     const data = {
-      typeEntity:this.stateOption,
-      status:  this.stateOptionSelect
+      typeEntity: this.stateOption,
+      status: this.stateOptionSelect
     }
-    console.log( "data",data)
+    console.log("data", data)
     // return
     this.personService.getStateTypePerson(data).subscribe(
       (response) => {
-        if(response?.statusCode !==200){
-          this.myToastr.showError('Hubo un error al actualizar','')
+        if (response?.statusCode !== 200) {
+          this.myToastr.showError('Hubo un error al actualizar', '')
           console.log("ERROR")
           return
         }
-        this.myToastr.showSuccess(response.message,'')
+        this.myToastr.showSuccess(response.message, '')
       }
     )
   }
@@ -428,11 +430,11 @@ export class StatusConciliationComponent implements OnInit {
       this.masterService.getItemsMasterTable('1')
 
     ]).subscribe({
-      next: ([typeEntity,options]) => {
+      next: ([typeEntity, options]) => {
         this.typeEntity = typeEntity.sort((a, b) => a.master_order - b.master_order);
         this.optionsType = options.sort((a, b) => a.master_order - b.master_order);
-        console.log("ENTIDAD: ",this.typeEntity)
-        console.log("ENTIDAD2: ",this.optionsType)
+        console.log("ENTIDAD: ", this.typeEntity)
+        console.log("ENTIDAD2: ", this.optionsType)
       }
     })
 
@@ -440,20 +442,20 @@ export class StatusConciliationComponent implements OnInit {
   }
 
 
-  assignUser(){
+  assignUser() {
     console.log("ingreso editar persona:")
     this.router.navigate([`/persons/edit/${this.selectedIds}`])
   }
 
 
-  editUsers(){
+  editUsers() {
     this.router.navigate([`/persons/user/edit/${this.selectedIds}`])
   }
 
-  onTabChange(event : MatTabChangeEvent){
+  onTabChange(event: MatTabChangeEvent) {
     console.log('Tab cambiada a:', event.index);
-    if(event.index == 1) {
-        this.viewData = false
+    if (event.index == 1) {
+      this.viewData = false
     } else {
       this.viewData = true
     }
@@ -485,50 +487,84 @@ export class StatusConciliationComponent implements OnInit {
         //llamar a busqueda sin filtros.
         console.log("filtros no definidos");
         this.getPersonData(this.pageSize);
-          this.reload();
-      }else{
+        this.reload();
+      } else {
         console.log("filtros definidos");
         this.getPersonInit(); // 🔄 recarga todo después de actualizar segun el filtro
       }
     });
   }
 
-  getPersonInit(){
+  getPersonInit() {
     console.log("typo:" + this.entitySelect);
     console.log("selectedAlias:" + this.selectedAlias);
-    
+
     this.spinner.spinnerOnOff();
     this.personService.getPersonAll(this.entitySelect, this.selectedAlias).subscribe({
-      next:(value)=> {
-          if(value.statusCode !== 200){
-            this.myToastr.showError('Error al cargar datos..','');
-            this.spinner.spinnerOnOff();
-            return
-          }
-          console.log(value.data)
-          //this.reload();
-          this.dataPerson = value.data.map(item => ({
-            nameAlias: item.servicePerson?.nameAlias || '-',
-            zone: item.servicePerson?.zone || '-',
-            typeDoc: item.servicePerson?.typeDoc || '-',
-            status: item.servicePerson?.status || '-',
-            typeService: item.servicePerson?.typeService.typeEntity || '-',
-            id: item.servicePerson?.idPerson || '-'
-          }));
-          //FILTRAR ALIAS SIN REPETIR
-          /*
-          this.nameAlias=this.dataPerson.filter(
-            (item, index, self) =>
-              item.nameAlias && self.findIndex((t) => t.nameAlias === item.nameAlias) === index
-          );
-          */
+      next: (value) => {
+        if (value.statusCode !== 200) {
+          this.myToastr.showError('Error al cargar datos..', '');
           this.spinner.spinnerOnOff();
-          console.log("DATA name : ",this.nameAlias)
+          return
+        }
+        console.log(value.data)
+        //this.reload();
+        this.dataPerson = value.data.map(item => ({
+          nameAlias: item.servicePerson?.nameAlias || '-',
+          zone: item.servicePerson?.zone || '-',
+          typeDoc: item.servicePerson?.typeDoc || '-',
+          status: item.servicePerson?.status || '-',
+          typeService: item.servicePerson?.typeService.typeEntity || '-',
+          id: item.servicePerson?.idPerson || '-'
+        }));
+        //FILTRAR ALIAS SIN REPETIR
+        /*
+        this.nameAlias=this.dataPerson.filter(
+          (item, index, self) =>
+            item.nameAlias && self.findIndex((t) => t.nameAlias === item.nameAlias) === index
+        );
+        */
+        this.spinner.spinnerOnOff();
+        console.log("DATA name : ", this.nameAlias)
       },
-      error(error){
-        console.error("ERROR: ",error)
+      error(error) {
+        console.error("ERROR: ", error)
         this.spinner.spinnerOnOff();
       }
     })
+  }
+  exportDataViaAPI(fileType: 'xlsx' | 'csv') {
+    console.log(`llamando para exportar ${fileType}`)
+
+    let exportFilters;
+    const bandeja = 'stc';
+    if (this.entitySelect) {
+      this.spinner.spinnerOnOff();
+      exportFilters = {
+        entitySelect: this.entitySelect,
+        selectedAlias: this.selectedAlias
+      }
+    } else {
+      this.myToastr.showError('', 'Primero selecciona un Tipo de Entidad');
+      return
+    }
+
+    console.log('exportFilters: ', exportFilters)
+    const token = localStorage.getItem('fcmToken');
+    this.personService.exportEntitys(fileType, exportFilters, bandeja, token).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.myToastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.myToastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        console.error('Error al exportar los datos:', error);
+        this.myToastr.showError('Error al exportar los datos', '');
+        this.spinner.spinnerOnOff();
+      }
+    });
   }
 }

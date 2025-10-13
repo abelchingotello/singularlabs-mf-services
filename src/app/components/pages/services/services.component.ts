@@ -92,7 +92,7 @@ export class ServicesComponent implements OnInit {
     const input = this.service_name.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
     const inputStatus = this.status.value?.master_name?.toUpperCase();
-    
+
     this.spinner.spinnerOnOff();
     // return
     console.log("pag key:");
@@ -106,7 +106,7 @@ export class ServicesComponent implements OnInit {
         //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
         //console.log(...data.data.Items);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
-        
+
         this.dataService = this.dataFilter.map(item => ({
           ...item,
           serviceTypeName: item.serviceType?.name || ''
@@ -119,9 +119,9 @@ export class ServicesComponent implements OnInit {
         console.log(this.count);
         console.log("data.data.Count:");
         console.log(data.data.Count);
-        if(this.dataService.length==this.count){//se recuperaron todos los datos
+        if (this.dataService.length == this.count) {//se recuperaron todos los datos
           this.pageKey = null;
-        }else{
+        } else {
           this.pageKey = data.data.nextPageKey ?? null;
         }
         this.count = data.data.Count ?? 0;
@@ -135,17 +135,6 @@ export class ServicesComponent implements OnInit {
         this.close = true
       }
     })
-  }
-
-  dataInitialForExport() {
-    if (this.pageKey) {  // Validamos pageKey en lugar de pageSize, si la tabla aun no esta llena
-      console.log('Tabla incompleta, cargando más datos antes de exportar...');
-      this.dynamic.shouldExport = true; // 🔹 decimos al hijo: “exporta después de cargar”
-      this.functionDataCurrent(this.count);
-    }else{//si tabla ya esta llena, llamar la fn exportar del hijo
-      console.log('Tabla completa, exportando directamente...');
-      this.dynamic.exportarDataExcel();
-    }
   }
 
   formService() {
@@ -340,6 +329,41 @@ export class ServicesComponent implements OnInit {
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
   }
 
+  exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
+    console.log('exportDataViaAPI called with', fileType);
+    this.spinner.spinnerOnOff();
+
+    // Preparar los filtros para la exportación
+    const exportFilters: Record<string, any> = {
+      name: this.service_name.value?.toUpperCase() || undefined,
+      type: this.service_type.value?.toUpperCase() || undefined,
+      status: this.status.value?.master_name?.toUpperCase() || undefined,
+    };
+
+    // Eliminar propiedades undefined
+    Object.keys(exportFilters).forEach(key => {
+      if (exportFilters[key] === undefined) {
+        delete exportFilters[key];
+      }
+    });
+    const inbx = 'srv';
+    const token = localStorage.getItem('fcmToken');
+    this.services.exportServices(fileType, exportFilters, inbx, token).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.mytoastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.mytoastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error('Error durante la exportación:', error);
+        this.mytoastr.showError('Error durante la exportación', '');
+      }
+    });
+  }
 
   /******************************************** METODOS GET ****************************************/
 

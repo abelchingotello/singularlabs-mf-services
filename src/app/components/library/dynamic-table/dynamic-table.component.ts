@@ -43,8 +43,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   ]
 })
 export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
- 
-  
   @Input() columns: any[] = [];
   @Input() data: any[] = [];
   @Input() actionsOptions?: boolean;
@@ -52,17 +50,17 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() pageKey: any;
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;
+
   //------------
   @Input() customExportFunction: ((fileType: 'xlsx' | 'csv') => void) | null = null;
   //------------
-  
+
 
   @Input() viewOptionsTable: boolean = true; //Si se muestran las opciones de la tabla(por defecto estara en true)
   @Input() viewCheckboxHeader: boolean = true; //Si se muestra el checkbox en el encabezado(por defecto estara en true)
 
   @Input() lengthTable: any;
   @Input() paginationinFrontend: any;
-  @Input() getDataForExport!: () => void;
   @Input() shouldExport: boolean = false;
 
   @Output() toggleChange = new EventEmitter<any>();
@@ -70,7 +68,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   onToggleChange(element: any, event: any): void {
     this.toggleChange.emit({ element, checked: event.checked });
   }
-  
+
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
   @Output() selectedChange = new EventEmitter<any[]>();
@@ -127,7 +125,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
       // Verificar si se ha modificado pageKey o si ha cambiado el tamaño de los datos
       if (this.pageKey) {
         // Si hay un pageKey válido o los datos han aumentado de tamaño, activamos hasNextPage
-        
+
         //evaluar para que sirve
         //this.paginator.hasNextPage = () => true;
       } else {
@@ -137,7 +135,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
       // Actualizar el tamaño anterior de los datos para futuras comparaciones
       if (this.paginationinFrontend) {
         //paginacion se realiza desde el Frontend, considerando que lengthTable no se recibe
-      }else{
+      } else {
         //paginacion se realiza desde el Backend, lengthTable si se recibe
         setTimeout(() => {
           if (this.paginator) {
@@ -147,15 +145,9 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
           }
         });
       }
-      
+
       // Iniciar o reiniciar la tabla
       this.initTable();
-
-     // Exportar solo si el padre lo pidió
-      if (this.shouldExport) {
-        this.exportarDataExcel();
-        this.shouldExport = false; // 🔹 reset automático
-      }
     }
 
     if (changes['columns']) {
@@ -164,7 +156,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
       this.attributeNames = this.columns.map(column => column.attribute);
     }
   }
-  
+
 
   initTable() {
     this.dataSource.sort = this.sort;
@@ -361,49 +353,15 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   exportExcel() {
-    this.getDataForExport();    
-  }
-  exportarDataExcel(){
-    //exportar excel
-    console.log("exportarDataExcel");
-    const wb = this.createWorkbook('Users');
-    const ws = wb.Sheets['Users'];
-
-    // Ajusta el ancho de las columnas según el contenido
-    const columnWidths = this.columns.map(col => {
-      const maxWidth = Math.max(
-        col.name.length, // Longitud del encabezado
-        ...this.filterAttributes().map(item => (item[col.attribute] ? item[col.attribute].toString().length : 0)) // Longitud de los valores
-      );
-      return { wpx: maxWidth * 10 }; // Multiplica por un factor para un mejor ajuste visual
-    });
-
-    // Establece los anchos de las columnas
-    ws['!cols'] = columnWidths;
-
-    writeFile(wb, 'Excel tabla.xlsx');
+    if (this.customExportFunction) {
+      this.customExportFunction('xlsx');
+    }
   }
 
   exportCsv() {
-    const wb = this.createWorkbook('Users', true);
-    const ws = wb.Sheets['Users'];
-
-    // Convierte la hoja a CSV con cada valor entre comillas
-    const csv = utils.sheet_to_csv(ws, {
-      FS: ',',
-      RS: '\n',
-      // Envolver cada campo en comillas dobles
-      forceQuotes: true, // Utiliza quoteColumns para asegurar que todos los campos estén entre comillas
-    });
-
-    // Crea un archivo CSV y dispara la descarga
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', 'tabla.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (this.customExportFunction) {
+      this.customExportFunction('csv');
+    }
   }
 
   filterAttributes() {
@@ -411,7 +369,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     const columnConfigMap = new Map<string, any>(
       this.columns.map(column => [column.attribute, column.config])
     );
-    
+
     return this.data.map(item => {
       const newObj: { [key: string]: any } = {};
 
@@ -432,7 +390,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
         }
 
         newObj[attribute] = value; // Asignar el valor (formateado o no) al nuevo objeto
-      
+
         //console.log("this.dataaA:"+item[attribute]);
       }
 

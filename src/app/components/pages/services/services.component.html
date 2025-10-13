@@ -74,7 +74,7 @@
           <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"
             [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
             (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)"
-            (pageChange)="onPageChange($event)" [lengthTable]="count" [getDataForExport]="dataInitialForExport.bind(this)">
+            (pageChange)="onPageChange($event)" [lengthTable]="count"  [customExportFunction]="exportDataViaAPI.bind(this)">
 
             <div class="d-flex">
               <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()">

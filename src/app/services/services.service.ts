@@ -152,4 +152,35 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/${id}/bills`, null, { params: params });
   }
 
+
+  exportServices(
+    format: 'xlsx' | 'csv',
+    filters: any,
+    bandeja: string,
+    token: any
+  ): Observable<any> {
+    let params = new HttpParams();
+
+    if (filters.name !== undefined) {
+      params = params.set('name', filters.name);
+    }
+
+    if (filters.status !== undefined) {
+      params = params.set('status', filters.status);
+    }
+
+    if (filters.type !== undefined) {
+      params = params.set('type', filters.type);
+    }
+
+    if (filters.client !== undefined) {
+      params = params.set('idClient', filters.client);
+    }
+    
+    params = params.set('format', format);
+    params = params.set('inbx', bandeja);
+    params = params.set('token', token);
+
+    return this.httpClient.get(`${this.url}/export`, { params });
+  }
 }

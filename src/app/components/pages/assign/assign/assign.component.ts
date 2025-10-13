@@ -24,9 +24,11 @@ export class AssignComponent implements OnInit {
     //{ 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Cliente', 'attribute': 'nameClient' },
-    { 'name': 'Fecha', 'attribute': 'date','config': {
-      'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
-    } },
+    {
+      'name': 'Fecha', 'attribute': 'date', 'config': {
+        'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
+      }
+    },
     //{ 'name': 'Proveedor', 'attribute': 'nameProvider' },
   ];
   public categoriesService: any[] = [];
@@ -53,7 +55,7 @@ export class AssignComponent implements OnInit {
     private mytoastr: MytoastrService
   ) {
     this.pagUtils = new PaginationUtils();
-   }
+  }
 
   ngOnInit(): void {
     this.formService();
@@ -71,25 +73,25 @@ export class AssignComponent implements OnInit {
   }
 
   listData() {
-      this.spinner.spinnerOnOff();
-      forkJoin([
-        this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
-        this.masterService.getItemsMasterTable('14') // CategoriaService
-      ]).subscribe({
-        next: (response) => {
-          const [ person, categoryService] = response;
-          this.persons = person.data;
-          this.categoriesService = categoryService;
-        },
-        error: (error) => {
-          this.spinner.spinnerOnOff();
-          console.error("Error loading master table data:", error);
-        },
-        complete: () => {
-          this.spinner.spinnerOnOff();
-        },
-      });
-    }
+    this.spinner.spinnerOnOff();
+    forkJoin([
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
+      this.masterService.getItemsMasterTable('14') // CategoriaService
+    ]).subscribe({
+      next: (response) => {
+        const [person, categoryService] = response;
+        this.persons = person.data;
+        this.categoriesService = categoryService;
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error("Error loading master table data:", error);
+      },
+      complete: () => {
+        this.spinner.spinnerOnOff();
+      },
+    });
+  }
 
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
@@ -104,7 +106,7 @@ export class AssignComponent implements OnInit {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
-        
+
         console.log("data.data.nextPageKey ver Items:");
         //console.log(data.data.nextPageKey);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
@@ -114,16 +116,16 @@ export class AssignComponent implements OnInit {
         }));
         //this.pageKey = data.data.nextPageKey ?? null;
         //this.count = data.data.Count ?? this.count;
-      
+
         //console.log("data.data.nextPageKey:");
         //console.log(data.data.nextPageKey);
         //console.log("this.count:");
         //console.log(this.count);
         //console.log("data.data.Count:");
-       // console.log(data.data.Count);
-        if(this.dataService.length==this.count){//se recuperaron todos los datos
+        // console.log(data.data.Count);
+        if (this.dataService.length == this.count) {//se recuperaron todos los datos
           this.pageKey = null;
-        }else{
+        } else {
           this.pageKey = data.data.nextPageKey ?? null;
         }
         this.count = data.data.Count ?? this.count;
@@ -139,16 +141,7 @@ export class AssignComponent implements OnInit {
     })
   }
 
-  dataInitialForExport() {
-    if (this.pageKey) {  // Validamos pageKey en lugar de pageSize, si la tabla aun no esta llena
-      console.log('Tabla incompleta, cargando más datos antes de exportar...');
-      this.dynamic.shouldExport = true; // 🔹 decimos al hijo: “exporta después de cargar”
-      this.functionDataCurrent(this.count);
-    }else{//si tabla ya esta llena, llamar la fn exportar del hijo
-      console.log('Tabla completa, exportando directamente...');
-      this.dynamic.exportarDataExcel();
-    }
-  }
+
   //Redireccionar a asignación individual(1) o masiva(2)
   redirectAsign(type: number) {
     if (type === 1) {
@@ -174,9 +167,9 @@ export class AssignComponent implements OnInit {
     this.dataService = [];
     this.dataFilter = [];
   }
-  
+
   reload() {
-     this.clearData();
+    this.clearData();
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
     //this.dataInitial(this.pageSize);
@@ -186,7 +179,7 @@ export class AssignComponent implements OnInit {
   onPageChange(event: PageEvent) {
     this.pageSize = this.pagUtils.updatePageSize(event.pageSize, this.pageSize);
     this.pagUtils.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
-}
+  }
 
   /************************************* METODOS DE BOTONES ***********************************/
   clearFormAndData() {
@@ -195,7 +188,41 @@ export class AssignComponent implements OnInit {
     this.dataInitial(this.pageSize);
   }
 
+  exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
+    console.log('exportDataViaAPI called with', fileType);
+    this.spinner.spinnerOnOff();
 
+    // Preparar los filtros para la exportación
+    const exportFilters: Record<string, any> = {
+      name: this.service_name.value?.toUpperCase() || undefined,
+      type: this.service_type.value?.toUpperCase() || undefined,
+      client: this.client.value || undefined,
+    };
+
+    // Eliminar propiedades undefined
+    Object.keys(exportFilters).forEach(key => {
+      if (exportFilters[key] === undefined) {
+        delete exportFilters[key];
+      }
+    });
+    const inbx = 'as';
+    const token = localStorage.getItem('fcmToken');
+    this.services.exportServices(fileType, exportFilters, inbx, token).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.mytoastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.mytoastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error('Error durante la exportación:', error);
+        this.mytoastr.showError('Error durante la exportación', '');
+      }
+    });
+  }
 
   get service_name() {
     return this.assignServiceForm.get('service_name')
