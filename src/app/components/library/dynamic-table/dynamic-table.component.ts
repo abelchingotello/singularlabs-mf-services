@@ -214,6 +214,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   getSelectedIds() {
+    console.log('entro a getSelectedIds');
     // Verificar que `element_id` está definido
     if (!this.element_id) {
       console.warn("element_id no está definido");

@@ -2,6 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ResponseDTO } from '../interfaces/responseInterface';
+import { PageInterface } from '../interfaces/PageInterface';
+import { ServiceTableInterface } from '../interfaces/serviceTableInterface';
 
 @Injectable({
   providedIn: 'root'
@@ -54,13 +57,32 @@ export class PersonService {
 
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
+  getPersonForStatusConciliation(typeEntity: string, nameAlias: string, count:number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+    let params = new HttpParams()
+    if (typeEntity) {
+      params = params.set('typeEntity', typeEntity);
+    }
+    if (nameAlias) {
+      params = params.set('nameAlias', nameAlias);
+    }
+    if (count != null) {
+      params = params.set('count', count);
+    }
+    if (limit !== undefined) {
+      params = params.set('limit', limit);
+    }
+    if (pageKey !== undefined) {
+      params = params.set('pageKey', JSON.stringify(pageKey));
+    }
+    return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/person/entityPagination`, { params: params });
+  }
 
   getStateTypePerson(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/person/entity/type/status`, data);
   }
 
   patchStatePerson(data: any): Observable<any> {
-    return this.httpClient.patch(`${this.url}/person/entity/statusAudit`, data);
+    return this.httpClient.patch(`${this.url}/person/entity/status`, data);
   }
   exportEntitys(
     format: 'xlsx' | 'csv',

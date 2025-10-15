@@ -75,9 +75,9 @@ export class ServicesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.formService();
-    this.dataMaster();
-    this.listData();
+    this.formService();//inicializa los inputs como vacios
+    this.dataMaster();//carga lista de estados
+    this.listData();//carga lista de tipos de servicios
     // Suscribirse a cambios y convertir a mayúsculas
     this.service_name?.valueChanges.subscribe(value => {
       if (value) {
