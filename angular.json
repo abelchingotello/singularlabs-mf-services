@@ -10,7 +10,7 @@
         "@schematics/angular:component": {
           "style": "scss"
         }
-      },//
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "uni",
@@ -55,7 +55,7 @@
                   "maximumError": "10kb"
                 }
               ],
-              "deployUrl":"https://d2m1ue0tbianp0.cloudfront.net/singularlabs-mf-services/",
+              "deployUrl":"https://hub-integracion.agentecash.com/singularlabs-mf-services/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
