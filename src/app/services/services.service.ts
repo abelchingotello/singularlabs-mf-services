@@ -15,7 +15,7 @@ export class ServicesService {
 
   public servicePayment = new BehaviorSubject<any[]>([]);
 
-  
+
   private url = `${environment.URL_API_GATEWAY}`;
   //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
@@ -42,7 +42,7 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string,type:string,category:string, count:number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
@@ -77,7 +77,7 @@ export class ServicesService {
     return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
-  getServicesPageKey(limit?:number,pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServicesPageKey(limit?: number, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams();
     if (limit !== undefined) {
       params = params.set('limit', limit);
