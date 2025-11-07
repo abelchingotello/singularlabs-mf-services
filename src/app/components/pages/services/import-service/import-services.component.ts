@@ -34,9 +34,9 @@ export class ImportServicesComponent implements OnInit {
   public disableCargar: boolean = false;
   //------------------
 
- constructor(
+  constructor(
     private personService: PersonService,
-    private router : Router,
+    private router: Router,
     private route: ActivatedRoute,
     private serviceServ: ServicesService,
     private spinner: SpinnerService,
@@ -84,7 +84,7 @@ export class ImportServicesComponent implements OnInit {
     this.showExcelUpload = true;
     this.disableProvider = true;
     this.disableCargar = true;
-    
+
   }
 
   onFileSelected(event: any) {
@@ -137,28 +137,29 @@ export class ImportServicesComponent implements OnInit {
       const refKey = `Referencia ${i}`;
       const typeKey = `Tipo de campo de referencia ${i}`;
       const lengthKey = `Longitud de campo referencia ${i}`;
+      if (value[refKey] !== 0) {
+        if (value[refKey]?.trim()) {
+          const fieldType = value[typeKey]?.trim() === 'N' ? 'NUMERICO' : 'ALFANUMERICO';
 
-      if (value[refKey]?.trim()) {
-        const fieldType = value[typeKey]?.trim() === 'N' ? 'NUMERICO' : 'ALFANUMERICO';
+          const isFirstRef = i === 1;
+          const modalidad = value['Modalidad de Recaudo'];
+          const isMandatory = (modalidad === 'DATA ENTRY') ||
+            (modalidad === 'BASE DE DATOS' && isFirstRef) ||
+            (modalidad === 'INTERCONECTADA' && isFirstRef);
 
-        const isFirstRef = i === 1;
-        const modalidad = value['Modalidad de Recaudo'];
-        const isMandatory = (modalidad === 'DATA ENTRY') || 
-                            (modalidad === 'BASE DE DATOS' && isFirstRef) || 
-                            (modalidad === 'INTERCONECTADA' && isFirstRef);
-
-        data.push({
-          id: `00${i}`,
-          name: value[refKey].trim(),
-          fieldType: {
-            id: value[typeKey].trim(),
-            name: fieldType
-          },
-          fieldMask: 'D',
-          maximumLength: value[lengthKey],
-          isMandatory,
-          isEditable: isMandatory
-        });
+          data.push({
+            id: `00${i}`,
+            name: value[refKey].trim(),
+            fieldType: {
+              id: value[typeKey].trim(),
+              name: fieldType
+            },
+            fieldMask: 'D',
+            maximumLength: value[lengthKey],
+            isMandatory,
+            isEditable: isMandatory
+          });
+        }
       }
     }
 
@@ -208,125 +209,125 @@ export class ImportServicesComponent implements OnInit {
 
   // Método para transformar los datos del Excel a la estructura requerida
   transformExcelData(jsonData: any[]): any[] {
-    const REQUIRED_COLUMNS = [  "ITEM",  "ID SERVICIO",  "ID CATEGORIA",  "CATEGORIA AGENTE CASH",  "Descripción del convenio",
-    "Estado del convenio T",    "Modalidad de Recaudo",    "Pago Parcial",    "Deuda más antigua primero T",    "Referencia 1",
-    "Tipo de campo de referencia 1",    "Longitud de campo referencia 1",    "Referencia 2",    "Tipo de campo de referencia 2",
-    "Longitud de campo referencia 2",    "Referencia 3",    "Tipo de campo de referencia 3",    "Longitud de campo referencia 3",
+    const REQUIRED_COLUMNS = ["ITEM", "ID SERVICIO", "ID CATEGORIA", "CATEGORIA AGENTE CASH", "Descripción del convenio",
+      "Estado del convenio T", "Modalidad de Recaudo", "Pago Parcial", "Deuda más antigua primero T", "Referencia 1",
+      "Tipo de campo de referencia 1", "Longitud de campo referencia 1", "Referencia 2", "Tipo de campo de referencia 2",
+      "Longitud de campo referencia 2", "Referencia 3", "Tipo de campo de referencia 3", "Longitud de campo referencia 3",
     ];
 
-      // Validar que haya datos
-      if (!jsonData || jsonData.length === 0) {
-        this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
-        return [];
-      }
+    // Validar que haya datos
+    if (!jsonData || jsonData.length === 0) {
+      this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
+      return [];
+    }
 
-      // Validar que todas las columnas requeridas estén presentes
-      const headers = Object.keys(jsonData[0]);
-      const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
-      if (missingColumns.length > 0) {
-        this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
-        return [];
-      }
+    // Validar que todas las columnas requeridas estén presentes
+    const headers = Object.keys(jsonData[0]);
+    const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
+    if (missingColumns.length > 0) {
+      this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+      return [];
+    }
 
-      // Filtrar registros que estén Activos
-      //const filteredData = jsonData.filter(value => value['Estado del convenio T'] == 'Activo');
-      const filteredData = jsonData;
-      // Transformar los registros filtrados
-      return filteredData.map(value => {
-        const pk = uuidv4();
-        const sk = `SERVICE#${pk}`;
-        const status = value['Estado del convenio T'] === 'Activo'
-          ? 'HABILITADO'
-          : 'BLOQUEADO';  
+    // Filtrar registros que estén Activos
+    //const filteredData = jsonData.filter(value => value['Estado del convenio T'] == 'Activo');
+    const filteredData = jsonData;
+    // Transformar los registros filtrados
+    return filteredData.map(value => {
+      const pk = uuidv4();
+      const sk = `SERVICE#${pk}`;
+      const status = value['Estado del convenio T'] === 'Activo'
+        ? 'HABILITADO'
+        : 'BLOQUEADO';
 
-        let comission;
-        let comissionFixed = "";
-        let comissionPct = "";
+      let comission;
+      let comissionFixed = "";
+      let comissionPct = "";
 
-        if (value['Tipo Comisión'] === 'Comisión fija') {
+      if (value['Tipo Comisión'] === 'Comisión fija') {
         comission = 'FIJO';
         comissionFixed = value['Comisión  a pagar B2CASH  sin IGV'];
-        } else if (value['Tipo Comisión'] === 'Comsión porcentual sobre el monto') {
-            comission = 'PORCENTUAL';
-            comissionPct = value['Comisión  a pagar B2CASH  sin IGV'];
-        }
+      } else if (value['Tipo Comisión'] === 'Comsión porcentual sobre el monto') {
+        comission = 'PORCENTUAL';
+        comissionPct = value['Comisión  a pagar B2CASH  sin IGV'];
+      }
 
-        // const commissions = this.generateCommissions();
-        // const comissionType = ['FIJO', 'PORCENTUAL', 'MULTIPLE'][commissions.type - 1];
+      // const commissions = this.generateCommissions();
+      // const comissionType = ['FIJO', 'PORCENTUAL', 'MULTIPLE'][commissions.type - 1];
 
-        const serviceObject: any = {
-          PK: pk,
-          SK: sk,
-          ADDITIONAL_PAYMENT_FIELDS: JSON.stringify(this.generateAdditionalPayment(value)),
-          BUSINESS: value['Descripción del convenio'].trim(),
-          DATE: new Date(),
-          ID_CLIENT: '00000100',
-          ID_PROVIDER: this.requiredIdClient,
-          ID_SERVICE: 'SAC000',
-          ID_SERVICE_PROV: value['ID SERVICIO'],
-          ID_TYPE_SERVICE: value['ID CATEGORIA'].toString(),
-          INDICATORS: JSON.stringify(this.generateIndicators(value)),
-          PREFIX: 'SERVICE',
-          SERVICE_CATEGORY: value['CATEGORIA AGENTE CASH'],
-          SERVICE_NAME: value['Descripción del convenio'].trim(),
-          STATUS: status,
-          TYPE_COMISSION: comission,
-          TYPE_SERVICE: value['CATEGORIA AGENTE CASH'],
-          EXTORNO: false
-        };
+      const serviceObject: any = {
+        PK: pk,
+        SK: sk,
+        ADDITIONAL_PAYMENT_FIELDS: JSON.stringify(this.generateAdditionalPayment(value)),
+        BUSINESS: value['Descripción del convenio'].trim(),
+        DATE: new Date(),
+        ID_CLIENT: '00000100',
+        ID_PROVIDER: this.requiredIdClient,
+        ID_SERVICE: 'SAC000',
+        ID_SERVICE_PROV: value['ID SERVICIO'],
+        ID_TYPE_SERVICE: value['ID CATEGORIA'].toString(),
+        INDICATORS: JSON.stringify(this.generateIndicators(value)),
+        PREFIX: 'SERVICE',
+        SERVICE_CATEGORY: value['CATEGORIA AGENTE CASH'],
+        SERVICE_NAME: value['Descripción del convenio'].trim(),
+        STATUS: status,
+        TYPE_COMISSION: comission,
+        TYPE_SERVICE: value['CATEGORIA AGENTE CASH'],
+        EXTORNO: false
+      };
 
 
-        if (comissionFixed !== null) serviceObject.COMISSION_FIXED = comissionFixed;
-        if (comissionPct !== null) serviceObject.COMISSION_PCT = comissionPct;
-        //if (commissions.criterion !== null) serviceObject.COMISSION_CRITERION = commissions.criterion;
+      if (comissionFixed !== null) serviceObject.COMISSION_FIXED = comissionFixed;
+      if (comissionPct !== null) serviceObject.COMISSION_PCT = comissionPct;
+      //if (commissions.criterion !== null) serviceObject.COMISSION_CRITERION = commissions.criterion;
 
-    return serviceObject;
-  });
-}
+      return serviceObject;
+    });
+  }
 
   // Método para procesar el archivo Excel
-    async processExcelFile() {
-      if (!this.selectedFile) {
-        this.mytoastr.showWarning('Error', 'Por favor seleccione un archivo');
+  async processExcelFile() {
+    if (!this.selectedFile) {
+      this.mytoastr.showWarning('Error', 'Por favor seleccione un archivo');
+      return;
+    }
+
+    //this.isProcessingExcel = true;
+    this.spinner.spinnerOnOff();
+
+    try {
+      const arrayBuffer = await this.selectedFile.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer);
+
+      // Obtener la primera hoja
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Convertir a JSON
+      const excelData = XLSX.utils.sheet_to_json(worksheet);
+
+      // Procesar los datos usando la lógica del script original
+
+      this.finalData = this.transformExcelData(excelData);
+
+      if (this.finalData.length === 0) {
+        this.mytoastr.showError('Error', 'No se encontraron datos válidos en el archivo');
         return;
       }
-  
-      //this.isProcessingExcel = true;
+      console.log("Primer objeto de importacion construido", JSON.stringify(this.finalData[0], null, 2));
+      this.disableFile = true;
+      this.isProcessingExcel = true;
+      this.showSendServices = true;
+      this.mytoastr.showSuccess('Archivo validado correctamente', `Se encontraron ${this.finalData.length} registros`);
+
+    } catch (error) {
+      console.error('Error procesando archivo Excel:', error);
+      this.mytoastr.showError('Error', 'Error al procesar el archivo Excel');
+    } finally {
       this.spinner.spinnerOnOff();
-  
-      try {
-        const arrayBuffer = await this.selectedFile.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer);
-  
-        // Obtener la primera hoja
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-  
-        // Convertir a JSON
-        const excelData = XLSX.utils.sheet_to_json(worksheet);
-  
-        // Procesar los datos usando la lógica del script original
-
-        this.finalData = this.transformExcelData(excelData);
-
-        if (this.finalData.length === 0) {
-          this.mytoastr.showError('Error', 'No se encontraron datos válidos en el archivo');
-          return;
-        }
-        console.log("Primer objeto de importacion construido", JSON.stringify(this.finalData[0], null, 2));
-        this.disableFile = true;
-        this.isProcessingExcel = true;
-        this.showSendServices = true;
-        this.mytoastr.showSuccess('Archivo validado correctamente', `Se encontraron ${this.finalData.length} registros`);
-
-      } catch (error) {
-        console.error('Error procesando archivo Excel:', error);
-        this.mytoastr.showError('Error', 'Error al procesar el archivo Excel');
-      } finally {
-        this.spinner.spinnerOnOff();
-      }
     }
-  
+  }
+
 
   registerServiceRequest(data: any) {
     this.spinner.spinnerOnOff();
@@ -339,7 +340,7 @@ export class ImportServicesComponent implements OnInit {
         console.log("RESPUESTA DE IMPORTACION: ", response)
         if (response.statusCode == 207) {
           // this.spinner.spinnerOnOff();
-          this.mytoastr.showWarning(response.messages ||'Error : Algunos servicios yno se procesaron correctamente', '')
+          this.mytoastr.showWarning(response.messages || 'Error : Algunos servicios yno se procesaron correctamente', '')
           this.excelData = response.data?.itemsFailed?.map(x => x.item) || [];
           return
         }
@@ -379,14 +380,14 @@ export class ImportServicesComponent implements OnInit {
       }
 
       this.registerServiceRequest(this.finalData);
-      
+
     } catch (error) {
       console.error('Error al enviar los servicios:', error);
       this.mytoastr.showError('Error', 'No se pudieron enviar los servicios');
     }
   }
 
-  cancelSend(){
+  cancelSend() {
     this.showSendServices = false;
     this.showExcelUpload = false;
     this.disableCargar = false;
