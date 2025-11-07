@@ -39,6 +39,17 @@ export class MytoastrService {
 
         this.toastr.error(message, title, options);
     }
+    showInfo(title: string, message: string) {
+        const options: Partial<IndividualConfig> = {
+            progressBar: true,
+            progressAnimation: 'decreasing',
+            disableTimeOut: false,
+            timeOut: 5000,
+            extendedTimeOut: 1000
+        };
+
+        this.toastr.info(message, title, options);
+    }
 
     handleHttpError(error: any) {
         switch (error.status) {

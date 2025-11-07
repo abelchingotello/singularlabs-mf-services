@@ -13,16 +13,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { DialogPersonaHabComponent } from './dialogs/dialog-persona-hab/dialog-persona-hab.component';
-import { DialogPersonEntityTypeComponent } from './dialogs/dialog-person-entity-type/dialog-person-entity-type.component';
 import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DialogServiceStatusComponent,
-    DialogPersonaHabComponent,
-    DialogPersonEntityTypeComponent
+    DialogServiceStatusComponent
   ],
   imports: [
     BrowserModule,
