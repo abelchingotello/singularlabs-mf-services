@@ -20,7 +20,7 @@ import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 export class AssignComponent implements OnInit {
 
   public columns: any[] = [
-    { 'name': 'ID del servicio', 'attribute': 'id' },
+    { 'name': 'Id del servicio', 'attribute': 'id' },
     { 'name': 'Nombre', 'attribute': 'name' },
     //{ 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
