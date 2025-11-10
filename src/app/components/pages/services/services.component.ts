@@ -17,10 +17,12 @@ import { forkJoin } from 'rxjs';
   selector: 'uni-services',
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss']
-})
+}) 
 export class ServicesComponent implements OnInit {
 
   public columns: any[] = [
+    { 'name': 'ID Servicio', 'attribute': 'id' },
+    { 'name': 'ID Servicio - Proveedor', 'attribute': 'id_serviceProv' },
     { 'name': 'Nombre', 'attribute': 'name' },
     { 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
