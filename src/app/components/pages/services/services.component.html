@@ -1,26 +1,25 @@
 <div class="content bg-gray-3">
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
     <uni-image-card title="Servicios"
-      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png"
-      size="10%" >
-      <div class="row"> 
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <div class="row">
         <div class="col  d-flex justify-content-end align-items-end ">
-       
-        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2 " (click)="addService()">
-          <mat-icon>add</mat-icon>
-          <span class="custom-span-icon-responsive">Añadir</span>
-        </button>
 
-        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
-          <mat-icon>upload_file</mat-icon>
-          <span class="custom-span-icon-responsive">Importar-Crear</span>
-        </button>
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2 " (click)="addService()">
+            <mat-icon>add</mat-icon>
+            <span class="custom-span-icon-responsive">Añadir</span>
+          </button>
 
-        <button  type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
-          <mat-icon>upload_file</mat-icon>
-          <span class="custom-span-icon-responsive">Importar-Actualizar</span>
-        </button>
-      </div>
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
+            <mat-icon>upload_file</mat-icon>
+            <span class="custom-span-icon-responsive">Importar-Crear</span>
+          </button>
+
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
+            <mat-icon>upload_file</mat-icon>
+            <span class="custom-span-icon-responsive">Importar-Actualizar</span>
+          </button>
+        </div>
       </div>
     </uni-image-card>
 
@@ -50,6 +49,21 @@
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="service_name">
           </mat-form-field>
+          
+                    <mat-form-field appearance="outline" class="col-md-3">
+                      <mat-label>Proveedor</mat-label>
+                      <mat-select formControlName="provider">
+                        <mat-option [value]="">NINGUNO</mat-option>
+                        <mat-option *ngFor="let provider of listProviders" [value]="provider.servicePerson.idPerson">
+                          {{provider.servicePerson.nameAlias}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>ID Servicio</mat-label>
+            <input matInput formControlName="service_id">
+          </mat-form-field>
 
         </form>
         <div class="row">
@@ -63,7 +77,7 @@
               <mat-icon>search</mat-icon>
               Buscar
             </button>
-        </div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -74,7 +88,8 @@
           <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"
             [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
             (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)"
-            (pageChange)="onPageChange($event)" [lengthTable]="count"  [customExportFunction]="exportDataViaAPI.bind(this)">
+            (pageChange)="onPageChange($event)" [lengthTable]="count"
+            [customExportFunction]="exportDataViaAPI.bind(this)">
 
             <div class="d-flex">
               <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()">

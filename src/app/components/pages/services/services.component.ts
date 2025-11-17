@@ -21,6 +21,8 @@ import { forkJoin } from 'rxjs';
 export class ServicesComponent implements OnInit {
 
   public columns: any[] = [
+    { 'name': 'ID Servicio', 'attribute': 'id' },
+    { 'name': 'ID Servicio - Proveedor', 'attribute': 'id_serviceProv' },
     { 'name': 'Nombre', 'attribute': 'name' },
     { 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
@@ -57,6 +59,7 @@ export class ServicesComponent implements OnInit {
   private pagUtils: PaginationUtils | undefined;
   public page: number = -1; // Variable para la página actual
   public count: number = null; // Variable para el total de elementos
+  public listProviders: any;
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
@@ -69,7 +72,8 @@ export class ServicesComponent implements OnInit {
     private master: MasterService,
     private person: PersonService,
     private spinner: SpinnerService,
-    private mytoastr: MytoastrService
+    private mytoastr: MytoastrService,
+    private personService: PersonService
   ) {
     this.pagUtils = new PaginationUtils();
   }
@@ -90,6 +94,8 @@ export class ServicesComponent implements OnInit {
 
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
+    const inputId = this.service_id.value?.toUpperCase();
+    const provider = this.provider.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
     const inputStatus = this.status.value?.master_name?.toUpperCase();
 
@@ -97,7 +103,7 @@ export class ServicesComponent implements OnInit {
     // return
     console.log("pag key:");
     console.log(this.pageKey);
-    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey).subscribe({
+    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey, undefined, inputId, provider).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
@@ -141,6 +147,8 @@ export class ServicesComponent implements OnInit {
     this.serviceForm = this.fb.group({
       service_name: [''],
       service_type: [''],
+      service_id: [''],
+      provider: [''],
       status: ['']
     })
   }
@@ -158,7 +166,7 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData() {
-    if (!this.service_name.value && !this.status.value && !this.service_type.value) {
+    if (!this.service_name.value && !this.status.value && !this.service_type.value && !this.service_id.value && !this.provider.value) {
       this.mytoastr.showWarning('Ingrese un valor válido', '')
       return
     }
@@ -227,11 +235,13 @@ export class ServicesComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.master.getItemsMasterTable('14') // CategoriaService
+      this.master.getItemsMasterTable('14'), // CategoriaService
+      this.personService.getPerson('PROVEEDOR'),
     ]).subscribe({
       next: (response) => {
-        const [categoryService] = response;
+        const [categoryService, providers] = response;
         this.categoriesService = categoryService;
+        this.listProviders = providers.data;
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
@@ -336,6 +346,7 @@ export class ServicesComponent implements OnInit {
       name: this.service_name.value?.toUpperCase() || undefined,
       type: this.service_type.value?.toUpperCase() || undefined,
       status: this.status.value?.master_name?.toUpperCase() || undefined,
+      service_id: this.service_id.value?.toUpperCase() || undefined,
     };
 
     // Eliminar propiedades undefined
@@ -375,6 +386,13 @@ export class ServicesComponent implements OnInit {
 
   get status() {
     return this.serviceForm.get('status')
+  }
+  get service_id() {
+    return this.serviceForm.get('service_id')
+  }
+
+  get provider() {
+    return this.serviceForm.get('provider')
   }
 
 

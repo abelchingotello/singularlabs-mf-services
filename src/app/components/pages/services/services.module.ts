@@ -8,6 +8,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ServicesComponent } from './services.component';
 import { DetailServiceComponent } from './detail-service/detail-service.component';
 import { PaymentServiceComponent } from './payment-service/payment-service.component';
+import { MatIconModule } from '@angular/material/icon';
 
 
 
@@ -24,7 +25,7 @@ import { PaymentServiceComponent } from './payment-service/payment-service.compo
     MaterialModule,
     LibraryModule,
     ReactiveFormsModule,
-
+    MatIconModule
   ]
 })
 export class ServicesModule { }
