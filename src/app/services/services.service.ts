@@ -17,7 +17,7 @@ export class ServicesService {
 
 
   private url = `${environment.URL_API_GATEWAY}`;
-  //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
+  // private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
     private httpClient: HttpClient
@@ -42,10 +42,16 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
+    }
+    if (id_service) {
+      params = params.set('id_service', id_service);
+    }
+    if (id_prov) {
+      params = params.set('id_provider', id_prov);
     }
     if (status) {
       params = params.set('status', status);
@@ -176,7 +182,7 @@ export class ServicesService {
     if (filters.client !== undefined) {
       params = params.set('idClient', filters.client);
     }
-    
+
     params = params.set('format', format);
     params = params.set('inbx', bandeja);
     params = params.set('token', token);
