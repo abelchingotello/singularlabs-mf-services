@@ -11,7 +11,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
-import { forkJoin } from 'rxjs';
+import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
 
 @Component({
   selector: 'uni-services',
@@ -25,6 +25,8 @@ export class ServicesComponent implements OnInit {
     { 'name': 'ID Servicio - Proveedor', 'attribute': 'id_serviceProv' },
     { 'name': 'Nombre', 'attribute': 'name' },
     { 'name': 'Descripción', 'attribute': 'description' },
+    { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
+    { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     { 'name': 'Cliente', 'attribute': 'nameClient' },
@@ -56,10 +58,18 @@ export class ServicesComponent implements OnInit {
   public dataIdService: any;
   public optionId: any
   public categoriesService: any[] = [];
+  public filteredServices: ServiceItem[] = []; // Lista filtrada que se mostrará
+  public listServicesSelected: ServiceItem[] = [];
+  public listServicesSelected1: ServiceItem[] = [];
+  public allItems1: ServiceItem[] = []; // Lista filtrada que se mostrará
+  public allItems: any[] = [];
+  public serviceFilter: string = '';
+
   private pagUtils: PaginationUtils | undefined;
   public page: number = -1; // Variable para la página actual
   public count: number = null; // Variable para el total de elementos
   public listProviders: any;
+  public selectedCategory: boolean = false;
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
@@ -92,18 +102,89 @@ export class ServicesComponent implements OnInit {
     this.functionDataCurrent(this.pageSize);
   }
 
+  async selectCategory() {
+    if (!this.service_type.value) {
+      this.selectedCategory = false;
+      this.filteredServices = [];
+      this.listServicesSelected = [];
+      this.serviceForm.get('idService')?.setValue('')
+      this.serviceForm.get('service_name')?.setValue('')
+      return;
+    }
+    this.serviceForm.get('service_name')?.setValue('')
+    this.selectedCategory = true;
+    await this.cargarServicios();
+  }
+
+  onServicesChange(event: any) {
+    const selectedIds: string[] = event.value;
+    const idsCategoriaActual = new Set(this.allItems1.map(s => s.id));
+
+    // Crear la lista de objetos seleccionados en esta categoría
+    const selectedObjects = this.allItems1
+      .filter(s => selectedIds.includes(s.id))
+      .map(s => ({ id: s.id, name: s.name }));
+
+    // Mantener los servicios seleccionados de otras categorías
+    const filteredPrev = this.listServicesSelected.filter(
+      item => !idsCategoriaActual.has(item.id)
+    );
+
+    // Unir y eliminar duplicados
+    this.listServicesSelected = [...filteredPrev, ...selectedObjects].filter(
+      (item, index, self) => index === self.findIndex(t => t.id === item.id)
+    );
+
+    // Actualizar el control 'idService' con los IDs seleccionados
+    this.serviceForm.get('idService')?.setValue(this.listServicesSelected.map(s => s.id));
+  }
+
+  async cargarServicios(): Promise<void> {
+    try {
+      this.spinner.spinnerOnOff();
+      const allItems = await lastValueFrom(
+        this.loadAllServices().pipe(
+          filter((items: any) => items.length > 0),
+          finalize(() => this.spinner.spinnerOnOff())
+        )
+      );
+      this.filteredServices = allItems;
+      this.allItems1 = allItems;
+      this.serviceFilter = '';
+      this.filterServices();
+    } catch (error) {
+      console.error("❌ Error al cargar servicios:", error);
+      this.filteredServices = [];
+      this.mytoastr.showError('', 'No tiene Servicios')
+    }
+  }
+
+  loadAllServices() {
+    return this.services.getServicesFromCategory(this.service_type.value).pipe(
+      expand(response =>
+        response?.data?.nextPageKey
+          ? this.services.getServicesFromCategory(this.service_type.value, response.data.nextPageKey)
+          : EMPTY // ✅ Termina el flujo cuando no hay más páginas
+      ),
+      map(response => response?.data?.Items ?? []),
+      scan((acc, items) => acc.concat(items), []),
+      startWith([])
+    );
+  }
+
+
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputId = this.service_id.value?.toUpperCase();
     const provider = this.provider.value?.toUpperCase();
     const inputType = this.service_type.value?.toUpperCase();
     const inputStatus = this.status.value?.master_name?.toUpperCase();
-
+    const listIds = this.servicesId;
     this.spinner.spinnerOnOff();
     // return
     console.log("pag key:");
     console.log(this.pageKey);
-    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey, undefined, inputId, provider).subscribe({
+    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey, undefined, inputId, provider, listIds).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '')
@@ -142,10 +223,18 @@ export class ServicesComponent implements OnInit {
       }
     })
   }
+  filterServices() {
+    const value = this.serviceFilter?.toLowerCase() || '';
+    this.filteredServices = this.allItems1.filter(service =>
+      service.name.toLowerCase().includes(value)
+    );
+    this.spinner.spinnerOnOff
+  }
 
   formService() {
     this.serviceForm = this.fb.group({
       service_name: [''],
+      idService: [''],
       service_type: [''],
       service_id: [''],
       provider: [''],
@@ -177,6 +266,11 @@ export class ServicesComponent implements OnInit {
   cleanSearch() {
     this.service_name.setValue('')
     this.close = false;
+    this.serviceFilter = '';
+    this.filteredServices = [];
+    this.listServicesSelected = [];
+    this.allItems = [];
+    this.listServicesSelected = [];
     this.clearData();
   }
 
@@ -270,6 +364,7 @@ export class ServicesComponent implements OnInit {
     this.pageKey = undefined;
     this.dataService = [];
     this.dataFilter = [];
+    this.allItems = [];
   }
 
   reload() {
@@ -320,10 +415,22 @@ export class ServicesComponent implements OnInit {
     this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
 
+  get servicesNames(): string {
+    return this.listServicesSelected.map(s => s.name).join(', ');
+  }
+
+  get servicesId(): string {
+    return this.listServicesSelected.map(s => s.id).join(', ');
+  }
+
   /************************************* METODOS DE BOTONES ***********************************/
   clearFormAndData() {
     this.clearData();
+    this.cleanSearch();
     this.serviceForm.reset();
+    this.selectedCategory = false;
+    this.listServicesSelected = [];
+
     this.dataInitial(this.pageSize);
   }
 
@@ -381,12 +488,13 @@ export class ServicesComponent implements OnInit {
   }
 
   get service_type() {
-    return this.serviceForm.get('service_type')
+    return this.serviceForm?.get('service_type')
   }
 
   get status() {
     return this.serviceForm.get('status')
   }
+
   get service_id() {
     return this.serviceForm.get('service_id')
   }
@@ -394,6 +502,12 @@ export class ServicesComponent implements OnInit {
   get provider() {
     return this.serviceForm.get('provider')
   }
+  get idService(): any[] {
+    return this.listServicesSelected
+  }
 
-
+}
+interface ServiceItem {
+  id: string;
+  name: string;
 }

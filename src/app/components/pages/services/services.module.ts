@@ -4,7 +4,7 @@ import { NewServiceComponent } from './new-service/new-service.component';
 import { ServicesRoutingModule } from './services.routing.module';
 import { MaterialModule } from 'src/app/modules/material/material.module';
 import { LibraryModule } from '../../library/library.module';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ServicesComponent } from './services.component';
 import { DetailServiceComponent } from './detail-service/detail-service.component';
 import { PaymentServiceComponent } from './payment-service/payment-service.component';
@@ -25,7 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
     MaterialModule,
     LibraryModule,
     ReactiveFormsModule,
-    MatIconModule
+    MatIconModule,
+    FormsModule
   ]
 })
 export class ServicesModule { }
