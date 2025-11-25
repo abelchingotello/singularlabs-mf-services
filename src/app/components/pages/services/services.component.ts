@@ -139,6 +139,14 @@ export class ServicesComponent implements OnInit {
     this.serviceForm.get('idService')?.setValue(this.listServicesSelected.map(s => s.id));
   }
 
+  filterServices() {
+    const value = this.serviceFilter?.toLowerCase() || '';
+    this.filteredServices = this.allItems1.filter(service =>
+      service.name.toLowerCase().includes(value)
+    );
+    this.spinner.spinnerOnOff
+  }
+
   async cargarServicios(): Promise<void> {
     try {
       this.spinner.spinnerOnOff();
@@ -222,13 +230,6 @@ export class ServicesComponent implements OnInit {
         this.close = true
       }
     })
-  }
-  filterServices() {
-    const value = this.serviceFilter?.toLowerCase() || '';
-    this.filteredServices = this.allItems1.filter(service =>
-      service.name.toLowerCase().includes(value)
-    );
-    this.spinner.spinnerOnOff
   }
 
   formService() {
@@ -415,14 +416,6 @@ export class ServicesComponent implements OnInit {
     this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
 
-  get servicesNames(): string {
-    return this.listServicesSelected.map(s => s.name).join(', ');
-  }
-
-  get servicesId(): string {
-    return this.listServicesSelected.map(s => s.id).join(', ');
-  }
-
   /************************************* METODOS DE BOTONES ***********************************/
   clearFormAndData() {
     this.clearData();
@@ -430,7 +423,6 @@ export class ServicesComponent implements OnInit {
     this.serviceForm.reset();
     this.selectedCategory = false;
     this.listServicesSelected = [];
-
     this.dataInitial(this.pageSize);
   }
 
@@ -502,8 +494,13 @@ export class ServicesComponent implements OnInit {
   get provider() {
     return this.serviceForm.get('provider')
   }
-  get idService(): any[] {
-    return this.listServicesSelected
+
+  get servicesNames(): string {
+    return this.listServicesSelected.map(s => s.name).join(', ');
+  }
+
+  get servicesId(): string {
+    return this.listServicesSelected.map(s => s.id).join(', ');
   }
 
 }
