@@ -3,19 +3,23 @@
         <uni-image-card title="Asignación de servicio"
             externImage="https://img.freepik.com/vector-gratis/red-social-servicio-citas-online-chat-comunicacion-internet-personaje-dibujos-animados-nina-mirando-perfiles-foto-ilustracion-concepto-redes-sociales_335657-2041.jpg?semt=ais_hybrid&w=740"
             size="8%">
+            <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2">
+                <mat-icon>download_file</mat-icon>
+                <span class="custom-span-icon-responsive">Plantilla para Asignar</span>
+            </button>
+
         </uni-image-card>
         <div>
             <div class="excel-upload-section">
                 <mat-card class="custom-border-radius-1-25 ">
-                    <mat-card-header class="text-default" 
-                        style="padding-top: 23px !important;
+                    <mat-card-header class="text-default" style="padding-top: 23px !important;
                         padding-left: 0px !important;
                         padding-bottom: 0px !important;">
                         <mat-card-title style="font-weight: bold;">
                             <mat-icon>cloud_upload</mat-icon>
                             Carga Masiva desde Excel
                         </mat-card-title>
-                        <mat-card-subtitle class="text-default" >
+                        <mat-card-subtitle class="text-default">
                             Cargar múltiples asignaciones desde un archivo Excel
                         </mat-card-subtitle>
                     </mat-card-header>
@@ -35,7 +39,8 @@
                                     <mat-icon>clear</mat-icon>
                                     Cancelar
                                 </button>
-                                <button class="btn btn-default3" (click)="confirmIdClient()" [disabled]="requiredIdClient=='' ">
+                                <button class="btn btn-default3" (click)="confirmIdClient()"
+                                    [disabled]="requiredIdClient=='' ">
                                     <mat-icon>upload_file</mat-icon>
                                     Cargar desde Excel
                                 </button>
@@ -48,8 +53,7 @@
             <!-- Sección de carga de Excel -->
             <div *ngIf="showExcelUpload" class="excel-upload-container">
                 <mat-card class="custom-border-radius-1-25">
-                    <mat-card-header class="text-default"  
-                        style="padding-top: 23px !important;
+                    <mat-card-header class="text-default" style="padding-top: 23px !important;
                         padding-left: 5px !important;
                         padding-bottom: 0px !important;">
                         <mat-card-title>
@@ -71,7 +75,8 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="padding: 0 0 16px 0;">
+                            <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3"
+                                style="padding: 0 0 16px 0;">
                                 <button class="btn btn-default2" (click)="cancelExcelUpload()">
                                     <mat-icon>clear</mat-icon>
                                     Cancelar
@@ -87,8 +92,7 @@
                     </mat-card-content>
                 </mat-card>
                 <mat-card *ngIf="excelData.length > 0" class="custom-border-radius-1-25">
-                    <mat-card-header class="text-default"  
-                        style="padding-top: 23px !important;
+                    <mat-card-header class="text-default" style="padding-top: 23px !important;
                         padding-left: 5px !important;
                         padding-bottom: 0px !important;">
                         <mat-card-title>

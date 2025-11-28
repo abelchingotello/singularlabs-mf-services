@@ -17,7 +17,7 @@ export class ServicesService {
 
 
   private url = `${environment.URL_API_GATEWAY}`;
-  // private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
+  //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
     private httpClient: HttpClient
@@ -42,7 +42,7 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string, listIds?: any): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
@@ -80,6 +80,9 @@ export class ServicesService {
     if (getAssignAll !== undefined) {
       params = params.set('getAssignAll', getAssignAll);
     }
+    if (listIds !== '') {
+      params = params.set('listIds', listIds);
+    }
     return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
@@ -93,6 +96,19 @@ export class ServicesService {
     }
     return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
+
+  getServicesFromCategory(category: string, pageKey?: any[]): Observable<any> {
+    let params = new HttpParams()
+    if (pageKey !== undefined) {
+      params = params.set('pageKey', JSON.stringify(pageKey));
+    }
+    params = params.set('category', category);
+
+    params = params.set('count', 0);
+    params = params.set('limit', 200);
+    return this.httpClient.get<any>(`${this.url}/services`, { params: params });
+  }
+
 
   getTypeServices(name?: string): Observable<any> {
     let params = new HttpParams()

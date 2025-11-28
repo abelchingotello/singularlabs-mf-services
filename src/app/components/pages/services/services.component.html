@@ -31,6 +31,7 @@
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado</mat-label>
             <mat-select formControlName="status">
+              <mat-option [value]="">NINGUNO</mat-option>
               <mat-option *ngFor="let status of stateMaster" [value]="status">
                 {{status.master_name}}
               </mat-option>
@@ -39,26 +40,52 @@
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Tipo de Servicio</mat-label>
-            <mat-select formControlName="service_type">
+            <mat-select formControlName="service_type" (selectionChange)="selectCategory()">
+              <mat-option [value]="">NINGUNO</mat-option>
               <mat-option *ngFor="let category of categoriesService"
                 [value]="category.master_name">{{category.master_name}}</mat-option>
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="col-md-3">
+          <mat-form-field appearance="outline" class="col-md-3"
+            *ngIf="selectedCategory">
+            <mat-label>Seleccionar Servicio</mat-label>
+            <mat-select formControlName="idService" multiple (selectionChange)="onServicesChange($event)">
+
+              <!-- Input de búsqueda -->
+              <mat-option disabled class="search-option" *ngIf="selectedCategory">
+                <input matInput placeholder="Buscar servicio..." [(ngModel)]="serviceFilter"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="filterServices()"
+                  (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()" />
+              </mat-option>
+
+              <!-- Input de Listado de Servicios Listados-->
+              <mat-option disabled *ngIf="selectedCategory">
+                <input matInput placeholder="Servicios Listados..." [value]="servicesNames" />
+              </mat-option>
+
+              <!-- Mostrar los servicios filtrados -->
+              <mat-option *ngFor="let service of filteredServices" [value]="service.id">
+                {{ service.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3" *ngIf="!selectedCategory">
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="service_name">
           </mat-form-field>
-          
-                    <mat-form-field appearance="outline" class="col-md-3">
-                      <mat-label>Proveedor</mat-label>
-                      <mat-select formControlName="provider">
-                        <mat-option [value]="">NINGUNO</mat-option>
-                        <mat-option *ngFor="let provider of listProviders" [value]="provider.servicePerson.idPerson">
-                          {{provider.servicePerson.nameAlias}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Proveedor</mat-label>
+            <mat-select formControlName="provider">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let provider of listProviders" [value]="provider.servicePerson.idPerson">
+                {{provider.servicePerson.nameAlias}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>ID Servicio</mat-label>

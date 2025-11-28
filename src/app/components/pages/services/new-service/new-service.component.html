@@ -3,9 +3,9 @@
         <uni-image-card title={{titlle}}
             externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
         </uni-image-card>
-        <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight >
+        <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight>
             <mat-tab>
-                <ng-template mat-tab-label >
+                <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">assignment</span>Datos de Servicio
                 </ng-template>
                 <mat-card style="
@@ -26,7 +26,7 @@
                                     </mat-form-field>
 
                                     <mat-form-field *ngIf="editAsigService" appearance="outline" fxFlex="75%"
-                                            class="col-md-3 ">
+                                        class="col-md-3 ">
                                         <mat-label>Proveedor</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_prov">
@@ -40,7 +40,7 @@
                                     </mat-form-field>
 
                                     <mat-form-field *ngIf="editClient" appearance="outline" fxFlex="75%"
-                                            class="col-md-3 ">
+                                        class="col-md-3 ">
                                         <mat-label>Cliente</mat-label>
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_client">
@@ -130,7 +130,7 @@
                 </mat-card>
             </mat-tab>
 
-            <mat-tab  [disabled]="tab2">
+            <mat-tab [disabled]="tab2">
                 <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">attach_money</span>Datos de Comisiones
                 </ng-template>
@@ -144,7 +144,7 @@
                             <!-- Comisión de Proveedor -->
                             <div *ngIf="editAsigService" class="form-container">
                                 <!-- COMISSION DE PROVEEDOR -->
-                                <h4  class="text-default pl-3">Comisión de Proveedor</h4>
+                                <h4 class="text-default pl-3">Comisión de Proveedor</h4>
                                 <form [formGroup]="comissionForm">
                                     <mat-form-field appearance="outline" fxFlex="25%" class="col-md-3">
                                         <mat-label>Tipo de comisión</mat-label>
@@ -213,8 +213,8 @@
                                     <mat-form-field *ngIf="owncomissionFixed" appearance="outline" fxFlex="25%"
                                         class="col-md-3">
                                         <mat-label>Comisión fija</mat-label>
-                                        <input formControlName="ownCommission_fixed" (blur)="validComissionFixed()" type="number" min="0" step="0.01"
-                                            matInput />
+                                        <input formControlName="ownCommission_fixed" (blur)="validComissionFixed()"
+                                            type="number" min="0" step="0.01" matInput />
                                         <!-- <mat-error *ngIf="numDoc?.hasError('required')">
                                                 Este campo es requerido
                                             </mat-error> -->
@@ -249,11 +249,11 @@
                 </mat-card>
             </mat-tab>
 
-            <mat-tab  *ngIf="disableTab3" [disabled]="tab3">
+            <mat-tab *ngIf="disableTab3" [disabled]="tab3">
                 <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">paid</span>Datos Pagos-Adicionales
                 </ng-template>
-                
+
                 <mat-card style="
                         border-top-left-radius: 0rem !important; 
                         border-top-right-radius: 0rem !important;
@@ -322,7 +322,7 @@
                                 </form>
                                 <div class="row">
                                     <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                                        <button  class="btn btn-default3" (click)="registerPayment()">
+                                        <button class="btn btn-default3" (click)="registerPayment()">
                                             <mat-icon>save</mat-icon>Agregar
                                         </button>
                                     </div>
@@ -340,15 +340,15 @@
         <mat-card class="custom-border-radius-1-25">
             <mat-card-content>
                 <div class="d-flex justify-content-between p-3">
-                    <button  (click)="onPrevious()" class="btn btn-default2">
+                    <button (click)="onPrevious()" class="btn btn-default2">
                         <mat-icon>
                             {{ currentStep === 0 ? 'clear' : 'arrow_back' }}
                         </mat-icon>
                         {{ currentStep === 0 ? 'Cancelar' : 'Anterior' }}
                     </button>
 
-                    <button  (click)="onNext()" class="btn btn-default3 ">
-                        <mat-icon>  
+                    <button (click)="onNext()" class="btn btn-default3 ">
+                        <mat-icon>
                             {{ currentStep === stepsOrig.length-1 ? 'check' : 'arrow_forward' }}
                         </mat-icon>
                         {{ currentStep === stepsOrig.length-1 ? 'Finalizar' : 'Siguiente' }}
@@ -358,4 +358,3 @@
         </mat-card>
     </div>
 </div>
-
