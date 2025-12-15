@@ -25,6 +25,8 @@ export class AssignComponent implements OnInit {
     //{ 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Cliente', 'attribute': 'nameClient' },
+    { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
+    { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
     {
       'name': 'Fecha', 'attribute': 'date', 'config': {
         'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
