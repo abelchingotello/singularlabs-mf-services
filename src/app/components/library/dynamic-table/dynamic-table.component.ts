@@ -19,6 +19,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { IconTypeComponent } from './../icons_type/icons_type.component'
 @Component({
   selector: 'uni-dynamic-table',
   templateUrl: './dynamic-table.component.html',
@@ -39,7 +40,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatCardModule,
     MatButtonModule,
     MatTooltipModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    IconTypeComponent
   ]
 })
 export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
@@ -70,6 +72,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   @Output() pageChange = new EventEmitter<PageEvent>();
+  @Output() clickButtonEvent = new EventEmitter<any>();
   @Output() selectedIdsChange = new EventEmitter<any[]>();
   @Output() selectedChange = new EventEmitter<any[]>();
   @Output() cellClick: EventEmitter<any> = new EventEmitter<any>();
@@ -351,6 +354,14 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     utils.book_append_sheet(wb, ws, sheetName);
 
     return wb;
+  }
+
+  onClickButton(value, element) {
+    const event = {
+      value,
+      element
+    }
+    this.clickButtonEvent.emit(event)
   }
 
   exportExcel() {

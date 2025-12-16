@@ -8,6 +8,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { LibraryModule } from './components/library/library.module';
 import { HttpClientModule } from '@angular/common/http';
 import { DialogServiceStatusComponent } from './dialogs/dialog-service-status/dialog-service-status.component';
+import { DialogCommissionAssingServiceComponent } from './dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,7 +19,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 @NgModule({
   declarations: [
     AppComponent,
-    DialogServiceStatusComponent
+    DialogServiceStatusComponent,
+    DialogCommissionAssingServiceComponent
   ],
   imports: [
     BrowserModule,
