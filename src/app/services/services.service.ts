@@ -159,6 +159,10 @@ export class ServicesService {
     return this.httpClient.patch(`${this.url}/services/status`, data);
   }
 
+  updateComissionService(data: any): Observable<any> {
+    return this.httpClient.patch(`${this.url}/services`, data);
+  }
+
   updateServiceEntity(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/services/status/entity`, data);
   }

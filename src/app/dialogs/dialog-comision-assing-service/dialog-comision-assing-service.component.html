@@ -1,5 +1,5 @@
 <div class="bg-custom  mb-3 p-3">
-    <h3 class="m-0">ACTUALIZACION DE COMISION PARA RECAUDADORES</h3>
+    <h3 class="m-0 text-white">ACTUALIZACION DE COMISION PARA RECAUDADORES</h3>
 </div>
 
 <form [formGroup]="formCommissionClient">
@@ -54,3 +54,11 @@
         <input formControlName="serviceComisionCriterio" type="number" matInput min="0" step="0.001">
     </mat-form-field>
 </form>
+
+<div class="d-flex justify-content-end m-2">
+
+    <button mat-button class="btn btn-custom" cdkFocusInitial (click)="updateServic()">
+        <mat-icon>save</mat-icon>
+        Guardar
+    </button>
+</div>

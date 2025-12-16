@@ -27,8 +27,8 @@ export class AssignComponent implements OnInit {
     //{ 'name': 'Descripción', 'attribute': 'description' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Cliente', 'attribute': 'nameClient' },
-    { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
-    { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
+    { 'name': 'Comision Fija', 'attribute': 'ownFixedComission' },
+    { 'name': 'Comision Porcentual', 'attribute': 'ownPctComission' },
     {
       'name': 'Fecha', 'attribute': 'date', 'config': {
         'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
@@ -175,14 +175,15 @@ export class AssignComponent implements OnInit {
         serviceName: data.name,
         serviceId: data.id,
         serviceStatus: data.status,
-        serviceComisionFixed: data.fixedcomission,
-        serviceComisionPrc: data.pctcomission,
-        serviceTypeComission: data.typeComission ?? typeCommission,
+        serviceComisionFixed: data.ownFixedComission,
+        serviceComisionPrc: data.ownPctComission,
+        serviceTypeComission: data.ownTypeComission ?? typeCommission,
         serviceType: data.serviceType.name,
         clientName: data.nameClient ?? data.idClient,
         clientId: data.idClient,
         status: this.masterStatus,
-        serviceComisionCriterio: data.comissionCriterion
+        serviceIdProv: data.id_serviceProv,
+        serviceComisionCriterio: data.ownComissionCriterion
       }
     });
 

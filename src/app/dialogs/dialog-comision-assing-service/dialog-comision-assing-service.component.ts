@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, RequiredValidator, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
@@ -28,6 +28,7 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
   ngOnInit(): void {
     this.initializaForms();
 
+    this.changeValidadors(this.data.serviceTypeComission)
     this.stateMaster = this.data.status;
 
     this.service_name.setValue(this.data.serviceName)
@@ -39,7 +40,8 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
     this.service_comision_type.setValue(this.data.serviceTypeComission)
     this.service_commission_fixed_value.setValue(this.data.serviceComisionFixed)
     this.service_commission_prc_value.setValue(this.data.serviceComisionPrc)
-    this.service_comision_criterio.setValue(this.data.serviceComisionCriterio )
+    this.service_comision_criterio.setValue(this.data.serviceComisionCriterio)
+
   }
 
   initializaForms() {
@@ -52,14 +54,41 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
       serviceComisionCriterio: [''],
 
       servicetype: [{ value: '', disabled: true }],
-      serviceStatus: [''],
+      serviceStatus: ['', Validators.required],
       serviceName: [{ value: '', disabled: true }],
     })
   }
 
+  changeValidadors(type: String) {
+    switch (type) {
+      case 'MULTIPLE':
+        this.service_comision_criterio.setValidators(Validators.required);
+        this.service_commission_prc_value.setValidators(Validators.required);
+        this.service_commission_fixed_value.setValidators(Validators.required);
+        break;
+
+      case 'FIJO':
+        this.service_commission_fixed_value.setValidators(Validators.required);
+        this.service_commission_prc_value.clearValidators();
+        this.service_comision_criterio.clearValidators();
+        break;
+
+      case 'PORCENTUAL':
+        this.service_commission_prc_value.setValidators(Validators.required);
+        this.service_commission_fixed_value.clearValidators();
+        this.service_comision_criterio.clearValidators();
+        break;
+    }
+
+    this.service_comision_criterio.updateValueAndValidity();
+    this.service_commission_prc_value.updateValueAndValidity();
+    this.service_commission_fixed_value.updateValueAndValidity();
+  }
+
+
   onTypeComissionChange(event) {
     console.log("event: ", event.value)
-
+    this.changeValidadors(event.value)
     if (event.value == this.data.serviceTypeComission || event.value == "MULTIPLE") {
       this.service_commission_fixed_value.setValue(this.data.serviceComisionFixed)
       this.service_commission_prc_value.setValue(this.data.serviceComisionPrc)
@@ -68,26 +97,81 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
       this.service_commission_prc_value.setValue("")
     }
 
-
-
-
-
   }
 
   updateServic() {
+    if (this.service_comision_type.value == this.data.serviceTypeComission &&
+      this.service_commission_fixed_value.value == this.data.serviceComisionFixed &&
+      this.service_commission_prc_value.value == this.data.serviceComisionPrc &&
+      this.service_comision_criterio.value == this.data.serviceComisionCriterio &&
+      this.service_status.value == this.data.serviceStatus) {
+      this.mytoastr.showWarning("", "Realice cambios")
+      return
+    }
+    this.formCommissionClient.markAllAsTouched();
+    if (!this.formCommissionClient.valid) {
+      this.mytoastr.showWarning('', 'Complete todos los campos obligatorios');
+      return;
+    }
 
-    /*   this.service.updateService(data).subscribe(
-         (data) => {
-           console.log("respuesta del servicio", data)
-           if (data?.statusCode !== 200) {
-             this.mytoastr.showError('Error al actualizar', '')
-             return
-           }
-           this.onNoClick();
-           this.mytoastr.showSuccess('Actualización correcta', '')
-         },
-   
-       )*/
+    let data = {
+      idProvider: "00000100",
+      idClient: this.data.clientId,
+      idService: this.data.serviceId,
+      idServiceProv: this.data.serviceIdProv,
+      updates: {
+
+      }
+    }
+
+    data.updates = {
+      ownTypeComissionService: this.service_comision_type.value,
+    }
+
+    if (this.service_status.value !== this.data.serviceStatus) {
+      data.updates = {
+        ...data.updates,
+        serviceStatus: this.service_status.value
+      }
+    }
+    switch (this.service_comision_type.value) {
+      case "MULTIPLE":
+        data.updates = {
+          ...data.updates,
+          ownFixedComission: this.service_commission_fixed_value.value,
+          ownPrcComission: this.service_commission_prc_value.value,
+          ownComissionCriterion: this.service_comision_criterio.value
+        }
+        break;
+      case "FIJO":
+        data.updates = {
+          ...data.updates,
+          ownFixedComission: this.service_commission_fixed_value.value
+        }
+        break
+      case "PORCENTUAL":
+        data.updates = {
+          ...data.updates,
+          ownPrcComission: this.service_commission_prc_value.value,
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    console.log("Data: ", data)
+    /*
+        this.service.updateComissionService(data).subscribe((response) => {
+          console.log("respuesta del servicio", response)
+          if (response?.statusCode !== 200) {
+            this.mytoastr.showError('Error al actualizar', '')
+            return
+          }
+          this.onNoClick();
+          this.mytoastr.showSuccess('Actualización correcta', '')
+        })
+          */
   }
 
 
@@ -129,6 +213,7 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
 export interface DialogData {
   serviceName: String,
   serviceId: String,
+  serviceIdProv: String,
   serviceStatus: String,
   serviceComisionFixed: Number,
   serviceComisionPrc: Number,
