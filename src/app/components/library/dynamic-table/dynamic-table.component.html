@@ -48,7 +48,8 @@
     <mat-tab *ngIf="selectedTab === 'tab1'" label="First">
         <div class="container-view">
             <table mat-table [dataSource]="dataSource" matSort class="table-custom">
-                <ng-container *ngIf="actionsOptions == true" matColumnDef="select">
+                <!-- Columna de selección -->
+                <ng-container *ngIf="actionsOptions" matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef class="custom-headercell-dynamictable">
                         <mat-checkbox *ngIf="viewCheckboxHeader" (change)="$event ? toggleAllRows() : null"
                             [checked]="selection.hasValue() && isAllSelected()"
@@ -62,69 +63,87 @@
                         </mat-checkbox>
                     </td>
                 </ng-container>
+
+                <!-- Columnas dinámicas -->
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.name">
-                    <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.attribute"
-                        class="custom-headercell-dynamictable">
-                        {{ column.name }}
-                    </th>
-                    <td mat-cell *matCellDef="let element" [class.checked-class]="selection.isSelected(element)">
-                        <!-- Si la columna está configurada como toggle -->
-                        <ng-container *ngIf="column.config?.isToggle;">
-                            <mat-slide-toggle [checked]="element[column.attribute] === 'HABILITADO'"
-                                (change)="onToggleChange(element, $event)">
-                            </mat-slide-toggle>
-                        </ng-container>
+                    <ng-container *ngIf="column.hide !== true">
+                        <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.attribute"
+                            class="custom-headercell-dynamictable">
+                            {{ column.name }}
+                        </th>
 
-                        <!-- Caso normal -->
-                        <ng-container *ngIf="column.config?.renderIcon; else buttonIcon">
-                            <icons-type [type]="element[column?.attribute]" [bg]="false" [priority]="'normal'"
-                                matTooltip="{{ element[column?.attribute || ''] }}"></icons-type>
-                        </ng-container>
-
-
-                        <ng-template #buttonIcon>
-                            <ng-container *ngIf="column.config?.type === 'buttonicons'; else normalCell">
-                                <ng-container *ngFor="let action of column.config?.actions">
-                                    <button class="btn btn-custom bg-button {{action.bgClass}}"
-                                        (click)="onClickButton(action.value , element)" matTooltip="{{action.toolTip}}"
-                                        matTooltipPosition="above">
-                                        <mat-icon>{{action.icon}}</mat-icon>
-                                    </button>
-                                </ng-container>
+                        <td mat-cell *matCellDef="let element" [class.checked-class]="selection.isSelected(element)">
+                            <!-- Toggle -->
+                            <ng-container *ngIf="column.config?.isToggle">
+                                <mat-slide-toggle [checked]="element[column.attribute] === 'HABILITADO'"
+                                    (change)="onToggleChange(element, $event)">
+                                </mat-slide-toggle>
                             </ng-container>
-                        </ng-template>
 
-                        <ng-template #normalCell>
-                            <span onKeyPress class="ellipsis-cell"
-                                (click)="column.config?.clickable ? onCellClick(element) : null"
-                                [ngClass]="[column.config?.styleClass ? (element[column?.attribute || ''] || '') : '', column.config?.clickable ? 'link' : '']"
-                                matTooltip="{{ column.config?.formatDate ? formatDate(
+                            <!-- Icono -->
+                            <ng-container *ngIf="column.config?.renderIcon; else buttonIcon">
+                                <icons-type [type]="element[column?.attribute]" [bg]="false" [priority]="'normal'"
+                                    matTooltip="{{ element[column?.attribute || ''] }}">
+                                </icons-type>
+                            </ng-container>
+
+                            <!-- Botones -->
+                            <ng-template #buttonIcon>
+                                <ng-container *ngIf="column.config?.type === 'buttonicons'; else normalCell">
+                                    <ng-container *ngFor="let action of column.config?.actions">
+                                        <button *ngIf="!action.restriccion"
+                                            class="btn btn-custom bg-button {{action.bgClass}}"
+                                            (click)="onClickButton(action.value , element)"
+                                            matTooltip="{{action.toolTip}}" matTooltipPosition="above">
+                                            <mat-icon>{{action.icon}}</mat-icon>
+                                        </button>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-template>
+
+                            <!-- Celda normal -->
+                            <ng-template #normalCell>
+                                <span onKeyPress class="ellipsis-cell"
+                                    (click)="column.config?.clickable ? onCellClick(element) : null" [ngClass]="[
+                  column.config?.styleClass ? (element[column?.attribute || ''] || '') : '',
+                  column.config?.clickable ? 'link' : ''
+                ]" matTooltip="{{
+                  column.config?.formatDate
+                    ? formatDate(
+                        element[column?.attribute || ''],
+                        column.config?.formatDate?.format || 'dd/MM/yyyy',
+                        column.config?.formatDate?.locale || 'en-US'
+                      )
+                    : element[column?.attribute || '']
+                }}" matTooltipPosition="above">
+                                    {{
+                                    column.config?.formatDate
+                                    ? formatDate(
                                     element[column?.attribute || ''],
                                     column.config?.formatDate?.format || 'dd/MM/yyyy',
                                     column.config?.formatDate?.locale || 'en-US'
-                                )
-                                : element[column?.attribute || ''] }}" matTooltipPosition="above">
-                                {{ column.config?.formatDate ? formatDate(element[column?.attribute || ''],
-                                column.config?.formatDate?.format || 'dd/MM/yyyy',
-                                column.config?.formatDate?.locale || 'en-US'
-                                ) :
-                                element[column?.attribute || ''] }}
-                            </span>
-
-                        </ng-template>
-                    </td>
-
+                                    )
+                                    : element[column?.attribute || '']
+                                    }}
+                                </span>
+                            </ng-template>
+                        </td>
+                    </ng-container>
                 </ng-container>
 
+                <!-- Header y filas -->
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsWithSelect"
                     class="custom-header-row-dynamic-table">
                 </tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsWithSelect"></tr>
+
                 <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell not-data-cell" [colSpan]="displayedColumnsWithSelect?.length">No hay datos para
-                        mostrar</td>
+                    <td class="mat-cell not-data-cell" [colSpan]="displayedColumnsWithSelect?.length">
+                        No hay datos para mostrar
+                    </td>
                 </tr>
             </table>
+
         </div>
         <mat-paginator [pageSizeOptions]="[5, 10, 20]" aria-label="Selecciona la página" (page)="onPageChange($event)">
         </mat-paginator>

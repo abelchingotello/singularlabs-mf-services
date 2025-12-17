@@ -12,7 +12,8 @@ import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { DialogCommissionAssingServiceComponent } from 'src/app/dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
-
+import { environment } from 'src/environments/environment'
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'uni-assign',
@@ -37,6 +38,7 @@ export class AssignComponent implements OnInit {
     {
       name: 'Acciones',
       attribute: '',
+      hide: this.router.url !== "/assign/admin",
       config: {
         type: 'buttonicons',
         actions: [
@@ -62,7 +64,7 @@ export class AssignComponent implements OnInit {
   public dataService: any[];
   public masterStatus: any[];
   public functionDataCurrent: (pageSize: any) => any;
-
+  public currentUrl: any;
   private pagUtils: PaginationUtils | undefined;
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
@@ -188,6 +190,9 @@ export class AssignComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      if (result === "200") {
+        this.reload();
+      }
     });
   }
 

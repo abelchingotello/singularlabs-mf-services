@@ -161,17 +161,18 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
     }
 
     console.log("Data: ", data)
-    /*
-        this.service.updateComissionService(data).subscribe((response) => {
-          console.log("respuesta del servicio", response)
-          if (response?.statusCode !== 200) {
-            this.mytoastr.showError('Error al actualizar', '')
-            return
-          }
-          this.onNoClick();
-          this.mytoastr.showSuccess('Actualización correcta', '')
-        })
-          */
+
+    this.service.updateComissionService(data).subscribe((response) => {
+      console.log("respuesta del servicio", response)
+      if (response?.statusCode !== 200) {
+        this.mytoastr.showError('Error al actualizar', '')
+        this.dialogRef.close("400");
+        return
+      }
+      this.dialogRef.close("200");
+      this.mytoastr.showSuccess('Actualización correcta', '')
+    })
+
   }
 
 

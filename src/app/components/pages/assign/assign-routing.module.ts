@@ -5,9 +5,10 @@ import { AssingIndividualComponent } from './assign/assing-individual/assing-ind
 import { AssingMassiveComponent } from './assign/assing-massive/assing-massive.component';
 
 const routes: Routes = [
-  {path:'',component:AssignComponent},
-  {path: 'individual', component: AssingIndividualComponent},
-  {path: 'massive', component: AssingMassiveComponent},
+  { path: '', component: AssignComponent },
+  { path: 'admin', component: AssignComponent },
+  { path: 'individual', component: AssingIndividualComponent },
+  { path: 'massive', component: AssingMassiveComponent },
 ];
 
 @NgModule({
