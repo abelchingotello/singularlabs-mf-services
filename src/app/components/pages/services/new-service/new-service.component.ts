@@ -142,7 +142,7 @@ export class NewServiceComponent implements OnInit {
 
     dataProvRecaud() {
 
-        this.service.getPerson('RECAUDADORA DE SERVICIOS', null).subscribe({
+        this.service.getPerson('RECAUDADORA DE SERVICIOS', null, true).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typeProClient = data.data
@@ -151,7 +151,7 @@ export class NewServiceComponent implements OnInit {
                 this.mytoastr.showError('Error al obtener datos de Recaudadora', '')
             }
         })
-        this.service.getPerson('PROVEEDOR', null).subscribe({
+        this.service.getPerson('PROVEEDOR', null, true).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typePro = data.data;
