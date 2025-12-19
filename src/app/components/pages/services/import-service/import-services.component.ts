@@ -53,7 +53,7 @@ export class ImportServicesComponent implements OnInit {
     this.spinner.spinnerOnOff();
     //obtener los datos de las personas de PROVEEDOR
     forkJoin([
-      this.personService.getPerson('PROVEEDOR'),
+      this.personService.getPerson('PROVEEDOR',undefined,true),
     ]).subscribe({
       next: (response) => {
         const [person] = response;

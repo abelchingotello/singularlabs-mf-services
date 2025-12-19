@@ -141,7 +141,8 @@ export class NewServiceComponent implements OnInit {
     }
 
     dataProvRecaud() {
-        this.service.getPerson('PROVEEDOR', null).subscribe({
+
+        this.service.getPerson('PROVEEDOR', null, true).subscribe({
             next: (data) => {
                 this.typePro = data.data;
             },
