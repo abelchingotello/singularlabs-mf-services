@@ -3,7 +3,7 @@
         <uni-image-card title={{titlle}}
             externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
         </uni-image-card>
-        <mat-tab-group [(selectedIndex)]="currentStep" dynamicHeight>
+        <mat-tab-group [selectedIndex]="currentStep" dynamicHeight>
             <mat-tab>
                 <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">assignment</span>Datos de Servicio
@@ -75,7 +75,7 @@
                                         <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_state">
                                             <mat-option *ngFor="let status of typeStatus"
-                                                [value]="status">{{status.master_name}}</mat-option>
+                                                [value]="status.master_name">{{status.master_name}}</mat-option>
                                         </mat-select>
                                         <!-- <mat-error *ngIf="name?.hasError('required')">
                                                 Este campo es requerido
@@ -284,13 +284,14 @@
                         </mat-icon>
                         {{ currentStep === 0 ? 'Cancelar' : 'Anterior' }}
                     </button>
-
-                    <button (click)="onNext()" class="btn btn-default3 ">
+                    <button (click)="currentStep === steps.length - 1 ? saveService() : onNext()"
+                        class="btn btn-default3">
                         <mat-icon>
-                            {{ currentStep === stepsOrig.length-1 ? 'check' : 'arrow_forward' }}
+                            {{ currentStep === steps.length-1 ? 'check' : 'arrow_forward' }}
                         </mat-icon>
-                        {{ currentStep === stepsOrig.length-1 ? 'Finalizar' : 'Siguiente' }}
+                        {{ currentStep === steps.length-1 ? 'Finalizar' : 'Siguiente' }}
                     </button>
+
                 </div>
             </mat-card-content>
         </mat-card>

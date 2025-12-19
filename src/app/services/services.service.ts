@@ -16,7 +16,7 @@ export class ServicesService {
   public servicePayment = new BehaviorSubject<any[]>([]);
 
 
-  
+
   private url = `${environment.URL_API_GATEWAY}`;
   //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
@@ -159,7 +159,11 @@ export class ServicesService {
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
 
-  updateService(data: any): Observable<any> {
+  updateService(data: any, id: any): Observable<any> {
+    return this.httpClient.patch(`${this.url}/services/${id}`, data);
+  }
+
+  updateStatusService(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/services/status`, data);
   }
 
