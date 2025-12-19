@@ -35,6 +35,21 @@ export class ServicesComponent implements OnInit {
         'styleClass': true
       }
     },
+    {
+      name: 'Acciones',
+      attribute: '',
+      config: {
+        type: 'buttonicons',
+        actions: [
+          {
+            bgClass: 'yellow',
+            toolTip: 'Editar Servicio',
+            icon: 'edit',
+            value: 'edit'
+          }
+        ]
+      }
+    },
   ];
   public options: any[] = [
     { value: 'Servicio', id: '1' },
@@ -78,7 +93,6 @@ export class ServicesComponent implements OnInit {
     private router: Router,
     private services: ServicesService,
     private fb: FormBuilder,
-    private dialog: MatDialog,
     private master: MasterService,
     private person: PersonService,
     private spinner: SpinnerService,
@@ -180,7 +194,6 @@ export class ServicesComponent implements OnInit {
     );
   }
 
-
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputId = this.service_id.value?.toUpperCase();
@@ -275,46 +288,18 @@ export class ServicesComponent implements OnInit {
     this.clearData();
   }
 
-  selectOption(event) {
-    this.optionId = event.value
-    // if(this.optionId.id == '1'){
-    this.openDialogType(this.optionId.id);
-    // }
-  }
-
-  editElement() {
-    // this.selectedIds
-    this.router.navigate([`/service/edit/${this.selectedIds}`]);
-  }
-
-  handleSelectedIds(selectedIds: any[]) {
-    this.disabledEditOption = selectedIds.length !== 1;
-    this.editOption = selectedIds.length == 1;
-    this.selectedIds = selectedIds;
-    if (this.selectedIds.length === 1) {
-
-      this.getIdService(selectedIds)
-
+  clickButton(event) {
+    console.log("event", event)
+    const { value, element } = event
+    if (value == "edit") {
+      console.log("element: ", element)
+      this.editElement(element.id)
     }
   }
 
-  selectedHandle(event: any) {
-    console.log('event', event);
-    if (this.selectedIds.length === 1) {
-      this.spinner.spinnerOnOff();
-      let completedRequests = 0; // Contador para peticiones completadas
-
-      const checkAndStopSpinner = () => {
-        completedRequests++;
-        if (completedRequests === 2) {
-          this.spinner.spinnerOnOff(); // Desactivar spinner cuando ambas peticiones terminen
-        }
-      };
-      this.getIdPerson(event[0].idClient, null, checkAndStopSpinner)
-      this.getIdPerson(null, event[0].idProvider, checkAndStopSpinner)
-    }
+  editElement(id: any) {
+    this.router.navigate([`/service/edit/${id}`]);
   }
-
 
   dataMaster() {
     this.master.getItemsMasterTable('1').subscribe({
@@ -346,18 +331,6 @@ export class ServicesComponent implements OnInit {
         this.spinner.spinnerOnOff();
       },
     });
-  }
-
-  getIdService(idService) {
-    console.log('idService', idService);
-    this.services.getIdServices(idService).subscribe({
-      next: (response) => {
-        this.dataIdService = response
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      }
-    })
   }
 
   clearData() {
@@ -392,28 +365,6 @@ export class ServicesComponent implements OnInit {
         console.log('complete');
       },
     })
-  }
-
-
-  openDialogType(stateId: string): void {
-
-    const dialogRef = this.dialog.open(DialogServiceStatusComponent, {
-      width: '900px',
-      data: {
-        resp: this.dataIdService,
-        id: stateId,
-        state: this.stateMaster,
-        idClient: this.idClient,
-        idProvider: this.idProvider
-      },
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
-  }
-
-  asignationService() {
-    this.router.navigate([`/service/edit/${this.selectedIds}`]);
   }
 
   /************************************* METODOS DE BOTONES ***********************************/
@@ -504,6 +455,7 @@ export class ServicesComponent implements OnInit {
   }
 
 }
+
 interface ServiceItem {
   id: string;
   name: string;

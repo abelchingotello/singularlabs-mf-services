@@ -43,6 +43,7 @@ export class AssignComponent implements OnInit {
         type: 'buttonicons',
         actions: [
           {
+            hide: false,
             bgClass: 'yellow',
             toolTip: 'Editar Comision',
             icon: 'edit',

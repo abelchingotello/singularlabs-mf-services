@@ -47,8 +47,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="col-md-3"
-            *ngIf="selectedCategory">
+          <mat-form-field appearance="outline" class="col-md-3" *ngIf="selectedCategory">
             <mat-label>Seleccionar Servicio</mat-label>
             <mat-select formControlName="idService" multiple (selectionChange)="onServicesChange($event)">
 
@@ -112,24 +111,10 @@
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
         <div>
-          <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"
-            [pageKey]="pageKey" (selectedIdsChange)="handleSelectedIds($event)"
-            (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)"
-            (pageChange)="onPageChange($event)" [lengthTable]="count"
-            [customExportFunction]="exportDataViaAPI.bind(this)">
+          <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id" [pageKey]="pageKey"
+            [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
+            [customExportFunction]="exportDataViaAPI.bind(this)" (clickButtonEvent)="clickButton($event)">
 
-            <div class="d-flex">
-              <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()">
-                <mat-icon matTooltip="Asignar" matTooltipPosition="above">assignment_ind</mat-icon>
-              </button>
-              <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;">
-                <mat-label>Actualizar</mat-label>
-
-                <mat-select (selectionChange)="selectOption($event)">
-                  <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
           </uni-dynamic-table>
         </div>
       </mat-card-content>

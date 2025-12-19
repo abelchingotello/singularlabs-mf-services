@@ -17,6 +17,7 @@ export class ServicesService {
 
 
   private url = `${environment.URL_API_GATEWAY}`;
+
   // private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
@@ -134,7 +135,7 @@ export class ServicesService {
   }
 
   getIdServices(id: string): Observable<ResponseDTO<ServiceByIdInterface>> {
-    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`${this.url}/services/${id}`, null);
+    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`http://localhost:3000/stage/services/${id}`, null);
   }
   getIdServicePerson(id: string, type?: string): Observable<any> {
     let params = new HttpParams();

@@ -91,7 +91,7 @@
                             <ng-template #buttonIcon>
                                 <ng-container *ngIf="column.config?.type === 'buttonicons'; else normalCell">
                                     <ng-container *ngFor="let action of column.config?.actions">
-                                        <button *ngIf="!action.restriccion"
+                                        <button *ngIf="!action.hide"
                                             class="btn btn-custom bg-button {{action.bgClass}}"
                                             (click)="onClickButton(action.value , element)"
                                             matTooltip="{{action.toolTip}}" matTooltipPosition="above">

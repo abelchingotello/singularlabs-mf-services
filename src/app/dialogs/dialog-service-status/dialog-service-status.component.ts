@@ -126,8 +126,6 @@ export class DialogServiceStatusComponent implements OnInit {
       idService: this.service_id.value,
       status: this.status.master_name
     }
-    console.log("UPDATE3:", data)
-    // return
     this.service.updateServiceClient(data).subscribe(
       (data) => {
         console.log("Respuesta del servicio", data)

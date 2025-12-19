@@ -12,4 +12,5 @@ export interface ServiceByIdInterface {//Interface para el servicio de obtener u
     indicators: any[];//indicators
     'additional-payment-fields': any[];//Asi viene en el json
     fixedcomission: number;//fixedcomission
+    zone: string;
 }
