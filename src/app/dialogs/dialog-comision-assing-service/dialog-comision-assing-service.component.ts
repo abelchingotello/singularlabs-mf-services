@@ -50,7 +50,7 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
 
       serviceComisionFixed: [''],
       serviceComisionPrc: [''],
-      serviceTypeComission: [''],
+      serviceTypeComission: [{ value: '', disabled: true }],
       serviceComisionCriterio: [''],
 
       servicetype: [{ value: '', disabled: true }],
@@ -100,82 +100,110 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
   }
 
   updateServic() {
-    if (this.service_comision_type.value == this.data.serviceTypeComission &&
+    if (
+      this.service_comision_type.value == this.data.serviceTypeComission &&
       this.service_commission_fixed_value.value == this.data.serviceComisionFixed &&
       this.service_commission_prc_value.value == this.data.serviceComisionPrc &&
       this.service_comision_criterio.value == this.data.serviceComisionCriterio &&
-      this.service_status.value == this.data.serviceStatus) {
-      this.mytoastr.showWarning("", "Realice cambios")
-      return
+      this.service_status.value == this.data.serviceStatus
+    ) {
+      this.mytoastr.showWarning('', 'Realice cambios');
+      return;
     }
+
     this.formCommissionClient.markAllAsTouched();
     if (!this.formCommissionClient.valid) {
       this.mytoastr.showWarning('', 'Complete todos los campos obligatorios');
       return;
     }
 
-    let data = {
-      idProvider: "00000100",
+    const originalType = this.data.serviceTypeComission;
+    const currentType = this.service_comision_type.value;
+
+    let data: any = {
+      idProvider: '00000100',
       idClient: this.data.clientId,
       idService: this.data.serviceId,
       idServiceProv: this.data.serviceIdProv,
-      updates: {
+      updates: {},
+      removes: '' // nuevo campo
+    };
 
-      }
-    }
-
+    // --- UPDATES con tus nombres actuales ---
     data.updates = {
-      ownTypeComissionService: this.service_comision_type.value,
-    }
+      ownTypeComissionService: currentType
+    };
 
     if (this.service_status.value !== this.data.serviceStatus) {
       data.updates = {
         ...data.updates,
         serviceStatus: this.service_status.value
-      }
+      };
     }
-    switch (this.service_comision_type.value) {
-      case "MULTIPLE":
+
+    switch (currentType) {
+      case 'MULTIPLE':
         data.updates = {
           ...data.updates,
           ownFixedComission: this.service_commission_fixed_value.value,
           ownPrcComission: this.service_commission_prc_value.value,
           ownComissionCriterion: this.service_comision_criterio.value
-        }
+        };
         break;
-      case "FIJO":
+      case 'FIJO':
         data.updates = {
           ...data.updates,
           ownFixedComission: this.service_commission_fixed_value.value
-        }
-        break
-      case "PORCENTUAL":
+        };
+        break;
+      case 'PORCENTUAL':
         data.updates = {
           ...data.updates,
-          ownPrcComission: this.service_commission_prc_value.value,
-        }
-        break;
-
-      default:
+          ownPrcComission: this.service_commission_prc_value.value
+        };
         break;
     }
 
-    console.log("Data: ", data)
+    // --- REMOVES: solo cambian de nombre aquí ---
+    const removes: string[] = [];
+
+    // FIJO -> PORCENTUAL: eliminar OWN_FIXED_COMISSION
+    if (originalType === 'FIJO' && currentType === 'PORCENTUAL') {
+      removes.push('OWN_FIXED_COMISSION');
+    }
+
+    // PORCENTUAL -> FIJO: eliminar OWN_PCT_COMISSION
+    if (originalType === 'PORCENTUAL' && currentType === 'FIJO') {
+      removes.push('OWN_PCT_COMISSION');
+    }
+
+    // MULTIPLE -> FIJO: eliminar OWN_PCT_COMISSION y OWN_CRITERION_COMISSION
+    if (originalType === 'MULTIPLE' && currentType === 'FIJO') {
+      removes.push('OWN_PCT_COMISSION', 'OWN_CRITERION_COMISSION');
+    }
+
+    // MULTIPLE -> PORCENTUAL: eliminar OWN_FIXED_COMISSION y OWN_CRITERION_COMISSION
+    if (originalType === 'MULTIPLE' && currentType === 'PORCENTUAL') {
+      removes.push('OWN_FIXED_COMISSION', 'OWN_CRITERION_COMISSION');
+    }
+
+    if (removes.length > 0) {
+      data.removes = removes.join(',');
+    }
+
+    console.log('Data: ', data);
 
     this.service.updateComissionService(data).subscribe((response) => {
-      console.log("respuesta del servicio", response)
+      console.log('respuesta del servicio', response);
       if (response?.statusCode !== 200) {
-        this.mytoastr.showError('Error al actualizar', '')
-        this.dialogRef.close("400");
-        return
+        this.mytoastr.showError('Error al actualizar', '');
+        this.dialogRef.close('400');
+        return;
       }
-      this.dialogRef.close("200");
-      this.mytoastr.showSuccess('Actualización correcta', '')
-    })
-
+      this.dialogRef.close('200');
+      this.mytoastr.showSuccess('Actualización correcta', '');
+    });
   }
-
-
 
   onNoClick(): void {
     this.dialogRef.close();

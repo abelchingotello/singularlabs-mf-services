@@ -231,55 +231,104 @@ export class NewServiceComponent implements OnInit {
     const serviceRaw = this.serviceForm.getRawValue();
     const comissionRaw = this.comissionForm.getRawValue();
 
+    // USANDO NOMBRES REALES DE CAMPOS
     const bodyBase = {
-      idProvider: serviceRaw.service_prov,
-      idClient: '00000100',
-      idServiceProv: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
-      serviceName: serviceRaw.service_name,
-      userRegistration: this.userName.Username,
-      idTypeService: String(serviceRaw.service_type.master_idTypeService),
-      typeService: serviceRaw.service_type.master_name,
-      business: serviceRaw.service_type_business,
-      status: serviceRaw.service_state,
-      zone: serviceRaw.service_zone ?? null,
-      collectorName: '',
-      typeComission: comissionRaw.comission_type,
-      comissionFixed: comissionRaw.comission_fixed,
-      comissionCriterion: comissionRaw.comission_criterion,
-      comissionPCT: comissionRaw.comission_percentage,
-      indicators: this.indicatrs,
-      additionalPaymentFields: this.dataPayment
+      ID_PROVIDER: serviceRaw.service_prov,
+      ID_CLIENT: '00000100',
+      ID_SERVICE_PROV: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
+      SERVICE_NAME: serviceRaw.service_name,
+      USER_REG: this.userName.Username,
+      ID_TYPE_SERVICE: String(serviceRaw.service_type.master_idTypeService),
+      TYPE_SERVICE: serviceRaw.service_type.master_name,
+      BUSINESS: serviceRaw.service_type_business,
+      STATUS: serviceRaw.service_state,
+      ZONE: serviceRaw.service_zone ?? null,
+      TYPE_COMISSION: comissionRaw.comission_type,
+      COMISSION_FIXED: comissionRaw.comission_fixed,
+      COMISSION_CRITERION: comissionRaw.comission_criterion,
+      COMISSION_PCT: comissionRaw.comission_percentage,
+      INDICATORS: this.indicatrs,
+      ADDITIONAL_PAYMENT_FIELDS: this.dataPayment
     };
 
     if (!this.idService) {
       this.AddService(bodyBase);
     } else {
-      const hasFormChanges = this.hasDiff(
-        { service: serviceRaw, comission: comissionRaw },
-        this.originalFormData
-      );
-      const hasExtraChanges = this.hasDiff(
-        { indicators: this.indicatrs, additionalPaymentFields: this.dataPayment },
-        this.originalExtras
-      );
-
-      if (!hasFormChanges && !hasExtraChanges) {
-        this.mytoastr.showWarning('', 'No se identificaron cambios');
-        return;
-      }
-
-      const changedBody = this.getBodyDiff(bodyBase, this.originalBodyBase);
-      changedBody.userRegistration = this.userName.Username;
-
-      console.log("changedBody: ", changedBody)
-      console.log("original type commision: ", this.originalBodyBase)
-      
-      const dataUpdate = {
-        updates: changedBody,
-        removes: ""
-      }
-      this.updateService(dataUpdate);
+      this.updateService(bodyBase, serviceRaw, comissionRaw)
     }
+  }
+
+  updateService(bodyBase: any, serviceRaw: any, comissionRaw: any) {
+    const hasFormChanges = this.hasDiff(
+      { service: serviceRaw, comission: comissionRaw },
+      this.originalFormData
+    );
+    const hasExtraChanges = this.hasDiff(
+      { indicators: this.indicatrs, additionalPaymentFields: this.dataPayment },
+      this.originalExtras
+    );
+
+    if (!hasFormChanges && !hasExtraChanges) {
+      this.mytoastr.showWarning('', 'No se identificaron cambios');
+      return;
+    }
+
+    const changedBody = this.getBodyDiff(bodyBase, this.originalBodyBase);
+    changedBody.USER_REG = this.userName.Username;
+
+    // LÓGICA PARA REMOVES CON NOMBRES REALES
+    const removes = this.getCommissionRemoves(
+      this.originalBodyBase?.TYPE_COMISSION,
+      comissionRaw.comission_type
+    );
+
+    console.log("changedBody: ", changedBody);
+    console.log("removes: ", removes);
+
+    const dataUpdate = {
+      updates: changedBody,
+      removes: removes
+    };
+    
+    this.service.updateService(dataUpdate, this.idService).subscribe({
+      next: (response: any) => {
+        if (response.statusCode !== 200) {
+          this.mytoastr.showWarning(response.messages, '');
+          return;
+        }
+        this.mytoastr.showSuccess('Servicio Actualizado correctamente', '');
+        this.router.navigate(['/service']);
+      },
+      error: (error: any) => {
+        console.error('ERROR: ', error);
+      }
+    });
+  }
+
+  // NUEVO MÉTODO PARA CAMPOS A ELIMINAR SEGÚN TIPO DE COMISIÓN
+  private getCommissionRemoves(originalType: string, currentType: string): string {
+    if (!originalType) return '';
+
+    const removes: string[] = [];
+
+    // FIJO → PORCENTUAL: eliminar COMISSION_FIXED
+    if (originalType === 'FIJO' && currentType === 'PORCENTUAL') {
+      removes.push('COMISSION_FIXED');
+    }
+    // PORCENTUAL → FIJO: eliminar COMISSION_PCT
+    else if (originalType === 'PORCENTUAL' && currentType === 'FIJO') {
+      removes.push('COMISSION_PCT');
+    }
+    // MULTIPLE → FIJO: eliminar COMISSION_CRITERION y COMISSION_PCT
+    else if (originalType === 'MULTIPLE' && currentType === 'FIJO') {
+      removes.push('COMISSION_CRITERION', 'COMISSION_PCT');
+    }
+    // MULTIPLE → PORCENTUAL: eliminar COMISSION_CRITERION y COMISSION_FIXED
+    else if (originalType === 'MULTIPLE' && currentType === 'PORCENTUAL') {
+      removes.push('COMISSION_CRITERION', 'COMISSION_FIXED');
+    }
+
+    return removes.join(',');
   }
 
   private hasDiff(current: any, original: any): boolean {
@@ -292,7 +341,7 @@ export class NewServiceComponent implements OnInit {
     const diff: any = {};
 
     for (const key of Object.keys(current)) {
-      if (key === 'userRegistration') continue;
+      if (key === 'USER_REG') continue;
 
       const cur = current[key];
       const orig = original[key];
@@ -322,22 +371,6 @@ export class NewServiceComponent implements OnInit {
       },
       complete: () => {
         this.router.navigate(['/service']);
-      }
-    });
-  }
-
-  updateService(data: any) {
-    this.service.updateService(data, this.idService).subscribe({
-      next: (response: any) => {
-        if (response.statusCode !== 200) {
-          this.mytoastr.showWarning(response.messages, '');
-          return;
-        }
-        this.mytoastr.showSuccess('Servicio Actualizado correctamente', '');
-        this.router.navigate(['/service']);
-      },
-      error: (error: any) => {
-        console.error('ERROR: ', error);
       }
     });
   }
@@ -430,24 +463,23 @@ export class NewServiceComponent implements OnInit {
 
       this.service_indicators.setValue(this.indicatrs.filter(i => i.isActive).map(i => i.id));
 
-      // body base original con mismo shape que en saveService
+      // originalBodyBase CON NOMBRES REALES DE CAMPOS
       this.originalBodyBase = {
-        idProvider: data.idProvider,
-        idClient: '00000100',
-        idServiceProv: data.id_serviceProv,
-        serviceName: data.name,
-        idTypeService: String(data.serviceType.id),
-        typeService: data.serviceType.name,
-        business: data.business,
-        status: data.status,
-        zone: data.zone ?? null,
-        collectorName: '',
-        typeComission: data.typeComission,
-        comissionFixed: data.fixedcomission,
-        comissionCriterion: data.comissioncriterion,
-        comissionPCT: data.pctcomission,
-        indicators: JSON.parse(JSON.stringify(this.indicatrs)),
-        additionalPaymentFields: JSON.parse(JSON.stringify(this.dataPayment))
+        ID_PROVIDER: data.idProvider,
+        ID_CLIENT: '00000100',
+        ID_SERVICE_PROV: data.id_serviceProv,
+        SERVICE_NAME: data.name,
+        ID_TYPE_SERVICE: String(data.serviceType.id),
+        TYPE_SERVICE: data.serviceType.name,
+        BUSINESS: data.business,
+        STATUS: data.status,
+        ZONE: data.zone ?? null,
+        TYPE_COMISSION: data.typeComission,
+        COMISSION_FIXED: data.fixedcomission,
+        COMISSION_CRITERION: data.comissioncriterion,
+        COMISSION_PCT: data.pctcomission,
+        INDICATORS: JSON.parse(JSON.stringify(this.indicatrs)),
+        ADDITIONAL_PAYMENT_FIELDS: JSON.parse(JSON.stringify(this.dataPayment))
       };
     } catch (err) {
       console.error('ERROR: ', err);
@@ -539,6 +571,7 @@ export class NewServiceComponent implements OnInit {
     return `${anio}${dia}${mes}${timeLocal}`;
   }
 
+  // GETTERS
   get service_name() { return this.serviceForm.get('service_name'); }
   get service_prov() { return this.serviceForm.get('service_prov'); }
   get service_type() { return this.serviceForm.get('service_type'); }

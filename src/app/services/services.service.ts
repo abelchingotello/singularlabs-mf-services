@@ -135,8 +135,9 @@ export class ServicesService {
   }
 
   getIdServices(id: string): Observable<ResponseDTO<ServiceByIdInterface>> {
-    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`http://localhost:3000/stage/services/${id}`, null);
+    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`${this.url}/services/${id}`, null);
   }
+
   getIdServicePerson(id: string, type?: string): Observable<any> {
     let params = new HttpParams();
 
