@@ -27,11 +27,13 @@ export class PersonService {
   }
 
 
-  getPerson(typeEntity?: string, nameAlias?: string): Observable<any> {
+  getPerson(typeEntity?: string, nameAlias?: string, activeOnly?: boolean): Observable<any> {
     let params = new HttpParams();
     if (typeEntity) params = params.set('typeEntity', typeEntity);
 
     if (nameAlias) params = params.set('nameAlias', nameAlias);
+
+    if (activeOnly) params = params.set('activeOnly', activeOnly);
 
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }

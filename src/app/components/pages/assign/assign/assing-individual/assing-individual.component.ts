@@ -102,7 +102,7 @@ export class AssingIndividualComponent implements OnInit {
     this.spinner.spinnerOnOff();
     forkJoin([
       this.masterService.getItemsMasterTable('15'), // tipoComission
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
       this.masterService.getItemsMasterTable('14') // CategoriaService
     ]).subscribe({
       next: (response) => {
