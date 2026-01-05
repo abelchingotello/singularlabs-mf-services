@@ -42,6 +42,7 @@ export class ServicesComponent implements OnInit {
         type: 'buttonicons',
         actions: [
           {
+            hide: false,
             bgClass: 'yellow',
             toolTip: 'Editar Servicio',
             icon: 'edit',
@@ -293,7 +294,7 @@ export class ServicesComponent implements OnInit {
     const { value, element } = event
     if (value == "edit") {
       console.log("element: ", element)
-      this.editElement(element.id)
+      this.editElement(element.ID)
     }
   }
 

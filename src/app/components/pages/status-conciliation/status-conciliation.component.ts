@@ -199,11 +199,11 @@ export class StatusConciliationComponent implements OnInit {
     // return
     this.personService.getPersons(pageSize, this.pageKey).subscribe({
       next: (value: any) => {
+        console.log("prueba salidaaa ", value);
         if (value.statusCode === 201) {
           this.myToastr.showWarning(value.messages || 'No se encontraron clientes', '');
           return
         }
-        console.log("prueba salidaaa ", value);
 
         let personData = value.data.map(item => ({
           nameAlias: item.servicePerson?.nameAlias || '-',
@@ -255,12 +255,11 @@ export class StatusConciliationComponent implements OnInit {
         }
         //this.reload();
         //repetido...
-        this.dataPerson = value.data.Items.map(item => ({
+        this.dataPerson = value.data.map((item:any) => ({
           nameAlias: item?.nameAlias || '-',
           zone: item?.zone || '-',
           typeDoc: item?.typeDoc || '-',
           status: item?.status || '-',
-          typeService: item?.typeService.typeEntity || '-',
           idPerson: item?.idPerson || '-'
         }));
         //FILTRAR ALIAS SIN REPETIR

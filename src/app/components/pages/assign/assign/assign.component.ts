@@ -31,6 +31,11 @@ export class AssignComponent implements OnInit {
     { 'name': 'Comision Fija', 'attribute': 'ownFixedComission' },
     { 'name': 'Comision Porcentual', 'attribute': 'ownPctComission' },
     {
+      'name': 'Estado', 'attribute': 'status', 'config': {
+        'styleClass': true
+      }
+    },
+    {
       'name': 'Fecha', 'attribute': 'date', 'config': {
         'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
       }
