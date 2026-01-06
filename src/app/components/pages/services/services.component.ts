@@ -294,7 +294,7 @@ export class ServicesComponent implements OnInit {
     const { value, element } = event
     if (value == "edit") {
       console.log("element: ", element)
-      this.editElement(element.ID)
+      this.editElement(element.id)
     }
   }
 
