@@ -17,19 +17,11 @@ td.mat-cell {
     padding-right: 8px;
     overflow-wrap: break-word;
     word-break: break-word;
-    justify-content: center !important;
+    align-items: center !important;
     text-align: center !important;
-    align-items: center;
     @media (max-width: 720px) {
         min-width: 150px;
     }
-}
-
-::ng-deep .mat-sort-header-container{
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
 }
 
 td.cdk-column-select {
@@ -43,6 +35,8 @@ td.mat-cell {
 
 th.mat-header-cell {
     padding-inline: 8px;
+    align-items: center !important;
+    text-align: center !important;
 }
 
 ::ng-deep .groupTableCard .mat-tab-header {
@@ -60,37 +54,6 @@ th.mat-header-cell {
     text-decoration: underline;
     cursor: pointer;
 }
-
-
-// .mat-paginator{
-//     width: auto;
-//     min-width: 100%;
-// }
-
-// .mat-header-cell,
-// .mat-cell {
-//     // padding: 8px;
-//     word-wrap: break-word;
-//     white-space: nowrap;
-//     text-overflow: ellipsis;
-// }
-
-// // .mat-header-cell {
-// //     font-weight: bold;
-// // }
-
-// // .mat-row,
-// // .mat-header-row {
-// //     display: table-row;
-// // }
-
-// @media screen and (max-width: 768px) {
-
-//     .mat-header-cell,
-//     .mat-cell {
-//         white-space: normal;
-//     }
-// }
 
 .card-container {
     display: grid;
@@ -181,7 +144,7 @@ th.mat-header-cell {
     visibility: hidden;
 }
 
-::ng-deep .custom-header-row-dynamic-table .mat-sort-header .mat-sort-header-container .mat-sort-header-content {
+::ng-deep .custom-header-row-dynamic-table .mat-sort-header .mat-sort-header-content {
     color: #333;
     /* Color del texto */
     font-weight: bold;
@@ -189,10 +152,17 @@ th.mat-header-cell {
     // overflow-wrap: break-word;
     // word-break: break-word;
 }
+::ng-deep .mat-sort-header-container{
+    width: 100%;
+    display: flex;
+    justify-content: center !important;
+    align-items: center;
+    text-align: center;}
 
 .custom-header-row-dynamic-table {
     /* Mantener la fila fija en la parte superior */
     top: 0;
+    padding: 0px 8px;
     /* Pegado a la parte superior */
     // z-index: 10;
     /* Asegurarse de que esté por encima de otras filas */
@@ -203,8 +173,6 @@ th.mat-header-cell {
     color: #333;
     font-weight: bold;
     top: 0;
-    justify-content: center;
-    text-align: center;
     // z-index: 1;
 }
 
@@ -238,4 +206,50 @@ th.mat-header-cell {
     font-size: large;
     color: #000000; 
     height: 60px; /* espacio vertical */
+}
+
+
+$button-colors: (
+    green: (#4CAF50, #E8F5E9),
+    // Verde "HABILITADO"
+    gray: (#B0BEC5, #ECEFF1),
+    // Gris suave como el de la UI
+    red: (#E53935, #FFEBEE),
+    // Rojo consistente con Material
+    yellow: (#FFC107, #FFF8E1),
+    // Mantengo amarillo (editar)
+    blue: (#005B99, #E3F2FD),
+    // Azul del top bar
+    lightblue: (#00C8FF, #E1F5FE),
+    // Celeste del menú / acento
+    purple: (#7EC8E3, #EEF7FB),
+    // Tono del logo (azul-lila suave)
+    pink: (#EC407A, #FCE4EC),
+    // Ajustado a Material para equilibrio
+    orange: (#FB8C00, #FFF3E0),
+    // Más consistente con la UI
+    teal: (#00838F, #E0F7FA),
+    // Azul verdoso acorde al esquema
+    black: (#263238, #FFFFFF),
+    // Negro grisáceo usado en textos
+    white: (#FFFFFF, #263238) // Blanco con texto contrastante
+);
+
+
+.bg-button {
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &.round {
+        border-radius: 20000px;
+    }
+
+    @each $name, $colors in $button-colors {
+        &.#{$name} {
+            background-color: nth($colors, 1);
+            color: nth($colors, 2);
+        }
+    }
 }

@@ -1,108 +1,91 @@
 <div class="content bg-gray-3">
-    <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
-        <uni-image-card title="Servicios"
-        externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Servicios"
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <div class="row">
+        <div class="col  d-flex justify-content-end align-items-end ">
 
-        <div class="align-content-center">
-            <button mat-flat-button type="button" class="mb-2 mb-md-0 custom-button btn-dark" (click)="addService()">
-              <mat-icon>add</mat-icon>
-              <span class="custom-span-icon-responsive">Añadir</span>
-
-            </button>
-          </div>
-    </uni-image-card>
-    <!-- <mat-card class="custom-border-radius-1-25">
-      <form [formGroup]="serviceForm">
-        <mat-card-content>
-          <div class="template-container custom-border-radius-1-25 bg-white p-3">
-            <mat-form-field  appearance="outline" class="col-md-4">
-              <mat-label>Buscar</mat-label>
-              <input matInput placeholder="Por nombre" formControlName="service_name">
-              <button *ngIf="close" mat-icon-button matSuffix (click)="cleanSearch()">
-                <mat-icon>close</mat-icon>
-              </button>
-
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="col-md-3">
-              <mat-label>Estado</mat-label>
-              <mat-select formControlName="status">
-                <mat-option *ngFor="let status of stateMaster" [value]="status">{{status.master_name}}</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-      </form>
-          </div>
-          <button class="btn btn-primary" matSuffix (click)="searchData()">
-            <mat-icon>search</mat-icon>
-            Buscar
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2 " (click)="addService()">
+            <mat-icon>add</mat-icon>
+            <span class="custom-span-icon-responsive">Añadir</span>
           </button>
-        </mat-card-content>
-      </form>
-      </mat-card> -->
 
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
+            <mat-icon>upload_file</mat-icon>
+            <span class="custom-span-icon-responsive">Importar-Crear</span>
+          </button>
 
-      <mat-card class="search-card shadow-sm">
-        <form [formGroup]="serviceForm">
-          <mat-card-content>
-            <div class="search-container p-4">
-              <div class="row align-items-center">
-                <div class="col-md-5 mb-3 mb-md-0">
-                  <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Buscar</mat-label>
-                    <input matInput placeholder="Por nombre" formControlName="service_name">
-                    <button *ngIf="serviceForm.get('service_name').value" mat-icon-button matSuffix (click)="cleanSearch()" aria-label="Limpiar búsqueda">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  </mat-form-field>
-                </div>
-                <div class="col-md-4 mb-3 mb-md-0">
-                  <!-- <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Estado</mat-label>
-                    <mat-select formControlName="status">
-                      <mat-option *ngFor="let status of stateMaster" [value]="status">
-                        {{status.master_name}}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field> -->
-                </div>
-                <div class="col-md-3 d-flex align-items-center">
-                  <button class="btn btn-primary px-4 d-flex align-items-center" (click)="searchData()">
-                    <mat-icon class="me-2">search</mat-icon>
-                    <span>Buscar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-        </form>
-      </mat-card>
+          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
+            <mat-icon>upload_file</mat-icon>
+            <span class="custom-span-icon-responsive">Importar-Actualizar</span>
+          </button>
+        </div>
+      </div>
+    </uni-image-card>
 
     <mat-card class="custom-border-radius-1-25">
-        <mat-card-content>
-          <div >
-            <uni-dynamic-table [columns]="columns" [data]="dataService" [actionsOptions]="true" element_id="id"  [pageKey]="pageKey"
-            (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)" [refreshFunction]="reload.bind(this)" [customExportFunction]="exportDataViaAPI.bind(this)">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+        <form [formGroup]="serviceForm" class="d-flex flex-wrap ">
 
-              <div class="d-flex">
-                <button class="icon-button" [disabled]="disabledEditOption" mat-icon-button (click)="asignationService()"  >
-                  <mat-icon matTooltip="Editar">assignment_ind</mat-icon>
-                </button>
-                <mat-form-field *ngIf="editOption" appearance="outline" style="width: 80%; margin-left: 15px;" >
-                  <mat-label>Actualizar</mat-label>
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let status of stateMaster" [value]="status">
+                {{status.master_name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-                <mat-select (selectionChange)="selectOption($event)">
-                  <!-- <mat-option>Ninguno</mat-option> -->
-                  <mat-option *ngFor="let option of options" [value]="option">{{option.value}}</mat-option>
-                </mat-select>
-              </mat-form-field>
-              </div>
-            </uni-dynamic-table>
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Tipo de Servicio</mat-label>
+            <mat-select formControlName="service_type">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let category of categoriesService"
+                [value]="category.master_name">{{category.master_name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3" *ngIf="!selectedCategory">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="service_name">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Proveedor</mat-label>
+            <mat-select formControlName="provider">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let provider of listProviders" [value]="provider.servicePerson.idPerson">
+                {{provider.servicePerson.nameAlias}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </form>
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+            <button type="button" class="btn-default2 btn" (click)="clearFormAndData()">
+              <mat-icon>filter_alt_off</mat-icon>Limpiar
+            </button>
+            <button type="button" class="btn-default3 btn" (click)="searchData()">
+              <mat-icon>search</mat-icon>Buscar
+            </button>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <div>
+          <uni-dynamic-table [columns]="columns" [lengthTable]="count" [data]="dataService" element_id="id"
+            [pageKey]="pageKey" [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)"
+            [customExportFunction]="exportDataViaAPI.bind(this)" (clickButtonEvent)="clickButton($event)">
 
-
-    </div>
+          </uni-dynamic-table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

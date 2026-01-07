@@ -43,6 +43,11 @@
     --breakpoint-xl: 1200px;
     --font-family-sans-serif: Open Sans, sans-serif;
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+    --default: #007BFF;
+    --default4: #11bfef;
+    --default3: #1171ef;
+    --default2: #1196ef;
 }
 
 *,
@@ -202,8 +207,9 @@ a {
 
     -webkit-text-decoration-skip: objects;
 }
+
 .dropdown-toggle::after {
-    display:none;
+    display: none;
 }
 
 
@@ -389,8 +395,7 @@ progress {
     height: auto;
 }
 
-[type='search']
-{
+[type='search'] {
     outline-offset: -2px;
 
     -webkit-appearance: none;
@@ -17692,7 +17697,7 @@ textarea[resize='horizontal'] {
     color: #fff !important;
 }
 
-.nav-list-link.active > .mat-list-item-content > .d-flex > span > .mat-icon {
+.nav-list-link.active>.mat-list-item-content>.d-flex>span>.mat-icon {
     color: #fff !important;
 }
 
@@ -20310,11 +20315,11 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
 }
 
 .custom-title-responsive-1 {
-    font-size: 1.6rem!important; // Tamaño base reducido para pantallas grandes
-    text-align: start!important;
-    font-family: Verdana, Geneva, Tahoma, sans-serif!important;
-    color: #32325d!important;
-    font-weight: 600!important;
+    font-size: 1.6rem !important; // Tamaño base reducido para pantallas grandes
+    text-align: start !important;
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: #32325d !important;
+    font-weight: 600 !important;
 
     @media (max-width: 1199.98px) {
         // lg
@@ -20342,10 +20347,10 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
 }
 
 .custom-title-responsive-2 {
-    font-size: 1.4rem!important; // Tamaño base reducido para pantallas grandes
-    font-family: Verdana, Geneva, Tahoma, sans-serif!important;
-    color: #32325d!important;
-    font-weight: 600!important;
+    font-size: 1.4rem !important; // Tamaño base reducido para pantallas grandes
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: #32325d !important;
+    font-weight: 600 !important;
 
     @media (max-width: 1199.98px) {
         // lg
@@ -20403,7 +20408,7 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
     }
 }
 
-.ARCHIVED{
+.ARCHIVED {
     padding-block: 2px;
     padding-inline: 15px;
     display: inline;
@@ -20416,7 +20421,7 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
     background-color: rgba(255, 0, 0, 0.458);
 }
 
-.INHABILITADO{
+.INHABILITADO {
     padding-block: 2px;
     padding-inline: 15px;
     display: inline;
@@ -20427,8 +20432,8 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
     color: rgb(150, 95, 12);
     border: 1px solid rgb(150, 95, 12);
     background-color: rgba(255, 255, 0, 0.671);
-  }
-  
+}
+
 .HABILITADO {
     padding-block: 2px;
     padding-inline: 15px;
@@ -20440,4 +20445,79 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle {
     color: rgb(5, 86, 5);
     border: 1px solid rgb(5, 86, 5);
     background-color: rgba(24, 183, 24, 0.411);
+}
+
+//-------botones personalizados (color e iconos centrados)
+.btn-default2,
+.btn-default3 {
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 16px 10px 13px !important;
+}
+
+.btn-default2 {
+    background-color: var(--default2) !important;
+    border-color: var(--default2) !important;
+    color: #fff !important;
+}
+
+.btn-default3 {
+    background-color: var(--default3) !important;
+    border-color: var(--default3) !important;
+    color: #fff !important;
+}
+
+.btn-default4 {
+    background-color: var(--default4) !important; //var(--default3) #172b4d #001F3F;
+    border-color: var(--default4) !important; //var(--default3) #172b4d
+    color: #fff !important; //#fff  var(--default4)
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 16px 8px 13px !important;
+}
+
+.btn-default2:hover,
+.btn-default3:hover,
+.btn-default4:hover {
+    color: #fff !important;
+}
+
+//-------botones con solo el color personalizado (boredes redondeados)
+.btn-color-default2 {
+    background-color: var(--default2) !important;
+    border-color: var(--default2) !important;
+    color: #fff !important;
+}
+
+.btn-color-default3 {
+    background-color: var(--default3) !important;
+    border-color: var(--default3) !important;
+    color: #fff !important;
+}
+
+
+
+//-------mat checkbox y radio button con color personalizado
+.mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+    background-color: var(--default3) !important;
+}
+
+.mat-accent .mat-ripple-element {
+    background-color: var(--default3) !important;
+}
+
+.mat-radio-outer-circle {
+    border-color: var(--default3) !important;
+}
+
+.mat-radio-inner-circle {
+    background-color: var(--default3) !important;
+}
+
+.mat-tab-body-content {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
 }
