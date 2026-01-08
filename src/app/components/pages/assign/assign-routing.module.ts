@@ -6,6 +6,7 @@ import { AssingMassiveComponent } from './assign/assing-massive/assing-massive.c
 
 const routes: Routes = [
   { path: '', component: AssignComponent },
+  { path: 'admin', component: AssignComponent },
   { path: 'individual', component: AssingIndividualComponent },
   { path: 'massive', component: AssingMassiveComponent },
 

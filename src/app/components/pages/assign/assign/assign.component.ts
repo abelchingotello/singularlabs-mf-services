@@ -13,6 +13,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { environment } from 'src/environments/environment'
 import { CookieService } from 'ngx-cookie-service';
+import { DialogCommissionAssingServiceComponent } from 'src/app/dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
 
 @Component({
   selector: 'uni-assign',
@@ -104,7 +105,7 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS', undefined),
       this.masterService.getItemsMasterTable('14'), // CategoriaService
       this.masterService.getItemsMasterTable('1') // EStados
     ]).subscribe({
@@ -175,7 +176,7 @@ export class AssignComponent implements OnInit {
 
   openDialogType(data: any): void {
     console.log("data: ", data)
-   /* const typeCommission = data.fixedcomission && data.pctcomission ? "MULTIPLE" : data.fixedcomission ? "FIJO" : data.pctcomission ? "PORCENTUAL" : null;
+    const typeCommission = data.fixedcomission && data.pctcomission ? "MULTIPLE" : data.fixedcomission ? "FIJO" : data.pctcomission ? "PORCENTUAL" : null;
     const dialogRef = this.dialog.open(DialogCommissionAssingServiceComponent, {
       width: '900px',
       data: {
@@ -198,7 +199,7 @@ export class AssignComponent implements OnInit {
       if (result === "200") {
         this.reload();
       }
-    });*/
+    });
   }
 
   //Redireccionar a asignación individual(1) o masiva(2)
