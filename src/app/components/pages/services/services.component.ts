@@ -69,8 +69,6 @@ export class ServicesComponent implements OnInit {
   public editOption: any;
   public selectedIds: any;
   public stateMaster: any;
-  public idClient: any;
-  public idProvider: any;
   public dataIdService: any;
   public optionId: any
   public categoriesService: any[] = [];
@@ -347,25 +345,6 @@ export class ServicesComponent implements OnInit {
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
     // this.functionDataCurrent(this.pageSize);
-  }
-
-  getIdPerson(idClient?: string, idProvider?: string, callback?: () => void) {
-    const id = idClient || idProvider
-    this.person.postIdPerson(id).subscribe({
-      next: (response) => {
-
-        // this.spinner.spinnerOnOff();
-        if (idClient) this.idClient = response.data[0];
-        if (idProvider) this.idProvider = response.data[0];
-      },
-      error: (error) => {
-        console.error(error);
-      },
-      complete: () => {
-        if (callback) callback();
-        console.log('complete');
-      },
-    })
   }
 
   /************************************* METODOS DE BOTONES ***********************************/
