@@ -1,0 +1,189 @@
+<ng-container [ngSwitch]="type" *ngIf="priority!=='important'; else important">
+    <!-- Tipos normales -->
+    <ng-container *ngSwitchCase="'info'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-blue"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-blue':''">
+            <mat-icon style="width: 24px; height: 24px;">check_circle</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'warning'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-yellow"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-yellow':''">
+            <mat-icon style="width: 24px; height: 24px;">info</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'alert'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">warning</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'processing-white'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-white"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-white':''">
+            <div class="spinner-border" style="width: 24px; height: 24px;" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'processing'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-processing"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-processing':''">
+            <div class="spinner-border" style="width: 24px; height: 24px;" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Iconos para Archivos-->
+    <ng-container *ngSwitchCase="'filedrive'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-green"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-green':''">
+            <mat-icon style="width: 24px; height: 24px;">insert_drive_file</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'externUrl'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-blue"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-blue':''">
+            <mat-icon style="width: 24px; height: 24px;">public</mat-icon>
+        </div>
+    </ng-container>
+
+    <!-- Iconos para estados -->
+    <ng-container *ngSwitchCase="'no leido'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-white"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-gray':''">
+            <mat-icon style="width: 24px; height: 24px;">drafts</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'success'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-green"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-green':''">
+            <mat-icon style="width: 24px; height: 24px;">check</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'error'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">error</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'remove'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">delete</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'blocked'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">block</mat-icon>
+        </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'HABILITADO'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-green"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-green':''">
+            <mat-icon style="width: 24px; height: 24px;">done_all</mat-icon>
+        </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'INHABILIDADO'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-yellow"
+            style=" width:48px; height:48px;" [ngClass]="bg? 'background-yellow':''">
+            <mat-icon style="width: 24px; height: 24px;">pause</mat-icon>
+        </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'BLOQUEADO'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">block</mat-icon>
+        </div>
+    </ng-container>
+
+    <!-- Iconos para estados booleanos -->
+    <ng-container *ngSwitchCase="undefined">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-black"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-gray':''">
+            <mat-icon style="width: 24px; height: 24px;">remove</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="false">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-red"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-red':''">
+            <mat-icon style="width: 24px; height: 24px;">cancel</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="true">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-green"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-green':''">
+            <mat-icon style="width: 24px; height: 24px;">check_circle</mat-icon>
+        </div>
+    </ng-container>
+
+
+    <!-- Estados de tiempo / flujo -->
+    <ng-container *ngSwitchCase="'pending'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-yellow"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-yellow':''">
+            <mat-icon style="width: 24px; height: 24px;">schedule</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'time'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-blue"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-blue':''">
+            <mat-icon style="width: 24px; height: 24px;">event</mat-icon>
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'completed'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-green"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-green':''">
+            <mat-icon style="width: 24px; height: 24px;">done_all</mat-icon>
+        </div>
+    </ng-container>
+
+    <!-- Conectividad / sincronización -->
+
+
+    <ng-container *ngSwitchCase="'sync'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-processing"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-processing':''">
+            <mat-icon style="width: 24px; height: 24px;">sync</mat-icon>
+        </div>
+    </ng-container>
+
+    <!-- Estados de usuario -->
+
+    <ng-container *ngSwitchCase="'users'">
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-blue"
+            style="width:48px; height:48px;" [ngClass]="bg? 'background-blue':''">
+            <mat-icon style="width: 24px; height: 24px;">supervisor_account</mat-icon>
+        </div>
+    </ng-container>
+
+    <!-- Tipo Default -->
+    <ng-container *ngSwitchDefault>
+        <div class="rounded d-inline-flex justify-content-center align-items-center icon-color-blue background-blue"
+            style="width:48px; height:48px;">
+            <mat-icon style="width: 24px; height: 24px;">question_mark</mat-icon>
+        </div>
+    </ng-container>
+</ng-container>
+<ng-template #important>
+    <div class="rounded d-inline-flex justify-content-center align-items-center icon-important"
+        style="width:48px; height:48px;">
+        <mat-icon style="width: 24px; height: 24px;"><span
+                class="material-symbols-sharp">priority_high</span></mat-icon>
+    </div>
+</ng-template>

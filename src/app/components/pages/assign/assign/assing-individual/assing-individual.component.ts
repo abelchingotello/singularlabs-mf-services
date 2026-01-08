@@ -280,7 +280,7 @@ export class AssingIndividualComponent implements OnInit {
   /****************************************** OTHER METHODS **********************************************/
   getRecaudador() {
     this.spinner.spinnerOnOff();
-    this.personService.getPerson('RECAUDADORA DE SERVICIOS').subscribe({
+    this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true).subscribe({
       next: (response) => {
         this.data = this.convertData(response.data)
       },

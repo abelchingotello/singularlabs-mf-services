@@ -16,6 +16,7 @@ export class ServicesService {
   public servicePayment = new BehaviorSubject<any[]>([]);
 
 
+
   private url = `${environment.URL_API_GATEWAY}`;
   //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
@@ -136,6 +137,7 @@ export class ServicesService {
   getIdServices(id: string): Observable<ResponseDTO<ServiceByIdInterface>> {
     return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`${this.url}/services/${id}`, null);
   }
+
   getIdServicePerson(id: string, type?: string): Observable<any> {
     let params = new HttpParams();
 
@@ -157,8 +159,16 @@ export class ServicesService {
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
 
-  updateService(data: any): Observable<any> {
+  updateService(data: any, id: any): Observable<any> {
+    return this.httpClient.patch(`${this.url}/services/${id}`, data);
+  }
+
+  updateStatusService(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/services/status`, data);
+  }
+
+  updateComissionService(data: any): Observable<any> {
+    return this.httpClient.patch(`${this.url}/services`, data);
   }
 
   updateServiceEntity(data: any): Observable<any> {

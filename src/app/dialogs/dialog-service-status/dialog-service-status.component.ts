@@ -86,7 +86,7 @@ export class DialogServiceStatusComponent implements OnInit {
     }
     console.log("UPDATE1:", data)
     // return
-    this.service.updateService(data).subscribe(
+    this.service.updateStatusService(data).subscribe(
       (data) => {
         console.log("respuesta del servicio", data)
         if (data?.statusCode !== 200) {
@@ -126,8 +126,6 @@ export class DialogServiceStatusComponent implements OnInit {
       idService: this.service_id.value,
       status: this.status.master_name
     }
-    console.log("UPDATE3:", data)
-    // return
     this.service.updateServiceClient(data).subscribe(
       (data) => {
         console.log("Respuesta del servicio", data)

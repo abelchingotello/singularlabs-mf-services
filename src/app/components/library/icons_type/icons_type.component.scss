@@ -1,0 +1,66 @@
+.icon-color-blue {
+    color: #1c8ffd;
+}
+
+.background-blue {
+    background-color: #bbe4fe;
+}
+
+.icon-color-green {
+    color: #00be36;
+}
+
+.background-green {
+    background-color: #7dff99;
+}
+
+.icon-color-white {
+    color: #ffffff;
+}
+
+.icon-color-black {
+    color: #000000;
+}
+
+.background-white {
+    background-color: #ffffffd0;
+}
+
+.background-gray {
+    background-color: #a3a3a3d0;
+}
+
+.icon-color-yellow {
+    color: #fdc34c;
+}
+
+.background-yellow {
+    background-color: #feefce;
+}
+
+.icon-color-red {
+    color: var(--danger);
+}
+
+.background-red {
+    background-color: #fddeda;
+}
+
+.icon-color-processing {
+    color: #007bff;
+}
+
+.background-processing {
+    background-color: #e0f0ff;
+}
+
+.not-important {
+    background-color: #fddeda3a;
+    border: 1px solid var(--danger) !important;
+
+}
+
+.icon-important {
+    color: #fddeda;
+    background-color: var(--orange);
+}
