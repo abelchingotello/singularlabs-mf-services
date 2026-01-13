@@ -15,6 +15,7 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
 
   public formCommissionClient!: FormGroup;
   public stateMaster: any;
+  public activedSpinnerSend : boolean = false;
 
   constructor(
     private form: FormBuilder,
@@ -192,14 +193,17 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
     }
 
     console.log('Data: ', data);
+    this.loadingChange(true);
 
     this.service.updateComissionService(data).subscribe((response) => {
       console.log('respuesta del servicio', response);
       if (response?.statusCode !== 200) {
         this.mytoastr.showError('Error al actualizar', '');
+        this.loadingChange(false);
         this.dialogRef.close('400');
         return;
       }
+      this.loadingChange(false);
       this.dialogRef.close('200');
       this.mytoastr.showSuccess('Actualización correcta', '');
     });
@@ -236,6 +240,10 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
 
   get service_comision_criterio() {
     return this.formCommissionClient.get('serviceComisionCriterio')
+  }
+  
+  loadingChange(loading: boolean){
+    this.activedSpinnerSend = loading;
   }
 }
 
