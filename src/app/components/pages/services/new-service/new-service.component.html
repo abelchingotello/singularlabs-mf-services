@@ -259,7 +259,7 @@
                                 </form>
                                 <div class="row">
                                     <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                                        <button class="btn btn-default3" (click)="registerPayment()">
+                                        <button class="btn button-tertiary" (click)="registerPayment()">
                                             <mat-icon>save</mat-icon>Agregar
                                         </button>
                                     </div>
@@ -278,14 +278,14 @@
         <mat-card class="custom-border-radius-1-25">
             <mat-card-content>
                 <div class="d-flex justify-content-between p-3">
-                    <button (click)="onPrevious()" class="btn btn-default2">
+                    <button (click)="onPrevious()" class="btn button-secondary">
                         <mat-icon>
                             {{ currentStep === 0 ? 'clear' : 'arrow_back' }}
                         </mat-icon>
                         {{ currentStep === 0 ? 'Cancelar' : 'Anterior' }}
                     </button>
                     <button (click)="currentStep === steps.length - 1 ? saveService() : onNext()"
-                        class="btn btn-default3">
+                        class="btn button-primary">
                         <mat-icon>
                             {{ currentStep === steps.length-1 ? 'check' : 'arrow_forward' }}
                         </mat-icon>

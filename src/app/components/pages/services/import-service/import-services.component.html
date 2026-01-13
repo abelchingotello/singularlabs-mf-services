@@ -3,11 +3,11 @@
     <uni-image-card title="Importación de servicios"
       externImage="https://static.vecteezy.com/system/resources/previews/010/186/154/non_2x/import-and-export-document-line-icon-illustration-vector.jpg"
       size="8%">
-      <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2"  *ngIf="valueImport=='create'">
+      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" *ngIf="valueImport=='create'">
         <mat-icon>download_file</mat-icon>
         <span class="custom-span-icon-responsive">Plantilla para Crear</span>
       </button>
-      <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2"  *ngIf="valueImport=='update'">
+      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" *ngIf="valueImport=='update'">
         <mat-icon>download_file</mat-icon>
         <span class="custom-span-icon-responsive">Plantilla para Actualizar</span>
       </button>
@@ -39,11 +39,11 @@
             </mat-form-field>
             <div class="row">
               <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                <button class="btn btn-default2" (click)="onCancel()">
+                <button class="btn button-secondary" (click)="onCancel()">
                   <mat-icon>clear</mat-icon>
                   Cancelar
                 </button>
-                <button class="btn btn-default3" (click)="confirmIdClient()"
+                <button class="btn button-primary" (click)="confirmIdClient()"
                   [disabled]="requiredIdClient==''|| disableCargar">
                   <mat-icon>upload_file</mat-icon>
                   Cargar desde Excel
@@ -82,12 +82,12 @@
 
             <div class="row">
               <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="padding: 0 0 16px 0;">
-                <button class="btn btn-default2" (click)="cancelExcelUpload()">
+                <button class="btn button-secondary" (click)="cancelExcelUpload()">
                   <mat-icon>clear</mat-icon>
                   Cancelar
                 </button>
 
-                <button class="btn btn-default3" [disabled]="!selectedFile || isProcessingExcel"
+                <button class="btn button-primary" [disabled]="!selectedFile || isProcessingExcel"
                   (click)="processExcelFile()">
                   <mat-icon *ngIf="!isProcessingExcel">play_arrow</mat-icon>
                   <mat-icon *ngIf="isProcessingExcel">hourglass_empty</mat-icon>
@@ -121,10 +121,10 @@
           </p>
           <div class="row">
             <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-              <button class="btn btn-default2" (click)="cancelSend()">
+              <button class="btn button-secondary" (click)="cancelSend()">
                 <mat-icon>clear</mat-icon>
                 Cancelar</button>
-              <button class="btn btn-default3" (click)="sendServices()">
+              <button class="btn button-primary" (click)="sendServices()">
                 <mat-icon>send</mat-icon>
                 Enviar
               </button>
