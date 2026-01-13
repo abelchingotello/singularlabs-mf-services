@@ -17692,12 +17692,20 @@ textarea[resize='horizontal'] {
 }
 
 .navbar-vertical .navbar-nav .nav-list-link.active {
-    background-color: #03c9d7 !important;
-    color: #fff !important;
+    background-color: var(--color-menu-itemSelected) !important;
+    color: var(--text-menu-itemSelected) !important;
 }
 
 .nav-list-link.active>.mat-list-item-content>.d-flex>span>.mat-icon {
-    color: #fff !important;
+    color: var(--text-menu-itemSelected) !important;
+}
+
+.nav-list-link.active>.mat-list-item-content>.d-flex>span>.nav-title {
+    color: var(--text-menu-itemSelected) !important;
+}
+
+.nav-list-link.active>.mat-list-item-content>.d-flex>span>mat-icon {
+    color: var(--text-menu-itemSelected) !important;
 }
 
 .navbar-vertical .navbar-nav .nav-link.active:before {
