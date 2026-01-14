@@ -57,10 +57,6 @@ export class UserService {
   getPersonId(id : string,): Observable<any>{
     return this.httpClient.get(`${this.url}/users/${id}`);
   }
-
-  postUser(data:any):Observable<any> {
-    return this.httpClient.post(`${this.url}/oauth`, data);
-  }
   
   updateUser(data:any,id: string):Observable<any> {
     return this.httpClient.patch(`${this.url}/users/${id}`,data);
