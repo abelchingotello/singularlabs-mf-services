@@ -17,14 +17,14 @@ export class ServicesService {
 
 
 
-  //private url = `${environment.URL_API_GATEWAY}`;
-  private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
+  private url = `${environment.URL_API_GATEWAY}`;
+  //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
   constructor(
     private httpClient: HttpClient
   ) { }
 
-  updateConfigService(id:any,data: any): Observable<any> {
+  updateConfigService(id: any, data: any): Observable<any> {
     return this.httpClient.post(`${this.url}/services`, data);
   }
 
