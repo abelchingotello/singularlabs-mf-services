@@ -1,0 +1,36 @@
+<div class="bg-dialog mb-3 p-3">
+  <h3 class="m-0 text-dialog" mat-dialog-title>Configuracion a {{Service}}</h3>
+</div>
+
+<form [formGroup]="formConfigEntity" class="pl-3">
+
+  <h3>Límite Máximo de Recaudación Diaria</h3>
+  <p>Establece el monto máximo permitido de recaudación diaria para el servicio.</p>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Por Dia</mat-label>
+    <input matInput type="number" placeholder="Monto por Día..." formControlName="amountDailyRestriccion">
+  </mat-form-field>
+  <h3>Límite Máximo por Transacción</h3>
+  <p>Configura el monto máximo que el servicio podrá procesar en una sola transacción.</p>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Por Transaccion</mat-label>
+    <input matInput type="number" placeholder="Monto por Transaccion..." formControlName="amountTransactionRestriccion">
+  </mat-form-field>
+
+  <div class="d-flex justify-content-end ">
+    <button mat-button (click)="onNoClick()" class="btn button-quaternary">
+      <mat-icon>clear</mat-icon>Cancelar
+    </button>
+    <button mat-raised-button class="btn button-tertiary" (click)="updateConfigRestriccion()">
+      <ng-container *ngIf="!activedSpinnerSend">
+        <mat-icon>update</mat-icon>
+        Actualizar
+      </ng-container>
+      <ng-container *ngIf="activedSpinnerSend">
+        <span class="spinner-border spinner-border-sm block" aria-hidden="true"></span>
+        Actualizando...
+      </ng-container>
+    </button>
+  </div>
+
+</form>

@@ -15,12 +15,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DialogServiceConfigComponent } from './dialogs/dialog-service-config/dialog-service-config.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DialogServiceStatusComponent,
-    DialogCommissionAssingServiceComponent
+    DialogCommissionAssingServiceComponent,
+    DialogServiceConfigComponent
   ],
   imports: [
     BrowserModule,

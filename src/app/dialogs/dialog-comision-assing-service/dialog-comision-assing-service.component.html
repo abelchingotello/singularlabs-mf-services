@@ -1,10 +1,10 @@
-<div class="bg-dialog  mb-3 p-3">
-    <h3 class="m-0 text-dialog">ACTUALIZACION DE COMISION PARA RECAUDADORES</h3>
+<div class="bg-dialog p-3">
+    <h3 class="m-0 text-dialog">ACTUALIZACION DE ASIGNACION {{data.serviceName }} - {{data.clientName}}</h3>
 </div>
 
-<form [formGroup]="formCommissionClient">
+<form [formGroup]="formCommissionClient" class="p-3">
 
-
+    <h3>Datos Generales</h3>
     <mat-form-field appearance="outline" class="col-md-3 ">
         <mat-label>Servicio</mat-label>
         <input formControlName="serviceName" type="text" matInput>
@@ -27,6 +27,8 @@
             </mat-option>
         </mat-select>
     </mat-form-field>
+
+    <h3>Comision</h3>
 
     <mat-form-field appearance="outline" class="col-md-3 ">
         <mat-label>Tipo de Comision</mat-label>
@@ -52,6 +54,14 @@
     <mat-form-field *ngIf="service_comision_type.value ===  'MULTIPLE'" appearance="outline" class="col-md-3 ">
         <mat-label>Criterio</mat-label>
         <input formControlName="serviceComisionCriterio" type="number" matInput min="0" step="0.001">
+    </mat-form-field>
+    <h3>Límite Máximo por Transacción (Opcional) </h3>
+    <p>Configura el monto máximo que la entidad podrá procesar en una sola transacción para el Servicio
+        {{data.serviceName}}.</p>
+    <mat-form-field class="col-lg-6" appearance="outline">
+        <mat-label>Por Transaccion</mat-label>
+        <input matInput type="number" placeholder="Monto por Transaccion..."
+            formControlName="serviceAmountTransactionRestriccion">
     </mat-form-field>
 </form>
 

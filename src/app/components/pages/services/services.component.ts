@@ -12,6 +12,7 @@ import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
+import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
 
 @Component({
   selector: 'uni-services',
@@ -29,7 +30,6 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
-    { 'name': 'Cliente', 'attribute': 'nameClient' },
     {
       'name': 'Estado', 'attribute': 'status', 'config': {
         'styleClass': true
@@ -47,6 +47,13 @@ export class ServicesComponent implements OnInit {
             toolTip: 'Editar Servicio',
             icon: 'edit',
             value: 'edit'
+          },
+          {
+            hide: false,
+            bgClass: 'gray',
+            toolTip: 'Configurar Servicio',
+            icon: 'settings_applications',
+            value: 'config_service'
           }
         ]
       }
@@ -96,7 +103,8 @@ export class ServicesComponent implements OnInit {
     private person: PersonService,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
-    private personService: PersonService
+    private personService: PersonService,
+    public dialog: MatDialog
   ) {
     this.pagUtils = new PaginationUtils();
   }
@@ -294,6 +302,35 @@ export class ServicesComponent implements OnInit {
       console.log("element: ", element)
       this.editElement(element.id)
     }
+    if (value == "config_service") {
+      console.log("element: ", element)
+      this.openDialogConfigService(element)
+    }
+  }
+
+  openDialogConfigService(element) {
+
+    const dialogRef = this.dialog.open(DialogServiceConfigComponent, {
+
+      width: '600px',
+      data: {
+        serviceName: element.name,
+        serviceId: element.id,
+        serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
+        serviceAmountDailyRestriccion: element.amountDailyRestriccion,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(
+      response => {
+        if (response) {
+          console.log('result en afterClosed of openDialogMinBalance', response)
+          this.reload();
+        }
+      });
+
+
+
   }
 
   editElement(id: any) {
