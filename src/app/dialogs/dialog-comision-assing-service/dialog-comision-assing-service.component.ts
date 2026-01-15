@@ -43,6 +43,8 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
     this.service_commission_prc_value.setValue(this.data.serviceComisionPrc)
     this.service_comision_criterio.setValue(this.data.serviceComisionCriterio)
 
+    this.service_amount_transaction_restriccion.setValue(this.data.serviceAmountTransactionRestriccion)
+
   }
 
   initializaForms() {
@@ -54,6 +56,7 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
       serviceTypeComission: [{ value: '', disabled: true }],
       serviceComisionCriterio: [''],
 
+      serviceAmountTransactionRestriccion: [''],
       servicetype: [{ value: '', disabled: true }],
       serviceStatus: ['', Validators.required],
       serviceName: [{ value: '', disabled: true }],
@@ -106,7 +109,8 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
       this.service_commission_fixed_value.value == this.data.serviceComisionFixed &&
       this.service_commission_prc_value.value == this.data.serviceComisionPrc &&
       this.service_comision_criterio.value == this.data.serviceComisionCriterio &&
-      this.service_status.value == this.data.serviceStatus
+      this.service_status.value == this.data.serviceStatus &&
+      this.service_amount_transaction_restriccion.value == this.data.serviceAmountTransactionRestriccion
     ) {
       this.mytoastr.showWarning('', 'Realice cambios');
       return;
@@ -135,6 +139,12 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
       ownTypeComissionService: currentType
     };
 
+    if (this.service_amount_transaction_restriccion.value !== this.data.serviceAmountTransactionRestriccion) {
+      data.updates = {
+        ...data.updates,
+        serviceAmountTransactionRestriccion: this.service_amount_transaction_restriccion.value
+      };
+    }
     if (this.service_status.value !== this.data.serviceStatus) {
       data.updates = {
         ...data.updates,
@@ -241,7 +251,10 @@ export class DialogCommissionAssingServiceComponent implements OnInit {
   get service_comision_criterio() {
     return this.formCommissionClient.get('serviceComisionCriterio')
   }
-  loadingChange(loading: boolean){
+  get service_amount_transaction_restriccion() {
+    return this.formCommissionClient.get('serviceAmountTransactionRestriccion')
+  }
+  loadingChange(loading: boolean) {
     this.activedSpinnerSend = loading;
   }
 }
@@ -258,5 +271,6 @@ export interface DialogData {
   clientName: String,
   clientId: String,
   status: String,
-  serviceComisionCriterio: Number
+  serviceComisionCriterio: Number,
+  serviceAmountTransactionRestriccion: Number
 }

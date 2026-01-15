@@ -191,7 +191,8 @@ export class AssignComponent implements OnInit {
         clientId: data.idClient,
         status: this.masterStatus,
         serviceIdProv: data.id_serviceProv,
-        serviceComisionCriterio: data.ownComissionCriterion
+        serviceComisionCriterio: data.ownComissionCriterion,
+        serviceAmountTransactionRestriccion: data.amountTransactionRestriccion
       }
     });
 
