@@ -66,9 +66,18 @@
 </form>
 
 <div class="d-flex justify-content-end m-2">
-
+    <button (click)="onNoClick()" class="btn button-secondary" >
+        <mat-icon>clear</mat-icon>Cancelar
+    </button> 
     <button mat-button class="btn button-tertiary" cdkFocusInitial (click)="updateServic()">
-        <mat-icon>save</mat-icon>
-        Guardar
+        <ng-container *ngIf="!activedSpinnerSend">
+            <mat-icon>update</mat-icon>
+            Actualizar
+        </ng-container>
+        <ng-container *ngIf="activedSpinnerSend">
+        <span class="spinner-border spinner-border-sm block"
+            aria-hidden="true"></span>
+        Actualizando...
+        </ng-container>
     </button>
 </div>
