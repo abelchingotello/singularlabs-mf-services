@@ -5,20 +5,21 @@
       <div class="row">
         <div class="col  d-flex justify-content-end align-items-end ">
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2 " (click)="addService()">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2 " (click)="addService()">
             <mat-icon>add</mat-icon>
             <span class="custom-span-icon-responsive">Añadir</span>
           </button>
+          <!--
+            <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
+              <mat-icon>upload_file</mat-icon>
+              <span class="custom-span-icon-responsive">Importar-Crear</span>
+            </button>
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4 me-2" (click)="createService()">
-            <mat-icon>upload_file</mat-icon>
-            <span class="custom-span-icon-responsive">Importar-Crear</span>
-          </button>
-
-          <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
-            <mat-icon>upload_file</mat-icon>
-            <span class="custom-span-icon-responsive">Importar-Actualizar</span>
-          </button>
+            <button type="button" class="mb-2 mb-md-0 custom-button btn btn-default4" (click)="updateService()">
+              <mat-icon>upload_file</mat-icon>
+              <span class="custom-span-icon-responsive">Importar-Actualizar</span>
+            </button>
+          -->
         </div>
       </div>
     </uni-image-card>
@@ -65,10 +66,10 @@
         </form>
         <div class="row">
           <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-            <button type="button" class="btn-default2 btn" (click)="clearFormAndData()">
+            <button type="button" class="button-secondary btn" (click)="clearFormAndData()">
               <mat-icon>filter_alt_off</mat-icon>Limpiar
             </button>
-            <button type="button" class="btn-default3 btn" (click)="searchData()">
+            <button type="button" class="button-primary btn" (click)="searchData()">
               <mat-icon>search</mat-icon>Buscar
             </button>
           </div>
