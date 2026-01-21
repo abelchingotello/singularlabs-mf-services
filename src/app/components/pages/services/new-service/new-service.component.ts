@@ -8,6 +8,8 @@ import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { PersonService } from 'src/app/services/person.service';
+
 
 @Component({
     selector: 'uni-new-service',
@@ -107,7 +109,9 @@ export class NewServiceComponent implements OnInit {
         private service: ServicesService,
         private masterService: MasterService,
         private spinner: SpinnerService,
-        private authService: AuthService
+        private authService: AuthService,
+        private personService: PersonService
+        
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -149,7 +153,7 @@ export class NewServiceComponent implements OnInit {
         const [personData, depart, typeService, typeClient, typeStatus, typeComission] =
             await firstValueFrom(
                 forkJoin([
-                    this.service.getPerson('PROVEEDOR', null, true),
+                    this.personService.getPerson('PROVEEDOR', null, true),
                     this.masterService.getItemsMasterTable('12'),
                     this.masterService.getItemsMasterTable('14'),
                     this.masterService.getItemsMasterTable('11'),
