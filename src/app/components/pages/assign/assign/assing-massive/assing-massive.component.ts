@@ -51,7 +51,7 @@ export class AssingMassiveComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true)
     ]).subscribe({
       next: (response) => {
         const [person] = response;
