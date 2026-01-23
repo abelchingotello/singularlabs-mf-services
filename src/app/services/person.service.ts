@@ -28,8 +28,8 @@ export class PersonService {
 
     if (nameAlias) params = params.set('nameAlias', nameAlias);
 
-    if (activeOnly) params = params.set('activeOnly', activeOnly);
-
+    if (activeOnly) params = params.set('activeOnly', JSON.stringify(activeOnly));
+    
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
 
