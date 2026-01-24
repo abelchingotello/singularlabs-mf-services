@@ -79,15 +79,6 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services/${id}`,{params:params});
   }
 
-  getPerson(typeEntity?:string,nameAlias?:string):Observable<any> {
-    let params = new HttpParams();
-    if(typeEntity) params = params.set('typeEntity', typeEntity);
-
-    if(nameAlias) params = params.set('nameAlias', nameAlias);
-
-    return this.httpClient.get(`${this.url}/person/entity`, {params:params});
-  }
-
   updateService(data:any):Observable<any>{
     return this.httpClient.patch(`${this.url}/services/status`,data);
   }

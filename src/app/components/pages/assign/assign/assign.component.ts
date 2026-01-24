@@ -119,7 +119,7 @@ export class AssignComponent implements OnInit {
     forkJoin([
       this.serviceServ.getServices(),
       this.masterService.getItemsMasterTable('15'), // tipoComission
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS'),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
     ]).subscribe({
       next: (response) => {
         const [service,typeComission,person] = response;
@@ -142,7 +142,7 @@ export class AssignComponent implements OnInit {
 
   getRecaudador(){
     this.spinner.spinnerOnOff();
-    this.personService.getPerson('RECAUDADORA DE SERVICIOS').subscribe({
+    this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true).subscribe({
       next:(response)=>{
         console.log("response",response);
         this.data = this.convertData(response.data)

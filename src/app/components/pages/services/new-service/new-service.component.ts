@@ -8,6 +8,8 @@ import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { PersonService } from 'src/app/services/person.service';
+
 
 @Component({
     selector: 'uni-new-service',
@@ -93,7 +95,8 @@ export class NewServiceComponent implements OnInit {
         private service : ServicesService,
         private masterService: MasterService,
         private spinner : SpinnerService,
-        private authService : AuthService
+        private authService : AuthService,
+        private personService : PersonService
     ) { }
 
     ngOnInit(): void {
@@ -137,7 +140,7 @@ export class NewServiceComponent implements OnInit {
 
     dataProvRecaud(){
         
-        this.service.getPerson('RECAUDADORA DE SERVICIOS',null).subscribe({
+        this.personService.getPerson('RECAUDADORA DE SERVICIOS',null,true).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typeProClient = data.data
@@ -147,7 +150,7 @@ export class NewServiceComponent implements OnInit {
                 console.error('ERROR',error)
             }
         })
-        this.service.getPerson('PROVEEDOR',null).subscribe({
+        this.personService.getPerson('PROVEEDOR',null,true).subscribe({
             next: (data) => {
                 // this.spinner.spinnerOnOff();
                 this.typePro = data.data;
