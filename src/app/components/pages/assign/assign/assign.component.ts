@@ -12,38 +12,41 @@ import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { DialogCommissionAssingServiceComponent } from 'src/app/dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
-import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'uni-assign',
   templateUrl: './assign.component.html',
-  styleUrls: ['./assign.component.scss']
+  styleUrls: ['./assign.component.scss'],
 })
 export class AssignComponent implements OnInit {
-
   public columns: any[] = [
-    { 'name': 'Id del servicio', 'attribute': 'id' },
-    { 'name': 'Nombre', 'attribute': 'name' },
+    { name: 'Cliente', attribute: 'nameClient' },
+    { name: 'Id del servicio', attribute: 'id' },
+    { name: 'Nombre', attribute: 'name' },
     //{ 'name': 'Descripción', 'attribute': 'description' },
-    { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
-    { 'name': 'Cliente', 'attribute': 'nameClient' },
-    { 'name': 'Comision Fija', 'attribute': 'ownFixedComission' },
-    { 'name': 'Comision Porcentual', 'attribute': 'ownPctComission' },
+    { name: 'Tipo de servicio', attribute: 'serviceTypeName' },
+    { name: 'Comision Fija', attribute: 'ownFixedComission' },
+    { name: 'Comision Porcentual', attribute: 'ownPctComission' },
     {
-      'name': 'Estado', 'attribute': 'status', 'config': {
-        'styleClass': true
-      }
+      name: 'Estado',
+      attribute: 'status',
+      config: {
+        styleClass: true,
+      },
     },
     {
-      'name': 'Fecha', 'attribute': 'date', 'config': {
-        'formatDate': { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
-      }
+      name: 'Fecha',
+      attribute: 'date',
+      config: {
+        formatDate: { format: 'dd/MM/yyyy hh:mm:ss a', locale: 'en-US' },
+      },
     },
     {
       name: 'Acciones',
       attribute: '',
-      hide: this.router.url !== "/assign/admin",
+      hide: this.router.url !== '/assign/admin',
       config: {
         type: 'buttonicons',
         actions: [
@@ -52,10 +55,10 @@ export class AssignComponent implements OnInit {
             bgClass: 'yellow',
             toolTip: 'Editar Comision',
             icon: 'edit',
-            value: 'edit'
-          }
-        ]
-      }
+            value: 'edit',
+          },
+        ],
+      },
     },
     //{ 'name': 'Proveedor', 'attribute': 'nameProvider' },
   ];
@@ -94,31 +97,39 @@ export class AssignComponent implements OnInit {
     this.functionDataCurrent(this.pageSize);
   }
 
+  onUppercaseInput(event: Event, controlName: string): void {
+    const inputElement = event.target as HTMLInputElement;
+    const uppercasedValue = inputElement.value.toUpperCase();
+    this.assignServiceForm
+      .get(controlName)
+      ?.setValue(uppercasedValue, { emitEvent: false });
+  }
+
   formService() {
     this.assignServiceForm = this.fb.group({
       service_name: [''],
       service_type: [''],
       client: [''],
-    })
+    });
   }
 
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS', undefined, true),
       this.masterService.getItemsMasterTable('14'), // CategoriaService
-      this.masterService.getItemsMasterTable('1') // EStados
+      this.masterService.getItemsMasterTable('1'), // EStados
     ]).subscribe({
       next: (response) => {
         const [person, categoryService, status] = response;
         this.persons = person.data;
         this.categoriesService = categoryService;
         this.masterStatus = status;
-        console.log("estadooooooos: ", this.masterStatus)
+        console.log('estadooooooos: ', this.masterStatus);
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
-        console.error("Error loading master table data:", error);
+        console.error('Error loading master table data:', error);
       },
       complete: () => {
         this.spinner.spinnerOnOff();
@@ -133,50 +144,70 @@ export class AssignComponent implements OnInit {
 
     this.spinner.spinnerOnOff();
     // return
-    this.services.getServices(input, null, inputType, null, this.count, idClient, pageSize, this.pageKey, true).subscribe({
-      next: (data) => {
-        if (data.statusCode == 201) {
-          this.mytoastr.showWarning(data.messages, '')
-          return
-        }
+    this.services
+      .getServices(
+        input,
+        null,
+        inputType,
+        null,
+        this.count,
+        idClient,
+        pageSize,
+        this.pageKey,
+        true,
+      )
+      .subscribe({
+        next: (data) => {
+          if (data.statusCode == 201) {
+            this.mytoastr.showWarning(data.messages, '');
+            return;
+          }
 
-        console.log("data.data.nextPageKey ver Items:");
-        //console.log(data.data.nextPageKey);
-        this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
-        this.dataService = this.dataFilter.map(item => ({
-          ...item,
-          serviceTypeName: item.serviceType?.name || ''
-        }));
-        //this.pageKey = data.data.nextPageKey ?? null;
-        //this.count = data.data.Count ?? this.count;
+          console.log('data.data.nextPageKey ver Items:');
+          //console.log(data.data.nextPageKey);
+          this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
+          this.dataService = this.dataFilter.map((item) => ({
+            ...item,
+            serviceTypeName: item.serviceType?.name || '',
+          }));
+          //this.pageKey = data.data.nextPageKey ?? null;
+          //this.count = data.data.Count ?? this.count;
 
-        //console.log("data.data.nextPageKey:");
-        //console.log(data.data.nextPageKey);
-        //console.log("this.count:");
-        //console.log(this.count);
-        //console.log("data.data.Count:");
-        // console.log(data.data.Count);
-        if (this.dataService.length == this.count) {//se recuperaron todos los datos
-          this.pageKey = null;
-        } else {
-          this.pageKey = data.data.nextPageKey ?? null;
-        }
-        this.count = data.data.Count ?? this.count;
-      },
-      error: (err) => {
-        console.log(err);
-        this.spinner.spinnerOnOff();
-      },
-      complete: () => {
-        this.spinner.spinnerOnOff();
-        //this.close = true
-      }
-    })
+          //console.log("data.data.nextPageKey:");
+          //console.log(data.data.nextPageKey);
+          //console.log("this.count:");
+          //console.log(this.count);
+          //console.log("data.data.Count:");
+          // console.log(data.data.Count);
+          if (this.dataService.length == this.count) {
+            //se recuperaron todos los datos
+            this.pageKey = null;
+          } else {
+            this.pageKey = data.data.nextPageKey ?? null;
+          }
+          this.count = data.data.Count ?? this.count;
+        },
+        error: (err) => {
+          console.log(err);
+          this.spinner.spinnerOnOff();
+        },
+        complete: () => {
+          this.spinner.spinnerOnOff();
+          //this.close = true
+        },
+      });
   }
 
   openDialogType(data: any): void {
-    console.log("data: ", data)
-    const typeCommission = data.fixedcomission && data.pctcomission ? "MULTIPLE" : data.fixedcomission ? "FIJO" : data.pctcomission ? "PORCENTUAL" : null;
+    console.log('data: ', data);
+    const typeCommission =
+      data.fixedcomission && data.pctcomission
+        ? 'MULTIPLE'
+        : data.fixedcomission
+          ? 'FIJO'
+          : data.pctcomission
+            ? 'PORCENTUAL'
+            : null;
     const dialogRef = this.dialog.open(DialogCommissionAssingServiceComponent, {
       width: '900px',
       data: {
@@ -192,12 +223,12 @@ export class AssignComponent implements OnInit {
         status: this.masterStatus,
         serviceIdProv: data.id_serviceProv,
         serviceComisionCriterio: data.ownComissionCriterion,
-        serviceAmountTransactionRestriccion: data.amountTransactionRestriccion
-      }
+        serviceAmountTransactionRestriccion: data.amountTransactionRestriccion,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === "200") {
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === '200') {
         this.reload();
       }
     });
@@ -212,11 +243,14 @@ export class AssignComponent implements OnInit {
     }
   }
 
-
   searchData() {
-    if (!this.service_name.value && !this.service_type.value && !this.client.value) {
-      this.mytoastr.showWarning('Ingrese un valor válido', '')
-      return
+    if (
+      !this.service_name.value &&
+      !this.service_type.value &&
+      !this.client.value
+    ) {
+      this.mytoastr.showWarning('Ingrese un valor válido', '');
+      return;
     }
     this.clearData();
     this.dataInitial(this.pageSize);
@@ -239,7 +273,12 @@ export class AssignComponent implements OnInit {
 
   onPageChange(event: PageEvent) {
     this.pageSize = this.pagUtils.updatePageSize(event.pageSize, this.pageSize);
-    this.pagUtils.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
+    this.pagUtils.onPageChange(
+      event,
+      this.pageSize,
+      this.functionDataCurrent.bind(this),
+      this.pageKey,
+    );
   }
 
   /************************************* METODOS DE BOTONES ***********************************/
@@ -250,11 +289,11 @@ export class AssignComponent implements OnInit {
   }
 
   clickButton(event) {
-    console.log("event", event)
-    const { value, element } = event
-    if (value == "edit") {
-      console.log("element: ", element)
-      this.openDialogType(element)
+    console.log('event', event);
+    const { value, element } = event;
+    if (value == 'edit') {
+      console.log('element: ', element);
+      this.openDialogType(element);
     }
   }
 
@@ -270,40 +309,41 @@ export class AssignComponent implements OnInit {
     };
 
     // Eliminar propiedades undefined
-    Object.keys(exportFilters).forEach(key => {
+    Object.keys(exportFilters).forEach((key) => {
       if (exportFilters[key] === undefined) {
         delete exportFilters[key];
       }
     });
     const inbx = 'as';
     const token = localStorage.getItem('fcmToken');
-    this.services.exportServices(fileType, exportFilters, inbx, token).subscribe({
-      next: (response) => {
-        this.spinner.spinnerOnOff();
-        if (response.statusCode === 200) {
-          this.mytoastr.showWarning('', 'Procesando Archivo...')
-        } else {
-          this.mytoastr.showError('', 'Error al enviar la solicitud')
-        }
-      },
-      error: (error) => {
-        this.spinner.spinnerOnOff();
-        console.error('Error durante la exportación:', error);
-        this.mytoastr.showError('Error durante la exportación', '');
-      }
-    });
+    this.services
+      .exportServices(fileType, exportFilters, inbx, token)
+      .subscribe({
+        next: (response) => {
+          this.spinner.spinnerOnOff();
+          if (response.statusCode === 200) {
+            this.mytoastr.showWarning('', 'Procesando Archivo...');
+          } else {
+            this.mytoastr.showError('', 'Error al enviar la solicitud');
+          }
+        },
+        error: (error) => {
+          this.spinner.spinnerOnOff();
+          console.error('Error durante la exportación:', error);
+          this.mytoastr.showError('Error durante la exportación', '');
+        },
+      });
   }
 
   get service_name() {
-    return this.assignServiceForm.get('service_name')
+    return this.assignServiceForm.get('service_name');
   }
 
   get service_type() {
-    return this.assignServiceForm.get('service_type')
+    return this.assignServiceForm.get('service_type');
   }
 
   get client() {
-    return this.assignServiceForm.get('client')
+    return this.assignServiceForm.get('client');
   }
-
 }
