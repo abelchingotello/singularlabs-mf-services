@@ -1,17 +1,26 @@
 <div class="content bg-gray-3">
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
-    <uni-image-card title="Asignación de servicios"
+    <uni-image-card
+      title="Asignación de servicios"
       externImage="https://img.freepik.com/vector-gratis/red-social-servicio-citas-online-chat-comunicacion-internet-personaje-dibujos-animados-nina-mirando-perfiles-foto-ilustracion-concepto-redes-sociales_335657-2041.jpg?semt=ais_hybrid&w=740"
-      size="8%">
-
+      size="8%"
+    >
       <div class="row">
         <div class="col lg-6 d-flex justify-content-end align-items-end mr-3">
-          <button type="button" class=" mb-2 mb-md-0 custom-button btn me-2 button-tertiary" (click)="redirectAsign(1)">
+          <button
+            type="button"
+            class="mb-2 mb-md-0 custom-button btn me-2 button-tertiary"
+            (click)="redirectAsign(1)"
+          >
             <mat-icon>add</mat-icon>
             <span class="custom-span-icon-responsive">Añadir</span>
           </button>
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary" (click)="redirectAsign(2)">
+          <button
+            type="button"
+            class="mb-2 mb-md-0 custom-button btn button-tertiary"
+            (click)="redirectAsign(2)"
+          >
             <mat-icon>upload_file</mat-icon>
             <span class="custom-span-icon-responsive">Importar</span>
           </button>
@@ -21,13 +30,16 @@
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+        <h2 class="mt-4 ml-3 text-default">Datos de Búsqueda</h2>
         <form [formGroup]="assignServiceForm" class="d-flex flex-wrap">
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Cliente</mat-label>
             <mat-select formControlName="client">
               <mat-option [value]="">NINGUNO</mat-option>
-              <mat-option *ngFor="let entity of persons" [value]="entity.servicePerson.idPerson">
+              <mat-option
+                *ngFor="let entity of persons"
+                [value]="entity.servicePerson.idPerson"
+              >
                 {{ entity.servicePerson.nameAlias }}
               </mat-option>
             </mat-select>
@@ -36,26 +48,42 @@
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Tipo de Servicio</mat-label>
             <mat-select formControlName="service_type">
-
               <mat-option [value]="">NINGUNO</mat-option>
-              <mat-option *ngFor="let category of categoriesService"
-                [value]="category.master_idTypeService">{{category.master_name}}</mat-option>
+              <mat-option
+                *ngFor="let category of categoriesService"
+                [value]="category.master_idTypeService"
+                >{{ category.master_name }}</mat-option
+              >
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Nombre de Servicio</mat-label>
-            <input formControlName="service_name" matInput type="text" />
+            <input
+              formControlName="service_name"
+              matInput
+              type="text"
+              (input)="onUppercaseInput($event, 'service_name')"
+            />
           </mat-form-field>
-
         </form>
         <div class="row">
-          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-            <button type="button" class=" btn button-secondary" (click)="clearFormAndData()">
+          <div
+            class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3"
+          >
+            <button
+              type="button"
+              class="btn button-secondary"
+              (click)="clearFormAndData()"
+            >
               <mat-icon>filter_alt_off</mat-icon>
               Limpiar
             </button>
-            <button type="button" class="btn button-primary " (click)="searchData()">
+            <button
+              type="button"
+              class="btn button-primary"
+              (click)="searchData()"
+            >
               <mat-icon>search</mat-icon>
               Buscar
             </button>
@@ -67,13 +95,19 @@
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
         <div>
-          <uni-dynamic-table [columns]="columns" [data]="dataService" [pageKey]="pageKey"
-            [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
-            [customExportFunction]="exportDataViaAPI.bind(this)" (clickButtonEvent)="clickButton($event)">
+          <uni-dynamic-table
+            [columns]="columns"
+            [data]="dataService"
+            [pageKey]="pageKey"
+            [refreshFunction]="reload.bind(this)"
+            (pageChange)="onPageChange($event)"
+            [lengthTable]="count"
+            [customExportFunction]="exportDataViaAPI.bind(this)"
+            (clickButtonEvent)="clickButton($event)"
+          >
           </uni-dynamic-table>
         </div>
       </mat-card-content>
     </mat-card>
-
   </div>
 </div>
