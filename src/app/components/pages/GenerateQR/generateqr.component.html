@@ -1,0 +1,350 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Generador QR"
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <div class="row">
+        <div class="col  d-flex justify-content-end align-items-end ">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2"
+            (click)="openGenerateQrDialog()">
+            <mat-icon>qr_code</mat-icon>
+            Generar QR
+          </button>
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary"
+            (click)="openGenerateQrMassiveDialog()">
+            <mat-icon>qr_code_2</mat-icon>
+            Generar QR masivo
+          </button>
+        </div>
+      </div>
+    </uni-image-card>
+
+
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
+        <form [formGroup]="serviceForm" class="d-flex flex-wrap ">
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="start_date" />
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="end_date" />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-error *ngIf="serviceForm.hasError('invalidDateRange') && (serviceForm.get('start_date').touched || serviceForm.get('end_date').touched)">
+              Fecha inicio debe ser menor o igual a fecha fin
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado pago</mat-label>
+            <mat-select formControlName="estado_pago">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let option of estadoPagoOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado anulado</mat-label>
+            <mat-select formControlName="estado_anulado">
+              <mat-option [value]="">NINGUNO</mat-option>
+              <mat-option *ngFor="let option of estadoAnuladoOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Suministro</mat-label>
+            <input matInput formControlName="suministro" inputmode="numeric" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Servicio</mat-label>
+            <mat-select formControlName="empresa" (selectionChange)="onFilterServiceChange($event)">
+              <mat-option disabled class="search-option">
+                <input matInput placeholder="Buscar servicio..." [(ngModel)]="serviceFilter"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="filterServices()"
+                  (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()" />
+              </mat-option>
+
+              <mat-option disabled>
+                <input matInput placeholder="Servicio seleccionado..." [value]="filterServiceName" />
+              </mat-option>
+
+              <mat-option *ngFor="let service of filteredServices" [value]="service.name">
+                {{ service.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Job ID</mat-label>
+            <input matInput formControlName="jobId" />
+          </mat-form-field>
+
+        </form>
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="margin-top: 0px;">
+
+            <button title="Limpiar" type="button" class="btn button-secondary" (click)="clearFormAndData()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn button-primary" (click)="searchData()">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <div>
+          <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr" [pageKey]="pageKey"
+            [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
+            [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="false" (clickButtonEvent)="clickButton($event)">
+
+          </uni-dynamic-table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-template #generateQrDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Generar QR</div>
+          <div class="qr-dialog-subtitle">Complete los campos para generar un QR</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <form [formGroup]="qrForm" class="qr-form">
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Servicio</mat-label>
+              <mat-select formControlName="idService" (selectionChange)="onQrServiceChange($event)">
+                <mat-option disabled class="search-option">
+                  <input matInput placeholder="Buscar servicio..." [(ngModel)]="qrServiceFilter"
+                    [ngModelOptions]="{standalone: true}" (ngModelChange)="filterQrServices()"
+                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                    (keydown.enter)="$event.stopPropagation()" />
+                </mat-option>
+
+                <mat-option disabled>
+                  <input matInput placeholder="Servicio seleccionado..." [value]="qrServiceName" />
+                </mat-option>
+
+                <mat-option *ngFor="let service of qrFilteredServices" [value]="service.id">
+                  {{ service.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Suministro</mat-label>
+              <input matInput formControlName="suministro" inputmode="numeric" maxlength="6"
+                (input)="onNumericInput($event, 6)" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Titular del servicio</mat-label>
+              <input matInput formControlName="titular" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Monto</mat-label>
+              <input matInput formControlName="amount" inputmode="numeric" placeholder="500.00"
+                (input)="onAmountInput($event)" (blur)="onAmountBlur()" />
+              <mat-error *ngIf="qrForm.get('amount').hasError('required')">
+                Monto requerido
+              </mat-error>
+              <mat-error
+                *ngIf="qrForm.get('amount').hasError('pattern') || qrForm.get('amount').hasError('invalidAmount')">
+                Monto inválido
+              </mat-error>
+              <mat-error *ngIf="qrForm.get('amount').hasError('maxAmount')">
+                Monto máximo 500.00
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>N de recibo</mat-label>
+              <input matInput formControlName="receipt_number" inputmode="numeric"
+                (input)="onNumericInput($event, 20)" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Fecha vencimiento</mat-label>
+              <input matInput [matDatepicker]="duePicker" [min]="minDate" formControlName="due_date_date" />
+              <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+              <mat-datepicker #duePicker></mat-datepicker>
+              <mat-error *ngIf="qrForm.get('due_date_date').hasError('required')">
+                Fecha requerida
+              </mat-error>
+              <mat-error *ngIf="qrForm.get('due_date').hasError('notFuture')">
+                Debe ser mayor a la fecha actual
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Hora</mat-label>
+              <input matInput type="time" formControlName="due_date_time" />
+              <mat-error *ngIf="qrForm.get('due_date_time').hasError('required')">
+                Hora requerida
+              </mat-error>
+            </mat-form-field>
+          </form>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Cancelar</button>
+            <button mat-raised-button color="primary" [disabled]="qrForm.invalid || isGeneratingQr"
+              (click)="generateQr()">Generar</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #generateQrResultDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">{{ qrDialogMode === 'view' ? 'Detalle QR' : 'QR generado' }}</div>
+          <div class="qr-dialog-subtitle">
+            {{ qrDialogMode === 'view' ? 'Vista previa del QR' : 'Revisa los datos y descarga la imagen' }}
+          </div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <div class="qr-result qr-result-center">
+            <div class="qr-title">{{ qrDetailTitle }}</div>
+            <div class="qr-amount">{{ qrDisplayAmount }}</div>
+            <div class="qr-meta">
+              <div class="qr-meta-item">Vence: {{ qrExpiredAtDisplay }}</div>
+              <div class="qr-meta-item">
+                Estado: <span class="status-pill" [ngClass]="qrEstadoPagoLabel !== '-' ? qrEstadoPagoLabel : null">
+                  {{ qrEstadoPagoLabel }}
+                </span>
+              </div>
+            </div>
+            <div class="qr-result-image" *ngIf="qrImageSrc">
+              <img [src]="qrImageSrc" alt="QR" />
+            </div>
+          </div>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close (click)="backToForm()">
+              {{ qrDialogMode === 'view' ? 'Cerrar' : 'Regresar' }}
+            </button>
+            <button mat-raised-button color="primary" (click)="downloadQrImage()">Descargar PNG</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #generateQrMassiveDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Generar QR masivo</div>
+          <div class="qr-dialog-subtitle">Selecciona archivo y workers</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <form [formGroup]="massiveForm" class="qr-form">
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Archivo SFTP</mat-label>
+              <mat-select formControlName="fileName">
+                <mat-option [value]="">Seleccione archivo</mat-option>
+                <mat-option *ngFor="let item of sftpItems" [value]="item">
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Workers</mat-label>
+              <input matInput type="number" formControlName="workers" min="1" />
+            </mat-form-field>
+          </form>
+
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Cancelar</button>
+            <button mat-raised-button color="primary" [disabled]="massiveForm.invalid || isGeneratingMassive"
+              (click)="generateQrMassive()">Generar</button>
+          </div>
+
+          <div class="qr-result" *ngIf="massiveResult">
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Job ID</mat-label>
+              <input matInput readonly [value]="massiveResult.jobId || '-'" />
+              <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.jobId)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Job original</mat-label>
+              <input matInput readonly [value]="massiveResult.jobOriginal || '-'" />
+              <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.jobOriginal)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <div class="qr-result-item">
+              <div class="qr-result-label">Status</div>
+              <div class="qr-result-value">{{ massiveResult.status || '-' }}</div>
+            </div>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Output path</mat-label>
+              <input matInput readonly [value]="massiveResult.outputPath || '-'" />
+              <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.outputPath)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+  <ng-template #cancelQrDialog>
+    <div class="qr-dialog-header">
+      <div class="qr-dialog-icon">
+        <mat-icon>warning</mat-icon>
+      </div>
+      <div>
+        <div class="qr-dialog-title">Anular QR</div>
+        <div class="qr-dialog-subtitle">Esta accion no se puede revertir</div>
+      </div>
+    </div>
+    <div class="qr-dialog-content">
+      <mat-card class="qr-dialog-card">
+        <div class="qr-result">Estas seguro que deseas anular este QR?</div>
+        <div class="qr-dialog-actions">
+          <button mat-button mat-dialog-close>Cancelar</button>
+          <button mat-raised-button color="warn" [disabled]="isCancellingQr" (click)="confirmCancelQr()">
+            {{ isCancellingQr ? 'Anulando...' : 'Anular' }}
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </ng-template>
+  </div>
+</div>

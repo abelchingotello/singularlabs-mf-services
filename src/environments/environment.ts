@@ -8,7 +8,10 @@ export const environment = {
   // URL_API_GATEWAY:'https://butdn2x1g7.execute-api.us-east-1.amazonaws.com/stage'
   URL_API_GATEWAY:'https://rrmnpgfzii.execute-api.us-east-1.amazonaws.com/sandbox',
    // rr es apigateway de desarrollo y gdu de produccion
-  URL_API_LOCAL:'http://localhost:3000/stage'
+  URL_API_LOCAL:'http://localhost:3000/stage',
+  
+  URL_API_GENERATE_QR: 'https://n48ne1w1vb.execute-api.us-east-1.amazonaws.com/dev',
+
 };
 
 /*

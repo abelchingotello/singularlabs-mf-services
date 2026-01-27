@@ -30,17 +30,20 @@
             <button mat-flat-button (click)="print()" matTooltip="Imprimir" matTooltipPosition="above">
                 <mat-icon>print</mat-icon>
             </button>
-            <button mat-flat-button matTooltip="Exportar" matTooltipPosition="above" [matMenuTriggerFor]="typesExport">
-                <span class="material-symbols-outlined">
-                    export_notes
-                </span>
-            </button>
-            <mat-menu #typesExport="matMenu" xPosition="before">
-                <button mat-menu-item (click)="exportExcel()">
-                    <mat-icon>table_chart</mat-icon>Excel</button>
-                <button mat-menu-item (click)="exportCsv()">
-                    <mat-icon>file_copy</mat-icon>Csv</button>
-            </mat-menu>
+            
+            <ng-container *ngIf="showExport">
+                <button mat-flat-button matTooltip="Exportar" matTooltipPosition="above" [matMenuTriggerFor]="typesExport">
+                    <span class="material-symbols-outlined">
+                        export_notes
+                    </span>
+                </button>
+                <mat-menu #typesExport="matMenu" xPosition="before">
+                    <button mat-menu-item (click)="exportExcel()">
+                        <mat-icon>table_chart</mat-icon>Excel</button>
+                    <button mat-menu-item (click)="exportCsv()">
+                        <mat-icon>file_copy</mat-icon>Csv</button>
+                </mat-menu>
+            </ng-container>
         </div>
     </div>
 </div>
