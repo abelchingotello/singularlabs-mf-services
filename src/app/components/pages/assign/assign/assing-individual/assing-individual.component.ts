@@ -236,8 +236,9 @@ export class AssingIndividualComponent implements OnInit {
       ownComissionType: this.comission.value,
       indicators: this.dataServiceSelected.indicators,
       additionalPaymentFields: this.dataServiceSelected.additional,
-      comissionFixed: this.dataServiceSelected.fixedcomission, //number
-      comissionPCT: this.dataServiceSelected.pctcomission, //number
+      comissionFixed:
+        this.dataServiceSelected.fixedcomission - this.fixed.value, //number
+      comissionPCT: this.dataServiceSelected.pctcomission - this.porcent, //number
     }));
     this.registerServiceRequest(dataRegister);
   }
@@ -417,12 +418,17 @@ export class AssingIndividualComponent implements OnInit {
   }
 
   isComisionFixed(): boolean {
-    return this.comission.value === 'FIJO';
+    return (
+      this.comission.value === 'FIJO' || this.comission.value === 'MULTIPLE'
+    );
   }
   isComisionMultiple(): boolean {
     return this.comission.value === 'MULTIPLE';
   }
   isComisionPorcent(): boolean {
-    return this.comission.value === 'PORCENTUAL';
+    return (
+      this.comission.value === 'PORCENTUAL' ||
+      this.comission.value === 'MULTIPLE'
+    );
   }
 }

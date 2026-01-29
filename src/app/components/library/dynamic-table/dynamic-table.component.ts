@@ -75,6 +75,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() lengthTable: any;
   @Input() paginationinFrontend: any;
   @Input() shouldExport: boolean = false;
+  @Input() showExport: boolean = true;
 
   @Output() toggleChange = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<PageEvent>();
