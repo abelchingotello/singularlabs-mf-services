@@ -113,7 +113,7 @@
         <div>
           <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr" [pageKey]="pageKey"
             [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
-            [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="false" (clickButtonEvent)="clickButton($event)">
+            [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="true" (clickButtonEvent)="clickButton($event)">
 
           </uni-dynamic-table>
         </div>
@@ -324,6 +324,30 @@
       </div>
     </ng-template>
 
+
+  <ng-template #markReturnedDialog>
+    <div class="qr-dialog-header">
+      <div class="qr-dialog-icon">
+        <mat-icon>report_problem</mat-icon>
+      </div>
+      <div>
+        <div class="qr-dialog-title">Marcar devuelto</div>
+        <div class="qr-dialog-subtitle">Solo se puede actualizar cuando el estado es pagado y el estado anulado es vigente.</div>
+      </div>
+    </div>
+    <div class="qr-dialog-content">
+      <mat-card class="qr-dialog-card">
+        <div class="qr-result">Este proceso solo actualiza el estado. El proceso se tiene que gestionar.</div>
+        <div class="qr-dialog-actions">
+          <button mat-button mat-dialog-close>Cancelar</button>
+          <button mat-raised-button color="accent" [disabled]="isMarkingReturned" (click)="confirmMarkReturned()">
+            {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </ng-template>
+
   <ng-template #cancelQrDialog>
     <div class="qr-dialog-header">
       <div class="qr-dialog-icon">
@@ -336,7 +360,7 @@
     </div>
     <div class="qr-dialog-content">
       <mat-card class="qr-dialog-card">
-        <div class="qr-result">Estas seguro que deseas anular este QR?</div>
+        <div class="qr-result">¿Estas seguro que deseas anular este QR?</div>
         <div class="qr-dialog-actions">
           <button mat-button mat-dialog-close>Cancelar</button>
           <button mat-raised-button color="warn" [disabled]="isCancellingQr" (click)="confirmCancelQr()">
@@ -348,3 +372,24 @@
   </ng-template>
   </div>
 </div>
+
+    <ng-template #cancelBlockedDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>info</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">No se puede anular</div>
+          <div class="qr-dialog-subtitle">El QR esta en estado pagado.</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>Para anular un QR pagado primero debes marcarlo como <strong>devuelto</strong>.</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Entendido</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+

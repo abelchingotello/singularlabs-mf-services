@@ -283,11 +283,16 @@
   line-height: 1.2;
 }
 
-:host ::ng-deep .pendiente,
-:host ::ng-deep .notificado_no_pagado {
+:host ::ng-deep .pendiente {
   background: #fef3c7;
   border-color: #f59e0b;
   color: #92400e;
+}
+
+:host ::ng-deep .notificado_no_pagado {
+  background: #fed7aa;
+  border-color: #f97316;
+  color: #9a3412;
 }
 
 :host ::ng-deep .pagado {
@@ -309,8 +314,8 @@
 }
 
 :host ::ng-deep .anulado {
-  background: #fef9c3;
-  border-color: #f59e0b;
-  color: #92400e;
+  background: #fecaca;
+  border-color: #dc2626;
+  color: #7f1d1d;
 }
 

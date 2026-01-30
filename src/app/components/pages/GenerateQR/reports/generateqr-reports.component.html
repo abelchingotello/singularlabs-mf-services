@@ -1,0 +1,313 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Reporte Pagos y QRs generados"
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <div class="row">
+        <div class="col d-flex justify-content-end align-items-end"></div>
+      </div>
+    </uni-image-card>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default">Datos de reporte</h2>
+        <form [formGroup]="reportForm" class="d-flex flex-wrap">
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="start" />
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="end" />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Servicio</mat-label>
+            <mat-select formControlName="servicio" (selectionChange)="onFilterServiceChange($event)">
+              <mat-option disabled class="search-option">
+                <input matInput placeholder="Buscar servicio..." [(ngModel)]="serviceFilter"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="filterServices()"
+                  (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()" />
+              </mat-option>
+
+              <mat-option disabled>
+                <input matInput placeholder="Servicio seleccionado..." [value]="filterServiceName" />
+              </mat-option>
+
+              <mat-option *ngFor="let service of filteredServices" [value]="service.name">
+                {{ service.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Suministro</mat-label>
+            <input matInput formControlName="suministro" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Titular</mat-label>
+            <input matInput formControlName="titular" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Vence desde</mat-label>
+            <input matInput [matDatepicker]="expFromPicker" formControlName="expiredFrom" />
+            <mat-datepicker-toggle matSuffix [for]="expFromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #expFromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Vence hasta</mat-label>
+            <input matInput [matDatepicker]="expToPicker" formControlName="expiredTo" />
+            <mat-datepicker-toggle matSuffix [for]="expToPicker"></mat-datepicker-toggle>
+            <mat-datepicker #expToPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Vigencia</mat-label>
+            <mat-select formControlName="vigencia">
+              <mat-option *ngFor="let option of vigenciaOptions" [value]="option.value">{{ option.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado pago</mat-label>
+            <mat-select formControlName="estadoPago">
+              <mat-option *ngFor="let option of estadoPagoOptions" [value]="option.value">{{ option.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Estado anulado</mat-label>
+            <mat-select formControlName="estadoAnulado">
+              <mat-option *ngFor="let option of estadoAnuladoOptions" [value]="option.value">{{ option.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3" style="margin-top: 0px;">
+            <button title="Limpiar" type="button" class="btn button-secondary" (click)="clearFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn button-primary" (click)="searchData()">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="custom-border-radius-1-25 totals-card">
+      <mat-card-content class="totals-content">
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>format_list_numbered</mat-icon>Total registros</div>
+          <div class="totals-value">{{ totalCount || 0 }}</div>
+        </div>
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>paid</mat-icon>Monto total</div>
+          <div class="totals-value">{{ totalAmount | number:'1.2-2' }}</div>
+        </div>
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>check_circle</mat-icon>Monto pagado</div>
+          <div class="totals-value">{{ totalPaidAmount | number:'1.2-2' }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr"
+          [refreshFunction]="searchData.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
+          (clickButtonEvent)="clickButton($event)" [showExport]="false">
+        </uni-dynamic-table>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-template #detailDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Detalle QR</div>
+          <div class="qr-dialog-subtitle">Informacion completa del QR</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <div class="report-detail">
+            <div class="report-detail-left">
+              <div class="qr-preview" *ngIf="detailQrImage; else noQr">
+                <img [src]="detailQrImage" alt="QR" />
+              </div>
+              <ng-template #noQr>
+                <div class="qr-placeholder">Sin imagen</div>
+              </ng-template>
+              <div class="qr-preview-title">{{ selectedRow?.titular || '-' }}</div>
+              <div class="qr-preview-amount">{{ selectedRow?.monto || '-' }}</div>
+            </div>
+            <div class="report-detail-right">
+              <div class="detail-row"><span>ID QR:</span><span>{{ selectedRow?.qr_id || '-' }}</span></div>
+              <div class="detail-row"><span>Fecha generacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.qr_created_at) }}</span></div>
+              <div class="detail-row"><span>Servicio:</span><span>{{ selectedRow?.servicio || '-' }}</span></div>
+              <div class="detail-row"><span>Suministro:</span><span>{{ selectedRow?.suministro || '-' }}</span></div>
+              <div class="detail-row"><span>Monto:</span><span>{{ selectedRow?.monto || '-' }}</span></div>
+              <div class="detail-row"><span>Titular:</span><span>{{ selectedRow?.titular || '-' }}</span></div>
+              <div class="detail-row"><span>Vencimiento:</span><span>{{ formatDateTimeDisplay(selectedRow?.qr_expired_at) }}</span></div>
+              <div class="detail-row"><span>N recibo:</span><span>{{ selectedRow?.numero_recibo || '-' }}</span></div>
+              <div class="detail-row"><span>Vigencia:</span><span class="status-pill" [ngClass]="selectedRow?.estado_vigencia">{{ selectedRow?.estado_vigencia || '-' }}</span></div>
+              <div class="detail-row"><span>Estado pago:</span><span class="status-pill" [ngClass]="selectedRow?.estado_pago_text">{{ selectedRow?.estado_pago_text || '-' }}</span></div>
+              <div class="detail-row"><span>Estado anulado:</span><span class="status-pill" [ngClass]="selectedRow?.estado_anulado_label">{{ selectedRow?.estado_anulado_label || '-' }}</span></div>
+              <div class="detail-row"><span>Notificacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.notificacion_at) }}</span></div>
+              <div class="detail-row"><span>Fecha pago:</span><span>{{ formatDateTimeDisplay(selectedRow?.pago_at) }}</span></div>
+            </div>
+          </div>
+          <div class="qr-dialog-actions">
+            <button mat-button (click)="openNotificationHistory()">Ver historial</button>
+            <button mat-button mat-dialog-close>Cerrar</button>
+            <button mat-raised-button color="primary" (click)="downloadDetailQrImage()">Descargar PNG</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #notificationHistoryDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>history</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Historial de notificaciones</div>
+          <div class="qr-dialog-subtitle">ID QR: {{ selectedRow?.qr_id || '-' }}</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <div class="history-summary">
+            <div class="history-item">
+              <div class="history-label">Automaticas</div>
+              <div class="history-value">{{ notificationHistory?.counts?.automatic || 0 }}</div>
+            </div>
+            <div class="history-item">
+              <div class="history-label">Manuales / reprocesados</div>
+              <div class="history-value">{{ notificationHistory?.counts?.manual || 0 }}</div>
+            </div>
+            <div class="history-item">
+              <div class="history-label">Total</div>
+              <div class="history-value">{{ notificationHistory?.counts?.total || 0 }}</div>
+            </div>
+          </div>
+
+          <div class="history-list" *ngIf="notificationItems?.length; else emptyHistory">
+            <div class="history-card" *ngFor="let item of notificationItems">
+              <div class="history-card-header">
+                <div>
+                  <div class="history-title">Notificacion #{{ item?.id }}</div>
+                  <div class="history-subtitle">{{ formatDateTimeDisplay(item?.created_at) }}</div>
+                </div>
+                <div class="history-meta">
+                  <div><strong>Instruction:</strong> {{ item?.instruction_id || '-' }}</div>
+                  <div><strong>Responsable:</strong> {{ item?.responsable || '-' }}</div>
+                </div>
+              </div>
+              <div class="history-body">
+                <div class="history-json">
+                  <div class="history-json-title">Payload</div>
+                  <pre>{{ formatJson(item?.payload) }}</pre>
+                </div>
+                <div class="history-json">
+                  <div class="history-json-title">Details</div>
+                  <pre>{{ formatJson(item?.details) }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyHistory>
+            <div class="empty-history">Sin historial</div>
+          </ng-template>
+
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Cerrar</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+    <ng-template #cancelDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Anular QR</div>
+          <div class="qr-dialog-subtitle">Esta acción no se puede revertir.</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>¿Seguro que deseas anular el QR <strong>{{ cancelRow?.qr_id || '-' }}</strong>?</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close [disabled]="isCancelling">Cancelar</button>
+            <button mat-raised-button color="warn" (click)="confirmCancel()" [disabled]="isCancelling">
+              {{ isCancelling ? 'Anulando...' : 'Anular' }}
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #markReturnedDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>undo</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Marcar devuelto</div>
+          <div class="qr-dialog-subtitle">Solo se puede actualizar cuando el estado es pagado y el estado anulado es vigente.</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>¿Seguro que deseas marcar como devuelto el QR <strong>{{ pendingReturnRow?.qr_id || '-' }}</strong>?</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close [disabled]="isMarkingReturned">Cancelar</button>
+            <button mat-raised-button color="accent" (click)="confirmMarkReturned()" [disabled]="isMarkingReturned">
+              {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #cancelBlockedDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>info</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">No se puede anular</div>
+          <div class="qr-dialog-subtitle">El QR esta en estado pagado.</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>Para anular un QR pagado primero debes marcarlo como <strong>devuelto</strong>.</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Entendido</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+

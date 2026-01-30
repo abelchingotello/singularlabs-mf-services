@@ -1,12 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ServicesService } from 'src/app/services/services.service';
@@ -17,28 +10,21 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
-import {
-  expand,
-  filter,
-  forkJoin,
-  EMPTY,
-  scan,
-  startWith,
-  lastValueFrom,
-  finalize,
-  map,
-} from 'rxjs';
+import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
 import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
 import { GenerateQrService } from 'src/app/services/generateqr.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import * as QRCode from 'qrcode';
+import jwtDecode from 'jwt-decode';
 
 @Component({
   selector: 'uni-services',
   templateUrl: './generateqr.component.html',
-  styleUrls: ['./generateqr.component.scss'],
+  styleUrls: ['./generateqr.component.scss']
 })
 export class GenerateQR implements OnInit {
+
   public columns: any[] = [
     { name: 'ID QR', attribute: 'id_qr' },
     { name: 'Suministro', attribute: 'suministro' },
@@ -47,30 +33,30 @@ export class GenerateQR implements OnInit {
       name: 'Fecha creacion',
       attribute: 'qr_created_at',
       config: {
-        formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' },
-      },
+        formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' }
+      }
     },
     {
       name: 'Fecha vencimiento',
       attribute: 'expired_at',
       config: {
-        formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' },
-      },
+        formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' }
+      }
     },
     { name: 'Monto', attribute: 'amount' },
     {
       name: 'Estado pago',
       attribute: 'estado_pago_label',
       config: {
-        styleClass: true,
-      },
+        styleClass: true
+      }
     },
     {
       name: 'Estado anulado',
       attribute: 'estado_anulado_label',
       config: {
-        styleClass: true,
-      },
+        styleClass: true
+      }
     },
     { name: 'Job ID', attribute: 'job_id' },
     {
@@ -84,24 +70,31 @@ export class GenerateQR implements OnInit {
             bgClass: 'gray',
             toolTip: 'Ver QR',
             icon: 'visibility',
-            value: 'view_qr',
+            value: 'view_qr'
           },
           {
             hide: false,
             bgClass: 'red',
             toolTip: 'Anular QR',
             icon: 'cancel',
-            value: 'cancel_qr',
+            value: 'cancel_qr'
           },
-        ],
-      },
+          {
+            hide: false,
+            bgClass: 'yellow',
+            toolTip: 'Marcar devuelto',
+            icon: 'undo',
+            value: 'mark_returned'
+          }
+        ]
+      }
     },
   ];
   public options: any[] = [
     { value: 'Servicio', id: '1' },
     { value: 'Entidad-Servicio', id: '2' },
     { value: 'Client-Servicio', id: '3' },
-  ];
+  ]
 
   public pageSize: any = 5;
   public pageKey: any[];
@@ -113,12 +106,12 @@ export class GenerateQR implements OnInit {
   public dataService: any[];
   public listFilters: any = {};
   public functionDataCurrent: (pageSize: any) => any;
-  public disabledEditOption: any;
+  public disabledEditOption: any
   public editOption: any;
   public selectedIds: any;
   public stateMaster: any;
   public dataIdService: any;
-  public optionId: any;
+  public optionId: any
   public categoriesService: any[] = [];
   public filteredServices: ServiceItem[] = []; // Lista filtrada que se mostrará
   public listServicesSelected: ServiceItem[] = [];
@@ -132,11 +125,11 @@ export class GenerateQR implements OnInit {
     { value: '0', label: 'pendiente' },
     { value: '1', label: 'pagado' },
     { value: '2', label: 'notificado no pagado' },
-    { value: '3', label: 'fallido' },
+    { value: '3', label: 'fallido' }
   ];
   public estadoAnuladoOptions = [
     { value: '0', label: 'vigente' },
-    { value: '1', label: 'anulado' },
+    { value: '1', label: 'anulado' }
   ];
   public qrFilteredServices: ServiceItem[] = [];
   public qrAllItems: ServiceItem[] = [];
@@ -152,11 +145,14 @@ export class GenerateQR implements OnInit {
   private qrDialogRef?: MatDialogRef<any>;
   private qrResultDialogRef?: MatDialogRef<any>;
   private cancelDialogRef?: MatDialogRef<any>;
+  private cancelBlockedDialogRef?: MatDialogRef<any>;
+  private markReturnedDialogRef?: MatDialogRef<any>;
   private qrMassiveDialogRef?: MatDialogRef<any>;
   public qrDialogMode: 'create' | 'view' = 'create';
   public isGeneratingQr: boolean = false;
   public isGeneratingMassive: boolean = false;
   public isCancellingQr: boolean = false;
+  public isMarkingReturned: boolean = false;
 
   private pagUtils: PaginationUtils | undefined;
   public page: number = 1; // Variable para la página actual
@@ -166,11 +162,12 @@ export class GenerateQR implements OnInit {
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
   @ViewChild('generateQrDialog') generateQrDialog!: TemplateRef<any>;
-  @ViewChild('generateQrResultDialog')
-  generateQrResultDialog!: TemplateRef<any>;
+  @ViewChild('generateQrResultDialog') generateQrResultDialog!: TemplateRef<any>;
   @ViewChild('cancelQrDialog') cancelQrDialog!: TemplateRef<any>;
-  @ViewChild('generateQrMassiveDialog')
-  generateQrMassiveDialog!: TemplateRef<any>;
+  @ViewChild('cancelBlockedDialog') cancelBlockedDialog!: TemplateRef<any>;
+  @ViewChild('markReturnedDialog') markReturnedDialog!: TemplateRef<any>;
+  @ViewChild('generateQrMassiveDialog') generateQrMassiveDialog!: TemplateRef<any>;
+
 
   constructor(
     private router: Router,
@@ -182,6 +179,7 @@ export class GenerateQR implements OnInit {
     private mytoastr: MytoastrService,
     private personService: PersonService,
     private generateQrService: GenerateQrService,
+    private authService: AuthService,
     public dialog: MatDialog,
   ) {
     this.pagUtils = new PaginationUtils();
@@ -190,15 +188,15 @@ export class GenerateQR implements OnInit {
   ngOnInit(): void {
     this.minDate.setHours(0, 0, 0, 0);
     this.minDate.setDate(this.minDate.getDate() + 1);
-    this.formService(); //inicializa los inputs como vacios
+    this.formService();//inicializa los inputs como vacios
     this.formQr();
     this.formMassive();
-    this.dataMaster(); //carga lista de estados
-    this.listData(); //carga lista de tipos de servicios
+    this.dataMaster();//carga lista de estados
+    this.listData();//carga lista de tipos de servicios
     this.serviceForm.get('service_type')?.setValue('LUZ');
     this.cargarServicios();
     // Suscribirse a cambios y convertir a mayusculas
-    this.service_name?.valueChanges.subscribe((value) => {
+    this.service_name?.valueChanges.subscribe(value => {
       if (value) {
         this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
       }
@@ -212,11 +210,11 @@ export class GenerateQR implements OnInit {
       this.selectedCategory = false;
       this.filteredServices = [];
       this.listServicesSelected = [];
-      this.serviceForm.get('idService')?.setValue('');
-      this.serviceForm.get('service_name')?.setValue('');
+      this.serviceForm.get('idService')?.setValue('')
+      this.serviceForm.get('service_name')?.setValue('')
       return;
     }
-    this.serviceForm.get('service_name')?.setValue('');
+    this.serviceForm.get('service_name')?.setValue('')
     this.selectedCategory = true;
     await this.cargarServicios();
   }
@@ -225,10 +223,14 @@ export class GenerateQR implements OnInit {
     const selectedId = Array.isArray(event.value)
       ? event.value[event.value.length - 1]
       : event.value;
-    const selectedObject = this.allItems1.find((s) => s.id === selectedId);
+    const selectedObject = this.allItems1.find(s => s.id === selectedId);
     this.listServicesSelected = selectedObject ? [selectedObject] : [];
     this.serviceForm.get('idService')?.setValue(selectedId || '');
   }
+
+
+  
+
 
   openGenerateQrDialog() {
     this.qrResult = null;
@@ -254,14 +256,12 @@ export class GenerateQR implements OnInit {
     this.qrDialogRef = this.dialog.open(this.generateQrDialog, {
       width: '640px',
       maxWidth: '92vw',
-      panelClass: 'qr-dialog',
+      panelClass: 'qr-dialog'
     });
   }
   onFilterServiceChange(event: any) {
     const selectedId = event.value;
-    const selectedObject = this.filteredServices.find(
-      (s) => s.name === selectedId,
-    );
+    const selectedObject = this.filteredServices.find(s => s.name === selectedId);
     this.filterServiceSelected = selectedObject ?? null;
     this.serviceForm.get('empresa')?.setValue(selectedId || '');
   }
@@ -270,16 +270,29 @@ export class GenerateQR implements OnInit {
     return this.filterServiceSelected?.name || '';
   }
 
+
+
+
   openCancelQrDialog(element: any) {
     this.pendingCancelId = String(element?.id_qr || element?.id || '');
     if (!this.pendingCancelId) {
       this.mytoastr.showWarning('ID QR no disponible', '');
       return;
     }
+    const estadoPago = String(element?.estado_pago_label || '').toLowerCase();
+    const estadoPagoRaw = element?.estado_pago;
+    if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
+      this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+      return;
+    }
     this.cancelDialogRef = this.dialog.open(this.cancelQrDialog, {
       width: '420px',
       maxWidth: '92vw',
-      panelClass: 'qr-dialog',
+      panelClass: 'qr-dialog'
     });
   }
 
@@ -289,29 +302,87 @@ export class GenerateQR implements OnInit {
     }
     this.isCancellingQr = true;
     this.spinner.spinnerOnOff();
-    this.generateQrService
-      .cancelQr([this.pendingCancelId])
-      .pipe(
-        finalize(() => {
-          this.isCancellingQr = false;
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          this.spinner.spinnerOnOff();
-          this.mytoastr.showWarning('QR anulado', '');
-          if (this.cancelDialogRef) {
-            this.cancelDialogRef.close();
-          }
-          this.reload();
-        },
-        error: (err) => {
-          console.error(err);
-          this.spinner.spinnerOnOff();
-          this.mytoastr.showError('Error al anular QR', '');
-        },
-      });
+    const responsable = this.getResponsable();
+    this.generateQrService.cancelQr([this.pendingCancelId], responsable).pipe(
+      finalize(() => {
+        this.isCancellingQr = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showWarning('QR anulado', '');
+        if (this.cancelDialogRef) {
+          this.cancelDialogRef.close();
+        }
+        this.reload();
+      },
+      error: (err) => {
+        console.error(err);
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showError('Error al anular QR', '');
+      }
+    });
   }
+
+  openMarkReturnedDialog(element: any) {
+    this.pendingCancelId = String(element?.id_qr || element?.id || '');
+    if (!this.pendingCancelId) {
+      this.mytoastr.showWarning('ID QR no disponible', '');
+      return;
+    }
+    this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
+      width: '460px',
+      maxWidth: '92vw',
+      panelClass: 'qr-dialog'
+    });
+  }
+
+  confirmMarkReturned() {
+    if (!this.pendingCancelId || this.isMarkingReturned) {
+      return;
+    }
+    this.isMarkingReturned = true;
+    this.spinner.spinnerOnOff();
+    const responsable = this.getResponsable();
+    this.generateQrService.markReturned([this.pendingCancelId], responsable).pipe(
+      finalize(() => {
+        this.isMarkingReturned = false;
+      })
+    ).subscribe({
+      next: () => {
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showWarning('Estado actualizado', '');
+        if (this.markReturnedDialogRef) {
+          this.markReturnedDialogRef.close();
+        }
+        this.reload();
+      },
+      error: (err) => {
+        console.error(err);
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showError('Error al actualizar estado', '');
+      }
+    });
+  }
+
+  private getResponsable(): string {
+    const user = this.authService.getUser?.();
+    const candidate = user?.username || user?.user_name || user?.name || user?.full_name || user?.email || user?.user || user?.nombre;
+    if (candidate) {
+      return String(candidate);
+    }
+    try {
+      const token = this.authService.getToken?.();
+      if (token) {
+        const decoded: any = jwtDecode(token);
+        return String(decoded?.username || decoded?.email || decoded?.['cognito:username'] || decoded?.sub || '');
+      }
+    } catch {
+      return '';
+    }
+    return '';
+  }
+
   openGenerateQrMassiveDialog() {
     this.massiveResult = null;
     this.sftpItems = [];
@@ -322,7 +393,7 @@ export class GenerateQR implements OnInit {
     this.qrMassiveDialogRef = this.dialog.open(this.generateQrMassiveDialog, {
       width: '640px',
       maxWidth: '92vw',
-      panelClass: 'qr-dialog',
+      panelClass: 'qr-dialog'
     });
   }
 
@@ -339,7 +410,7 @@ export class GenerateQR implements OnInit {
       },
       complete: () => {
         this.spinner.spinnerOnOff();
-      },
+      }
     });
   }
 
@@ -360,7 +431,7 @@ export class GenerateQR implements OnInit {
       description: this.qrForm.get('receipt_number')?.value || '',
       expiredAt: this.qrForm.get('due_date')?.value,
       cellphone: '',
-      email: '',
+      email: ''
     };
     console.log('GenerateQR payload:', payload);
     this.isGeneratingQr = true;
@@ -370,8 +441,7 @@ export class GenerateQR implements OnInit {
         this.spinner.spinnerOnOff();
         this.isGeneratingQr = false;
         if (response?.logError || response?.excelError) {
-          const msg =
-            response?.logError || response?.excelError || 'Error al generar QR';
+          const msg = response?.logError || response?.excelError || 'Error al generar QR';
           this.mytoastr.showError(msg, '');
           return;
         }
@@ -389,7 +459,7 @@ export class GenerateQR implements OnInit {
         this.spinner.spinnerOnOff();
         this.isGeneratingQr = false;
         this.mytoastr.showError('Error al generar QR', '');
-      },
+      }
     });
   }
 
@@ -407,7 +477,7 @@ export class GenerateQR implements OnInit {
     const payload = {
       sftp_path: `${fileName}`,
       output_dir: 'out',
-      workers: Number(workersRaw),
+      workers: Number(workersRaw)
     };
     this.isGeneratingMassive = true;
     this.spinner.spinnerOnOff();
@@ -422,7 +492,7 @@ export class GenerateQR implements OnInit {
         this.spinner.spinnerOnOff();
         this.isGeneratingMassive = false;
         this.mytoastr.showError('Error al generar QR masivo', '');
-      },
+      }
     });
   }
 
@@ -461,15 +531,15 @@ export class GenerateQR implements OnInit {
     const selectedId = Array.isArray(event.value)
       ? event.value[event.value.length - 1]
       : event.value;
-    const selectedObject = this.qrAllItems.find((s) => s.id === selectedId);
+    const selectedObject = this.qrAllItems.find(s => s.id === selectedId);
     this.qrSelectedService = selectedObject ?? null;
     this.qrForm.get('idService')?.setValue(selectedId || '');
   }
 
   filterQrServices() {
     const value = this.qrServiceFilter?.toLowerCase() || '';
-    this.qrFilteredServices = this.qrAllItems.filter((service) =>
-      service.name.toLowerCase().includes(value),
+    this.qrFilteredServices = this.qrAllItems.filter(service =>
+      service.name.toLowerCase().includes(value)
     );
   }
 
@@ -480,8 +550,8 @@ export class GenerateQR implements OnInit {
       const allItems = await lastValueFrom(
         this.loadAllServicesByType(type).pipe(
           filter((items: any) => items.length > 0),
-          finalize(() => this.spinner.spinnerOnOff()),
-        ),
+          finalize(() => this.spinner.spinnerOnOff())
+        )
       );
       this.qrFilteredServices = allItems;
       this.qrAllItems = allItems;
@@ -490,16 +560,17 @@ export class GenerateQR implements OnInit {
     } catch (error) {
       console.error('Error al cargar servicios QR:', error);
       this.qrFilteredServices = [];
-      this.mytoastr.showError('', 'No tiene Servicios');
+      this.mytoastr.showError('', 'No tiene Servicios')
     }
   }
 
+
   filterServices() {
     const value = this.serviceFilter?.toLowerCase() || '';
-    this.filteredServices = this.allItems1.filter((service) =>
-      service.name.toLowerCase().includes(value),
+    this.filteredServices = this.allItems1.filter(service =>
+      service.name.toLowerCase().includes(value)
     );
-    this.spinner.spinnerOnOff;
+    this.spinner.spinnerOnOff
   }
 
   async cargarServicios(): Promise<void> {
@@ -508,17 +579,17 @@ export class GenerateQR implements OnInit {
       const allItems = await lastValueFrom(
         this.loadAllServices().pipe(
           filter((items: any) => items.length > 0),
-          finalize(() => this.spinner.spinnerOnOff()),
-        ),
+          finalize(() => this.spinner.spinnerOnOff())
+        )
       );
       this.filteredServices = allItems;
       this.allItems1 = allItems;
       this.serviceFilter = '';
       this.filterServices();
     } catch (error) {
-      console.error('❌ Error al cargar servicios:', error);
+      console.error("❌ Error al cargar servicios:", error);
       this.filteredServices = [];
-      this.mytoastr.showError('', 'No tiene Servicios');
+      this.mytoastr.showError('', 'No tiene Servicios')
     }
   }
 
@@ -528,18 +599,14 @@ export class GenerateQR implements OnInit {
 
   loadAllServicesByType(serviceType: string) {
     return this.services.getServicesFromCategory(serviceType).pipe(
-      expand(
-        (response) =>
-          response?.data?.nextPageKey
-            ? this.services.getServicesFromCategory(
-                serviceType,
-                response.data.nextPageKey,
-              )
-            : EMPTY, // Termina el flujo cuando no hay mas paginas
+      expand(response =>
+        response?.data?.nextPageKey
+          ? this.services.getServicesFromCategory(serviceType, response.data.nextPageKey)
+          : EMPTY // Termina el flujo cuando no hay mas paginas
       ),
-      map((response) => response?.data?.Items ?? []),
+      map(response => response?.data?.Items ?? []),
       scan((acc, items) => acc.concat(items), []),
-      startWith([]),
+      startWith([])
     );
   }
 
@@ -553,81 +620,71 @@ export class GenerateQR implements OnInit {
       this.close = true;
       return;
     }
-    this.generateQrService
-      .listIndividuals(page, pageSize, this.listFilters)
-      .subscribe({
-        next: (data) => {
-          if (data?.statusCode && data.statusCode !== 200) {
-            this.mytoastr.showWarning(
-              data?.messages || 'No se pudo cargar el listado',
-              '',
-            );
-            return;
-          }
-          const items = Array.isArray(data?.data?.items)
-            ? data.data.items
-            : Array.isArray(data?.items)
-              ? data.items
-              : Array.isArray(data?.data?.Items)
-                ? data.data.Items
-                : Array.isArray(data?.Items)
-                  ? data.Items
-                  : Array.isArray(data?.data)
-                    ? data.data
-                    : Array.isArray(data)
-                      ? data
-                      : [];
-          if (page === 1) {
-            this.dataFilter = [];
-          }
-          const normalizedItems = items.map((item: any) => ({
-            ...item,
-            amount: this.normalizeAmount(item?.amount),
-            estado_pago_label: this.formatEstadoPago(item?.estado_pago),
-            estado_anulado_label: this.formatEstadoAnulado(
-              item?.estado_anulado,
-            ),
-          }));
-          this.dataFilter = [...this.dataFilter, ...normalizedItems];
-          this.dataService = [...this.dataFilter];
-          this.count =
-            data?.data?.total ??
-            data?.total ??
-            data?.data?.Count ??
-            data?.Count ??
-            data?.count ??
-            this.dataService.length;
-        },
-        error: (err) => {
-          console.log(err);
-          this.spinner.spinnerOnOff();
-        },
-        complete: () => {
-          this.spinner.spinnerOnOff();
-          this.close = true;
-        },
-      });
+    this.generateQrService.listIndividuals(page, pageSize, this.listFilters).subscribe({
+      next: (data) => {
+        if (data?.statusCode && data.statusCode !== 200) {
+          this.mytoastr.showWarning(data?.messages || 'No se pudo cargar el listado', '')
+          return
+        }
+        const items = Array.isArray(data?.data?.items)
+          ? data.data.items
+          : Array.isArray(data?.items)
+            ? data.items
+            : Array.isArray(data?.data?.Items)
+              ? data.data.Items
+              : Array.isArray(data?.Items)
+                ? data.Items
+                : Array.isArray(data?.data)
+                  ? data.data
+                  : Array.isArray(data)
+                    ? data
+                    : [];
+        if (page === 1) {
+          this.dataFilter = [];
+        }
+        const normalizedItems = items.map((item: any) => ({
+          ...item,
+          amount: this.normalizeAmount(item?.amount),
+          estado_pago_label: this.formatEstadoPago(item?.estado_pago),
+          estado_anulado_label: this.formatEstadoAnulado(item?.estado_anulado)
+        }));
+        this.dataFilter = [...this.dataFilter, ...normalizedItems];
+        this.dataService = [...this.dataFilter];
+        this.count =
+          data?.data?.total ??
+          data?.total ??
+          data?.data?.Count ??
+          data?.Count ??
+          data?.count ??
+          this.dataService.length;
+      },
+      error: (err) => {
+        console.log(err);
+        this.spinner.spinnerOnOff();
+      },
+      complete: () => {
+        this.spinner.spinnerOnOff();
+        this.close = true
+      }
+    })
   }
 
   formService() {
-    this.serviceForm = this.fb.group(
-      {
-        start_date: [''],
-        end_date: [''],
-        estado_pago: [''],
-        estado_anulado: [''],
-        suministro: [''],
-        empresa: [''],
-        jobId: [''],
-        service_name: [''],
-        idService: [''],
-        service_type: [''],
-        service_id: [''],
-        provider: [''],
-        status: [''],
-      },
-      { validators: this.dateRangeValidator('start_date', 'end_date') },
-    );
+    this.serviceForm = this.fb.group({
+      start_date: [''],
+      end_date: [''],
+      estado_pago: [''],
+      estado_anulado: [''],
+      suministro: [''],
+      empresa: [''],
+      jobId: [''],
+      service_name: [''],
+      idService: [''],
+      service_type: [''],
+      service_id: [''],
+      provider: [''],
+      status: ['']
+    }, { validators: this.dateRangeValidator('start_date', 'end_date') })
   }
 
   formQr() {
@@ -636,33 +693,22 @@ export class GenerateQR implements OnInit {
       idService: ['', [Validators.required]],
       suministro: ['', [Validators.required, Validators.pattern(/^\d{1,6}$/)]],
       titular: ['', [Validators.required]],
-      amount: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d+(\.\d{2})$/),
-          this.maxAmountValidator(500),
-        ],
-      ],
+      amount: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{2})$/), this.maxAmountValidator(500)]],
       receipt_number: ['', [Validators.pattern(/^\d+$/)]],
       due_date: ['', [Validators.required, this.futureDateValidator()]],
       due_date_date: ['', [Validators.required]],
-      due_date_time: ['23:59', [Validators.required]],
-    });
+      due_date_time: ['23:59', [Validators.required]]
+    })
 
-    this.qrForm
-      .get('due_date_date')
-      ?.valueChanges.subscribe(() => this.syncDueDate());
-    this.qrForm
-      .get('due_date_time')
-      ?.valueChanges.subscribe(() => this.syncDueDate());
+    this.qrForm.get('due_date_date')?.valueChanges.subscribe(() => this.syncDueDate());
+    this.qrForm.get('due_date_time')?.valueChanges.subscribe(() => this.syncDueDate());
   }
 
   formMassive() {
     this.massiveForm = this.fb.group({
       fileName: ['', [Validators.required]],
-      workers: [1, [Validators.required, Validators.min(1)]],
-    });
+      workers: [1, [Validators.required, Validators.min(1)]]
+    })
   }
 
   private syncDueDate() {
@@ -677,11 +723,7 @@ export class GenerateQR implements OnInit {
     const [hh, mm] = String(timeValue).split(':');
     const hour = Number(hh);
     const minute = Number(mm);
-    if (
-      Number.isNaN(date.getTime()) ||
-      Number.isNaN(hour) ||
-      Number.isNaN(minute)
-    ) {
+    if (Number.isNaN(date.getTime()) || Number.isNaN(hour) || Number.isNaN(minute)) {
       this.qrForm.get('due_date')?.setValue('', { emitEvent: false });
       this.qrForm.get('due_date')?.updateValueAndValidity({ emitEvent: false });
       return;
@@ -703,9 +745,7 @@ export class GenerateQR implements OnInit {
       if (!value) {
         return null;
       }
-      const match = value.match(
-        /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/,
-      );
+      const match = value.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
       if (!match) {
         return { invalidFormat: true };
       }
@@ -790,7 +830,7 @@ export class GenerateQR implements OnInit {
   }
 
   addService() {
-    this.router.navigate(['service/add']);
+    this.router.navigate(['service/add'])
   }
 
   updateService() {
@@ -808,7 +848,7 @@ export class GenerateQR implements OnInit {
   }
 
   cleanSearch() {
-    this.service_name.setValue('');
+    this.service_name.setValue('')
     this.close = false;
     this.serviceFilter = '';
     this.filteredServices = [];
@@ -820,33 +860,40 @@ export class GenerateQR implements OnInit {
   }
 
   clickButton(event) {
-    console.log('event', event);
-    const { value, element } = event;
-    if (value == 'view_qr') {
-      this.openQrPreview(element);
-    } else if (value == 'cancel_qr') {
-      this.openCancelQrDialog(element);
+    console.log("event", event)
+    const { value, element } = event
+    if (value == "view_qr") {
+      this.openQrPreview(element)
+    } else if (value == "cancel_qr") {
+      this.openCancelQrDialog(element)
+    } else if (value == "mark_returned") {
+      this.openMarkReturnedDialog(element)
     }
   }
 
   openDialogConfigService(element) {
+
     const dialogRef = this.dialog.open(DialogServiceConfigComponent, {
+
       width: '600px',
       data: {
         serviceName: element.name,
         serviceId: element.id,
-        serviceAmountTransactionRestriccion:
-          element.amountTransactionRestriccion,
+        serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((response) => {
-      if (response) {
-        console.log('result en afterClosed of openDialogMinBalance', response);
-        this.reload();
       }
     });
+
+    dialogRef.afterClosed().subscribe(
+      response => {
+        if (response) {
+          console.log('result en afterClosed of openDialogMinBalance', response)
+          this.reload();
+        }
+      });
+
+
+
   }
 
   editElement(id: any) {
@@ -877,7 +924,7 @@ export class GenerateQR implements OnInit {
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
-        console.error('Error loading master table data:', error);
+        console.error("Error loading master table data:", error);
       },
       complete: () => {
         this.spinner.spinnerOnOff();
@@ -912,6 +959,7 @@ export class GenerateQR implements OnInit {
     this.dataInitial(this.pageSize);
   }
 
+
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
     console.log('onPageChange', event);
@@ -930,69 +978,69 @@ export class GenerateQR implements OnInit {
     console.log('exportDataViaAPI called with', fileType);
     this.spinner.spinnerOnOff();
 
-    // Preparar los filtros para la exportación
-    const exportFilters: Record<string, any> = {
-      name: this.service_name.value?.toUpperCase() || undefined,
-      type: this.service_type.value?.toUpperCase() || undefined,
-      status: this.status.value?.master_name?.toUpperCase() || undefined,
-      service_id: this.service_id.value?.toUpperCase() || undefined,
-    };
+    const exportFilters: Record<string, any> = Object.keys(this.listFilters || {}).length
+      ? { ...this.listFilters }
+      : this.buildListFilters();
 
-    // Eliminar propiedades undefined
-    Object.keys(exportFilters).forEach((key) => {
-      if (exportFilters[key] === undefined) {
-        delete exportFilters[key];
+    // alias keys for backend compatibility
+    if (exportFilters['estado'] && !exportFilters['estadoPago']) {
+      exportFilters['estadoPago'] = exportFilters['estado'];
+    }
+    if (exportFilters['estadoAnulado'] && !exportFilters['estado_anulado']) {
+      exportFilters['estado_anulado'] = exportFilters['estadoAnulado'];
+    }
+    if (exportFilters['empresa'] && !exportFilters['servicio']) {
+      exportFilters['servicio'] = exportFilters['empresa'];
+    }
+
+    const inbx = 'generate_qr';
+    const token = localStorage.getItem('fcmToken');
+    this.generateQrService.exportServices(fileType, exportFilters, inbx, token).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.mytoastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.mytoastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error('Error durante la exportaci?n:', error);
+        this.mytoastr.showError('Error durante la exportaci?n', '');
       }
     });
-    const inbx = 'srv';
-    const token = localStorage.getItem('fcmToken');
-    this.services
-      .exportServices(fileType, exportFilters, inbx, token)
-      .subscribe({
-        next: (response) => {
-          this.spinner.spinnerOnOff();
-          if (response.statusCode === 200) {
-            this.mytoastr.showWarning('', 'Procesando Archivo...');
-          } else {
-            this.mytoastr.showError('', 'Error al enviar la solicitud');
-          }
-        },
-        error: (error) => {
-          this.spinner.spinnerOnOff();
-          console.error('Error durante la exportación:', error);
-          this.mytoastr.showError('Error durante la exportación', '');
-        },
-      });
   }
 
-  /******************************************** METODOS GET ****************************************/
+  
+/******************************************** METODOS GET ****************************************/
 
   get service_name() {
-    return this.serviceForm.get('service_name');
+    return this.serviceForm.get('service_name')
   }
 
   get service_type() {
-    return this.serviceForm?.get('service_type');
+    return this.serviceForm?.get('service_type')
   }
 
   get status() {
-    return this.serviceForm.get('status');
+    return this.serviceForm.get('status')
   }
 
   get service_id() {
-    return this.serviceForm.get('service_id');
+    return this.serviceForm.get('service_id')
   }
 
   get provider() {
-    return this.serviceForm.get('provider');
+    return this.serviceForm.get('provider')
   }
 
   get qr_service_type() {
-    return this.qrForm?.get('service_type');
+    return this.qrForm?.get('service_type')
   }
 
   get qr_idService() {
-    return this.qrForm?.get('idService');
+    return this.qrForm?.get('idService')
   }
 
   get qr_amount_cents(): number {
@@ -1032,7 +1080,7 @@ export class GenerateQR implements OnInit {
     const fromResult = this.buildQrTitle(
       this.qrResult?.suministro,
       this.qrResult?.empresa,
-      this.qrResult?.cliente,
+      this.qrResult?.cliente
     );
     if (fromResult !== '-') {
       return fromResult;
@@ -1040,17 +1088,14 @@ export class GenerateQR implements OnInit {
     const fromForm = this.buildQrTitle(
       this.qrForm?.get('suministro')?.value,
       this.qrSelectedService?.name || this.qrResult?.empresa,
-      this.qrForm?.get('titular')?.value,
+      this.qrForm?.get('titular')?.value
     );
     return fromForm;
   }
 
   private buildQrTitle(suministro: any, empresa: any, cliente: any): string {
     const parts = [suministro, empresa, cliente]
-      .filter(
-        (value: any) =>
-          value !== null && value !== undefined && String(value).trim() !== '',
-      )
+      .filter((value: any) => value !== null && value !== undefined && String(value).trim() !== '')
       .map((value: any) => String(value).trim());
     return parts.length ? parts.join(' ') : '-';
   }
@@ -1061,19 +1106,18 @@ export class GenerateQR implements OnInit {
 
   get qrExpiredAtDisplay(): string {
     const formValue = this.qrForm?.get('due_date')?.value;
-    const value =
-      this.qrDialogMode === 'create'
-        ? formValue || this.qrResult?.expired_at || this.qrResult?.expiredAt
-        : this.qrResult?.expired_at || this.qrResult?.expiredAt;
+    const value = this.qrDialogMode === 'create'
+      ? (formValue || this.qrResult?.expired_at || this.qrResult?.expiredAt)
+      : (this.qrResult?.expired_at || this.qrResult?.expiredAt);
     return this.formatDateTimeDisplay(value);
   }
 
   get servicesNames(): string {
-    return this.listServicesSelected.map((s) => s.name).join(', ');
+    return this.listServicesSelected.map(s => s.name).join(', ');
   }
 
   get servicesId(): string {
-    return this.listServicesSelected.map((s) => s.id).join(', ');
+    return this.listServicesSelected.map(s => s.id).join(', ');
   }
 
   private openQrResultDialog(mode: 'create' | 'view') {
@@ -1081,7 +1125,7 @@ export class GenerateQR implements OnInit {
     this.qrResultDialogRef = this.dialog.open(this.generateQrResultDialog, {
       width: '640px',
       maxWidth: '92vw',
-      panelClass: 'qr-dialog',
+      panelClass: 'qr-dialog'
     });
   }
 
@@ -1089,8 +1133,7 @@ export class GenerateQR implements OnInit {
     if (!row) {
       return '';
     }
-    const base64 =
-      row?.imageBase64 || row?.qr_image_base64 || row?.qrImageBase64;
+    const base64 = row?.imageBase64 || row?.qr_image_base64 || row?.qrImageBase64;
     if (base64) {
       return `data:image/png;base64,${base64}`;
     }
@@ -1105,23 +1148,14 @@ export class GenerateQR implements OnInit {
     return `${base}/${String(path).replace(/^\/+/, '')}`;
   }
 
+
   private buildListFilters(): Record<string, any> {
-    const start = this.formatDateParam(
-      this.serviceForm?.get('start_date')?.value,
-    );
+    const start = this.formatDateParam(this.serviceForm?.get('start_date')?.value);
     const end = this.formatDateParam(this.serviceForm?.get('end_date')?.value);
-    const estadoPago = String(
-      this.serviceForm?.get('estado_pago')?.value || '',
-    ).trim();
-    const estadoAnulado = String(
-      this.serviceForm?.get('estado_anulado')?.value || '',
-    ).trim();
-    const suministro = String(
-      this.serviceForm?.get('suministro')?.value || '',
-    ).trim();
-    const empresa = String(
-      this.serviceForm?.get('empresa')?.value || '',
-    ).trim();
+    const estadoPago = String(this.serviceForm?.get('estado_pago')?.value || '').trim();
+    const estadoAnulado = String(this.serviceForm?.get('estado_anulado')?.value || '').trim();
+    const suministro = String(this.serviceForm?.get('suministro')?.value || '').trim();
+    const empresa = String(this.serviceForm?.get('empresa')?.value || '').trim();
     const jobId = String(this.serviceForm?.get('jobId')?.value || '').trim();
     const filters: Record<string, any> = {};
     if (start) {
@@ -1176,9 +1210,7 @@ export class GenerateQR implements OnInit {
       if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
         return null;
       }
-      return start.getTime() <= end.getTime()
-        ? null
-        : { invalidDateRange: true };
+      return start.getTime() <= end.getTime() ? null : { invalidDateRange: true };
     };
   }
 
@@ -1198,6 +1230,7 @@ export class GenerateQR implements OnInit {
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${MM}-${dd}`;
   }
+
 
   private formatEstadoAnulado(value: any): string {
     if (value === null || value === undefined || value === '') {
@@ -1264,10 +1297,7 @@ export class GenerateQR implements OnInit {
   }
 
   private buildQrFileName(): string {
-    const base =
-      this.qrDetailTitle && this.qrDetailTitle !== '-'
-        ? this.qrDetailTitle
-        : 'qr';
+    const base = this.qrDetailTitle && this.qrDetailTitle !== '-' ? this.qrDetailTitle : 'qr';
     const cleaned = base
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -1305,9 +1335,10 @@ export class GenerateQR implements OnInit {
   private buildQrImageFromHash(hash: string): Promise<string> {
     return QRCode.toDataURL(hash, {
       width: 220,
-      margin: 1,
+      margin: 1
     });
   }
+
 }
 
 interface ServiceItem {
