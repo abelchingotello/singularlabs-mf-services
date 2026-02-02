@@ -102,6 +102,9 @@ export class GenerateQrReportsComponent implements OnInit {
   public totalCount: number = 0;
   public totalAmount: number = 0;
   public totalPaidAmount: number = 0;
+  public totalAnulados: number = 0;
+  public totalVencidos: number = 0;
+  public totalPagados: number = 0;
   public selectedRow: any = null;
   public detailQrImage: string = '';
   private detailDialogRef?: MatDialogRef<any>;
@@ -464,6 +467,9 @@ export class GenerateQrReportsComponent implements OnInit {
         this.totalCount = data?.totals?.count ?? data?.totals?.total ?? this.count ?? 0;
         this.totalAmount = data?.totals?.amount ?? 0;
         this.totalPaidAmount = data?.totals?.paidAmount ?? 0;
+        this.totalAnulados = data?.totals?.anulados ?? 0;
+        this.totalVencidos = data?.totals?.vencidos ?? 0;
+        this.totalPagados = data?.totals?.pagados ?? 0;
       },
       error: (err) => {
         console.error(err);

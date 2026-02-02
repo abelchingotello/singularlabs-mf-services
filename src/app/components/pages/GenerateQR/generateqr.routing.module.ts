@@ -4,6 +4,7 @@ import { GenerateQR } from './generateqr.component';
 import { GenerateQrReportsComponent } from './reports/generateqr-reports.component';
 
 const routes: Routes = [
+  { path: '', component: GenerateQR },
   { path: 'generate', component: GenerateQR },
   { path: 'reports', component: GenerateQrReportsComponent },
 

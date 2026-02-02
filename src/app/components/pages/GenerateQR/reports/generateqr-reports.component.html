@@ -120,6 +120,18 @@
           <div class="totals-label"><mat-icon>check_circle</mat-icon>Monto pagado</div>
           <div class="totals-value">{{ totalPaidAmount | number:'1.2-2' }}</div>
         </div>
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>cancel</mat-icon>Registros anulados</div>
+          <div class="totals-value">{{ totalAnulados || 0 }}</div>
+        </div>
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>paid</mat-icon>Registros pagados</div>
+          <div class="totals-value">{{ totalPagados || 0 }}</div>
+        </div>
+        <div class="totals-item">
+          <div class="totals-label"><mat-icon>event_busy</mat-icon>Registros vencidos</div>
+          <div class="totals-value">{{ totalVencidos || 0 }}</div>
+        </div>
       </mat-card-content>
     </mat-card>
 
