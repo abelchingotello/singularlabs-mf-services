@@ -9,16 +9,7 @@ export const environment = {
   URL_API_GATEWAY:'https://rrmnpgfzii.execute-api.us-east-1.amazonaws.com/sandbox',
    // rr es apigateway de desarrollo y gdu de produccion
   URL_API_LOCAL:'http://localhost:3000/stage',
-  
-  URL_API_GENERATE_QR: 'https://n48ne1w1vb.execute-api.us-east-1.amazonaws.com/dev',
 
+  URL_API_GENERATE_QR: 'https://7yqzt06h8g.execute-api.us-east-1.amazonaws.com/prod',
+  URL_API_GENERATE_QR_API_KEY: 'BSTFcTujZl7M1HBM5HwMuqm6xZUFkTQ3W1hjhjK3',
 };
-
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
