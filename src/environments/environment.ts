@@ -10,6 +10,6 @@ export const environment = {
    // rr es apigateway de desarrollo y gdu de produccion
   URL_API_LOCAL:'http://localhost:3000/stage',
 
-  URL_API_GENERATE_QR: 'https://7yqzt06h8g.execute-api.us-east-1.amazonaws.com/prod',
+  URL_API_GENERATE_QR: 'https://n48ne1w1vb.execute-api.us-east-1.amazonaws.com/dev',
   URL_API_GENERATE_QR_API_KEY: 'BSTFcTujZl7M1HBM5HwMuqm6xZUFkTQ3W1hjhjK3',
 };
