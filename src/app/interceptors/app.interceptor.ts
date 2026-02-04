@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 import { CompanyService } from '../services/company.service';
 import { Router } from '@angular/router';
 import { MytoastrService } from '../services/mytoastr';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AppInterceptor implements HttpInterceptor {
@@ -26,6 +27,7 @@ export class AppInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let intReq = request;
+    const skipAuthForQr = request.url.startsWith(environment.URL_API_GENERATE_QR);
     const token = this.authService.getToken();
     // console.log("TOKENNNN: ",token)
     const companyId = this.companyService.getCompanyId();
@@ -40,11 +42,17 @@ export class AppInterceptor implements HttpInterceptor {
     //   }));
     // }
 
-    if (token) {
+    if (request.url.startsWith(environment.URL_API_GENERATE_QR) && environment.URL_API_GENERATE_QR_API_KEY) {
+      intReq = intReq.clone({
+        headers: intReq.headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY)
+      });
+    }
+
+    if (token && !skipAuthForQr) {
 
       const apiKey = '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm'; 
-      intReq = request.clone({
-        headers: request.headers
+      intReq = intReq.clone({
+        headers: intReq.headers
         .set('Authorization','Bearer ' + token)
         .set('x-api-key', apiKey),
         // params: request.params.set('companyId', companyId)
