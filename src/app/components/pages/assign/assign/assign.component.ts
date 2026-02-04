@@ -95,6 +95,7 @@ export class AssignComponent implements OnInit {
     this.listData();
     this.functionDataCurrent = this.dataInitial.bind(this);
     this.functionDataCurrent(this.pageSize);
+    this.currentUrl = this.router.url;
   }
 
   onUppercaseInput(event: Event, controlName: string): void {
@@ -237,9 +238,15 @@ export class AssignComponent implements OnInit {
   //Redireccionar a asignación individual(1) o masiva(2)
   redirectAsign(type: number) {
     if (type === 1) {
-      this.router.navigate(['../assign/individual']);
+      this.router.navigate(
+        ['../assign/individual'],
+        { queryParams: { returnUrl: this.currentUrl } }
+      );
     } else if (type === 2) {
-      this.router.navigate(['../assign/massive']);
+      this.router.navigate(
+        ['../assign/massive'],
+        { queryParams: { returnUrl: this.currentUrl } }
+      );
     }
   }
 

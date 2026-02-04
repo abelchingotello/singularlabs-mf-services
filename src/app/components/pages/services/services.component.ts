@@ -104,6 +104,7 @@ export class ServicesComponent implements OnInit {
   public selectedCategory: boolean = false;
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
+  public currentUrl: string;
 
   constructor(
     private router: Router,
@@ -131,6 +132,8 @@ export class ServicesComponent implements OnInit {
     });
     this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
     this.functionDataCurrent(this.pageSize);
+    this.currentUrl = this.router.url;
+    console.log('this.currentUrl',this.currentUrl);
   }
 
   async selectCategory() {
@@ -303,7 +306,10 @@ export class ServicesComponent implements OnInit {
   }
 
   addService() {
-    this.router.navigate(['service/add']);
+    this.router.navigate(
+      ['service/add'],
+      { queryParams: { returnUrl: this.currentUrl } }
+    );
   }
 
   updateService() {
