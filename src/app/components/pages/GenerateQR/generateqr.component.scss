@@ -319,3 +319,7 @@
   color: #7f1d1d;
 }
 
+
+::ng-deep .service-schedule-dialog .mat-dialog-container {
+  padding: 0;
+}

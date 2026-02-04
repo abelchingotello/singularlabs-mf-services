@@ -153,6 +153,7 @@
               </mat-select>
             </mat-form-field>
 
+
             <mat-form-field appearance="outline" class="qr-field">
               <mat-label>Suministro</mat-label>
               <input matInput formControlName="suministro" inputmode="numeric" maxlength="6"
@@ -269,8 +270,24 @@
         <mat-card class="qr-dialog-card">
           <form [formGroup]="massiveForm" class="qr-form">
             <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Servicio</mat-label>
+              <mat-select formControlName="serviceName" (selectionChange)="onMassiveServiceChange($event)">
+                <mat-option disabled class="search-option">
+                  <input matInput placeholder="Buscar servicio..." [(ngModel)]="massiveServiceFilter"
+                    [ngModelOptions]="{standalone: true}" (ngModelChange)="filterMassiveServices()"
+                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                    (keydown.enter)="$event.stopPropagation()" />
+                </mat-option>
+                <mat-option [value]="">Seleccione servicio</mat-option>
+                <mat-option *ngFor="let service of massiveFilteredServices" [value]="service.name">
+                  {{ service.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
               <mat-label>Archivo SFTP</mat-label>
-              <mat-select formControlName="fileName">
+              <mat-select formControlName="fileName" [disabled]="!massiveForm.get('serviceName')?.value">
                 <mat-option [value]="">Seleccione archivo</mat-option>
                 <mat-option *ngFor="let item of sftpItems" [value]="item">
                   {{ item }}

@@ -142,6 +142,9 @@ export class GenerateQR implements OnInit {
   public pendingCancelId: string | null = null;
   public massiveResult: any = null;
   public sftpItems: string[] = [];
+  public massiveServiceFilter: string = '';
+  public massiveFilteredServices: ServiceItem[] = [];
+  public massiveSelectedServiceName: string = '';
   private qrDialogRef?: MatDialogRef<any>;
   private qrResultDialogRef?: MatDialogRef<any>;
   private cancelDialogRef?: MatDialogRef<any>;
@@ -386,10 +389,15 @@ export class GenerateQR implements OnInit {
   openGenerateQrMassiveDialog() {
     this.massiveResult = null;
     this.sftpItems = [];
+    this.massiveServiceFilter = '';
+    this.massiveSelectedServiceName = '';
+    this.massiveFilteredServices = [...this.allItems1];
+    if (!this.massiveFilteredServices.length) {
+      this.cargarServicios();
+    }
     this.isGeneratingMassive = false;
     this.massiveForm.reset();
     this.massiveForm.get('workers')?.setValue(1);
-    this.loadSftpItems();
     this.qrMassiveDialogRef = this.dialog.open(this.generateQrMassiveDialog, {
       width: '640px',
       maxWidth: '92vw',
@@ -397,9 +405,26 @@ export class GenerateQR implements OnInit {
     });
   }
 
-  private loadSftpItems() {
+  onMassiveServiceChange(event: any) {
+    const serviceName = event?.value || '';
+    this.massiveSelectedServiceName = serviceName;
+    this.massiveForm.get('fileName')?.setValue('');
+    this.sftpItems = [];
+    if (serviceName) {
+      this.loadSftpItems(serviceName);
+    }
+  }
+
+  filterMassiveServices() {
+    const value = this.massiveServiceFilter?.toLowerCase() || '';
+    this.massiveFilteredServices = this.allItems1.filter(service =>
+      service.name.toLowerCase().includes(value)
+    );
+  }
+
+  private loadSftpItems(serviceName: string) {
     this.spinner.spinnerOnOff();
-    this.generateQrService.listSftp('in').subscribe({
+    this.generateQrService.listSftp('in', serviceName).subscribe({
       next: (response) => {
         const items = response?.items ?? response?.data?.items ?? [];
         this.sftpItems = Array.isArray(items) ? items : [];
@@ -475,9 +500,10 @@ export class GenerateQR implements OnInit {
     const fileName = this.massiveForm.get('fileName')?.value;
     const workersRaw = this.massiveForm.get('workers')?.value;
     const payload = {
-      sftp_path: `${fileName}`,
-      output_dir: 'out',
-      workers: Number(workersRaw)
+      sftpPath: `in/${fileName}`,
+      outputDir: 'out',
+      workers: Number(workersRaw),
+      serviceName: this.massiveForm.get('serviceName')?.value
     };
     this.isGeneratingMassive = true;
     this.spinner.spinnerOnOff();
@@ -706,6 +732,7 @@ export class GenerateQR implements OnInit {
 
   formMassive() {
     this.massiveForm = this.fb.group({
+      serviceName: ['', [Validators.required]],
       fileName: ['', [Validators.required]],
       workers: [1, [Validators.required, Validators.min(1)]]
     })

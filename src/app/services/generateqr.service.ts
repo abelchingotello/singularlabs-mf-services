@@ -12,6 +12,9 @@ export class GenerateQrService {
   private listUrl = `${environment.URL_API_GENERATE_QR}/v1/qr/list`;
   private sftpListUrl = `${environment.URL_API_GENERATE_QR}/v1/sftp/list`;
   private massiveUrl = `${environment.URL_API_GENERATE_QR}/v1/batch/start`;
+  private serviceScheduleUrl = `${environment.URL_API_GENERATE_QR}/v1/service-schedule`;
+  private reprocessQueueUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/queue`;
+  private reprocessHistoryUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/history`;
   private URL1= `${environment.URL_API_GATEWAY}/export`;
 
   constructor(
@@ -41,10 +44,13 @@ export class GenerateQrService {
     return this.httpClient.get<any>(this.listUrl, { params });
   }
 
-  listSftp(path: string): Observable<any> {
+  listSftp(path: string, serviceName?: string): Observable<any> {
     let params = new HttpParams();
     if (path) {
       params = params.set('path', path);
+    }
+    if (serviceName) {
+      params = params.set('serviceName', serviceName);
     }
     return this.httpClient.get<any>(this.sftpListUrl, { params });
   }
@@ -86,6 +92,70 @@ export class GenerateQrService {
       });
     }
     return this.httpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/reports/qr`, { params });
+  }
+
+  listServiceSchedule(page?: number, pageSize?: number, serviceName?: string): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) {
+      params = params.set('page', page);
+    }
+    if (pageSize !== undefined) {
+      params = params.set('pageSize', pageSize);
+    }
+    if (serviceName) {
+      params = params.set('serviceName', serviceName);
+    }
+    return this.httpClient.get<any>(this.serviceScheduleUrl, { params });
+  }
+
+  createServiceSchedule(payload: any): Observable<any> {
+    return this.httpClient.post<any>(this.serviceScheduleUrl, payload);
+  }
+
+  updateServiceSchedule(serviceId: string, payload: any): Observable<any> {
+    return this.httpClient.put<any>(`${this.serviceScheduleUrl}/${serviceId}`, payload);
+  }
+
+  deleteServiceSchedule(serviceId: string): Observable<any> {
+    return this.httpClient.delete<any>(`${this.serviceScheduleUrl}/${serviceId}`);
+  }
+
+  listReprocessQueue(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) {
+      params = params.set('page', page);
+    }
+    if (pageSize !== undefined) {
+      params = params.set('pageSize', pageSize);
+    }
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+    return this.httpClient.get<any>(this.reprocessQueueUrl, { params });
+  }
+
+  listReprocessHistory(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) {
+      params = params.set('page', page);
+    }
+    if (pageSize !== undefined) {
+      params = params.set('pageSize', pageSize);
+    }
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+    return this.httpClient.get<any>(this.reprocessHistoryUrl, { params });
   }
 
   notificationHistory(idQr: string): Observable<any> {

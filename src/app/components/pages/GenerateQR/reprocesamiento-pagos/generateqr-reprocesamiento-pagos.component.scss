@@ -1,0 +1,398 @@
+.schedule-card {
+  margin-bottom: 1.5rem;
+}
+
+.schedule-form {
+  gap: 0.75rem;
+}
+
+.schedule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.schedule-table th,
+.schedule-table td {
+  vertical-align: middle;
+}
+
+.empty-state {
+  padding: 1rem 0.5rem;
+  color: #6b7280;
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+::ng-deep .service-schedule-dialog .mat-dialog-container {
+  padding: 12px;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.schedule-form-grid .col-md-4,
+.schedule-form-grid .col-md-3,
+.schedule-form-grid .col-md-2 {
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .schedule-form-grid {
+  padding-top: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .schedule-form-grid {
+  padding-top: 20px;
+    grid-template-columns: 1fr;
+  }
+}
+
+::ng-deep .service-schedule-dialog .buttons {
+  display: none;
+}
+
+::ng-deep .service-schedule-dialog .mat-dialog-content {
+  max-height: 70vh;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-card {
+  box-shadow: none;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.schedule-field {
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+.schedule-field .mat-form-field {
+  width: 100%;
+}
+
+::ng-deep .service-schedule-dialog .buttons,
+::ng-deep .service-schedule-dialog .viewOptions {
+  display: none !important;
+}
+
+::ng-deep .service-schedule-dialog .custom-header-row-dynamic-table {
+  margin-top: 0;
+}
+
+.schedule-dialog-shell {
+  background: #fff;
+  border-radius: 18px;
+}
+
+::ng-deep .service-schedule-dialog .schedule-time .mat-form-field-infix input {
+  height: 100%;
+}
+
+::ng-deep .service-schedule-dialog .schedule-time .mat-form-field-infix {
+  padding: 8px !important;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-content {
+  padding: 0 24px 24px;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-actions {
+  padding: 0 24px 16px;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.schedule-field {
+  width: 100%;
+}
+
+.schedule-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.schedule-timezone {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.schedule-timezone .timezone-label {
+  font-size: 12px;
+  color: #8a8a8a;
+}
+
+.schedule-timezone .timezone-value {
+  font-size: 16px;
+  color: #5f6368;
+}
+
+::ng-deep .service-schedule-dialog .buttons,
+::ng-deep .service-schedule-dialog .viewOptions {
+  display: none !important;
+}
+
+::ng-deep .service-schedule-dialog .mat-dialog-container {
+  background: #f5f7fb;
+}
+
+.schedule-dialog-shell {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-header {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #eef1f6;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-subtitle {
+  color: #6b7280;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.schedule-field {
+  min-width: 0;
+}
+
+.schedule-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 900px) {
+  .schedule-form-grid {
+  padding-top: 20px;
+    grid-template-columns: 1fr;
+  }
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  grid-template-columns: 1.4fr 1fr 1fr;
+}
+
+::ng-deep .service-schedule-dialog .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #e5e7eb;
+}
+
+.schedule-dialog-shell {
+  padding: 12px;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-content {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  padding: 16px 12px;
+}
+
+.schedule-time {
+  max-width: 160px;
+}
+
+.schedule-time .mat-form-field {
+  width: 100%;
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 160px 160px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.schedule-form-grid .schedule-field {
+  width: 100%;
+}
+
+.schedule-form-grid .schedule-time {
+  width: 160px;
+  max-width: 160px;
+}
+
+@media (max-width: 900px) {
+  .schedule-form-grid {
+  padding-top: 20px;
+    grid-template-columns: 1fr;
+  }
+  .schedule-form-grid .schedule-time {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+
+.schedule-time input {
+}
+
+.schedule-form-grid {
+  padding-top: 20px;
+  align-items: start;
+}
+
+.schedule-field {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.schedule-service {
+  margin-top: 6px;
+}
+
+
+
+
+
+
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-appearance-outline .mat-form-field-hint-wrapper,
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-appearance-outline .mat-form-field-errors-wrapper {
+  position: absolute;
+  bottom: -18px;
+}
+
+.schedule-service {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .schedule-service {
+    margin-top: 0;
+  }
+}
+
+
+
+
+.schedule-form-grid input {
+}
+
+
+
+
+
+
+::ng-deep .service-schedule-dialog .mat-form-field-appearance-outline .mat-form-field-outline {
+  top: 0 !important;
+}
+
+
+
+
+
+
+
+
+
+.queue-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+.queue-stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.queue-stat .stat-label {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.queue-stat .stat-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.pending {
+  background: #fff3cd;
+  color: #8a6d3b;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.processing {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.success {
+  background: #dcfce7;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.failed {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.skipped {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
