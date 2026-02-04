@@ -1,0 +1,260 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Reprocesamiento de pagos"
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <div class="row">
+        <div class="col d-flex justify-content-between align-items-end flex-wrap">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary"
+            (click)="openScheduleDialog()">
+            <mat-icon>schedule</mat-icon>
+            Registrar horario servicio
+          </button>
+        </div>
+      </div>
+    </uni-image-card>
+
+    <ng-template #scheduleDialog>
+      <div class="schedule-dialog-shell">
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Horario de servicio</div>
+          <div class="qr-dialog-subtitle">Registra horarios por servicio y consulta el listado</div>
+        </div>
+      </div>
+
+      <mat-dialog-content class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <form [formGroup]="scheduleForm" class="schedule-form-grid">
+            <mat-form-field appearance="outline" class="schedule-field">
+              <mat-label>Servicio</mat-label>
+              <mat-select formControlName="serviceName" (selectionChange)="onServiceChange($event)">
+                <mat-option disabled class="search-option">
+                  <input matInput placeholder="Buscar servicio..." [(ngModel)]="serviceFilter"
+                    [ngModelOptions]="{standalone: true}" (ngModelChange)="filterServices()"
+                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                    (keydown.enter)="$event.stopPropagation()" />
+                </mat-option>
+
+                <mat-option disabled>
+                  <input matInput placeholder="Servicio seleccionado..." [value]="selectedServiceName" />
+                </mat-option>
+
+                <mat-option *ngFor="let service of filteredServices" [value]="service.name">
+                  {{ service.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="scheduleForm.get('serviceName')?.touched && scheduleForm.get('serviceName')?.invalid">
+                Servicio requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="schedule-field schedule-time">
+              <mat-label>Hora apertura</mat-label>
+              <input matInput type="time" formControlName="open_time" />
+              <mat-error *ngIf="scheduleForm.get('open_time')?.touched && scheduleForm.get('open_time')?.invalid">
+                Hora requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="schedule-field schedule-time">
+              <mat-label>Hora cierre</mat-label>
+              <input matInput type="time" formControlName="close_time" />
+              <mat-error *ngIf="scheduleForm.get('close_time')?.touched && scheduleForm.get('close_time')?.invalid">
+                Hora requerida
+              </mat-error>
+            </mat-form-field>
+
+          </form>
+
+          <div class="schedule-actions">
+            <button mat-stroked-button color="primary" type="button" (click)="clearForm()">
+              Limpiar
+            </button>
+            <button mat-raised-button color="primary" type="button" (click)="saveSchedule()"
+              [disabled]="scheduleForm.invalid || isSaving">
+              Guardar horario
+            </button>
+            <button mat-raised-button color="accent" type="button" (click)="loadSchedules()"
+              [disabled]="isLoading">
+              Buscar horarios
+            </button>
+          </div>
+        </mat-card>
+
+        <mat-card class="qr-dialog-card">
+          <h3 class="mt-2 text-default">Horarios registrados</h3>
+          <uni-dynamic-table
+            [columns]="scheduleColumns"
+            [data]="scheduleData"
+            [actionsOptions]="false"
+            [viewOptionsTable]="false"
+            [viewCheckboxHeader]="false"
+            [showExport]="false"
+            [lengthTable]="total"
+            [paginationinFrontend]="false"
+            (pageChange)="onPageChange($event)"
+            (clickButtonEvent)="onScheduleAction($event)">
+          </uni-dynamic-table>
+
+        </mat-card>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end" class="qr-dialog-actions">
+        <button mat-button mat-dialog-close>Cerrar</button>
+      </mat-dialog-actions>
+      </div>
+    </ng-template>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default">Reprocesos de pagos</h2>
+        <form [formGroup]="queueForm" class="d-flex flex-wrap">
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha inicio</mat-label>
+            <input matInput [matDatepicker]="queueStartPicker" formControlName="dateFrom" />
+            <mat-datepicker-toggle matSuffix [for]="queueStartPicker"></mat-datepicker-toggle>
+            <mat-datepicker #queueStartPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha fin</mat-label>
+            <input matInput [matDatepicker]="queueEndPicker" formControlName="dateTo" />
+            <mat-datepicker-toggle matSuffix [for]="queueEndPicker"></mat-datepicker-toggle>
+            <mat-datepicker #queueEndPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">TODOS</mat-option>
+              <mat-option value="pending">pending</mat-option>
+              <mat-option value="processing">processing</mat-option>
+              <mat-option value="success">success</mat-option>
+              <mat-option value="failed">failed</mat-option>
+              <mat-option value="skipped">skipped</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Instruction ID</mat-label>
+            <input matInput formControlName="instructionId" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Service ID</mat-label>
+            <input matInput formControlName="serviceId" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>ID QR</mat-label>
+            <input matInput formControlName="idQr" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Suministro</mat-label>
+            <input matInput formControlName="supplyNumber" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Responsable</mat-label>
+            <input matInput formControlName="responsable" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Monto m?n</mat-label>
+            <input matInput type="number" formControlName="minAmount" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Monto m?x</mat-label>
+            <input matInput type="number" formControlName="maxAmount" />
+          </mat-form-field>
+        </form>
+
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+            <button title="Limpiar" type="button" class="btn button-secondary" (click)="clearQueueFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn button-primary" (click)="loadQueue()">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="queue-stats">
+      <div class="queue-stat">
+        <div class="stat-label">Pendientes hoy</div>
+        <div class="stat-value">{{ todayStats?.pending || 0 }}</div>
+      </div>
+      <div class="queue-stat">
+        <div class="stat-label">Procesando hoy</div>
+        <div class="stat-value">{{ todayStats?.processing || 0 }}</div>
+      </div>
+      <div class="queue-stat">
+        <div class="stat-label">Exitosos hoy</div>
+        <div class="stat-value">{{ todayStats?.success || 0 }}</div>
+      </div>
+      <div class="queue-stat">
+        <div class="stat-label">Fallidos hoy</div>
+        <div class="stat-value">{{ todayStats?.failed || 0 }}</div>
+      </div>
+      <div class="queue-stat">
+        <div class="stat-label">Omitidos hoy</div>
+        <div class="stat-value">{{ todayStats?.skipped || 0 }}</div>
+      </div>
+    </div>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <uni-dynamic-table
+          [columns]="queueColumns"
+          [data]="queueData"
+          element_id="instruction_id"
+          [lengthTable]="queueTotal"
+          [paginationinFrontend]="false"
+          (pageChange)="onQueuePageChange($event)"
+          (clickButtonEvent)="onQueueAction($event)"
+          [showExport]="false">
+        </uni-dynamic-table>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-template #historyDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>history</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Historial de reproceso</div>
+          <div class="qr-dialog-subtitle">Detalle del procesamiento</div>
+        </div>
+      </div>
+      <mat-dialog-content class="qr-dialog-content">
+        <uni-dynamic-table
+          [columns]="[
+            { name: 'Status', attribute: 'status', config: { styleClass: true } },
+            { name: 'Responsable', attribute: 'responsable' },
+            { name: 'Mensaje', attribute: 'message' },
+            { name: 'Creado', attribute: 'created_at' }
+          ]"
+          [data]="historyData"
+          [lengthTable]="historyTotal"
+          [paginationinFrontend]="false"
+          (pageChange)="onHistoryPageChange($event)"
+          [showExport]="false">
+        </uni-dynamic-table>
+      </mat-dialog-content>
+      <mat-dialog-actions align="end" class="qr-dialog-actions">
+        <button mat-button mat-dialog-close>Cerrar</button>
+      </mat-dialog-actions>
+    </ng-template>
+  </div>
+</div>
