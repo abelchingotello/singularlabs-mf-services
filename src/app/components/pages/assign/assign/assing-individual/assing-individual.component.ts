@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { forkJoin } from 'rxjs';
 import { DynamicTableComponent } from 'src/app/components/library/dynamic-table/dynamic-table.component';
@@ -66,6 +66,7 @@ export class AssingIndividualComponent implements OnInit {
   //------------------------
   public disableEntities = false;
   public disableAll = false;
+  public returnUrl: String;
 
   constructor(
     private serviceServ: ServicesService,
@@ -76,6 +77,7 @@ export class AssingIndividualComponent implements OnInit {
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private cookies: CookieService,
+    private route: ActivatedRoute,
   ) {}
 
   /****************************************** METODOS INICIALES **********************************************/
@@ -85,6 +87,9 @@ export class AssingIndividualComponent implements OnInit {
     this.initialForm();
     this.functionDataCurrent = this.searchService.bind(this);
     this.functionDataCurrent(this.pageSize);
+    this.route.queryParams.subscribe(params => {
+      this.returnUrl = params['returnUrl'] || '/assign';
+    });
   }
 
   onUppercaseInput(event: Event, controlName: string): void {
@@ -244,7 +249,7 @@ export class AssingIndividualComponent implements OnInit {
   }
 
   onCancel() {
-    this.router.navigate(['../assign']);
+    this.router.navigate([`../${this.returnUrl}`]);
   }
 
   /************************************* METODOS PARA LOS INPUTS *******************************************/
