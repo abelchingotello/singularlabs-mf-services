@@ -717,7 +717,7 @@ export class GenerateQR implements OnInit {
     this.qrForm = this.fb.group({
       service_type: [''],
       idService: ['', [Validators.required]],
-      suministro: ['', [Validators.required, Validators.pattern(/^\d{1,6}$/)]],
+      suministro: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
       titular: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{2})$/), this.maxAmountValidator(500)]],
       receipt_number: ['', [Validators.pattern(/^\d+$/)]],
