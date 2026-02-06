@@ -30,14 +30,14 @@
     "jwt-decode": "^3.1.2",
     "ngx-cookie-service": "^14.0.1",
     "ngx-toastr": "^15.2.0",
+    "qrcode": "^1.5.3",
     "rxjs": "~7.5.0",
     "single-spa": ">=4.0.0",
     "single-spa-angular": "7.1.0",
     "tslib": "^2.3.0",
     "xlsx": "^0.18.5",
-    "zone.js": "~0.11.4",
-    "qrcode": "^1.5.3"
-  }, 
+    "zone.js": "~0.11.4"
+  },
   "devDependencies": {
     "@angular-builders/custom-webpack": "^14.0.1",
     "@angular-devkit/build-angular": "^14.2.13",
@@ -45,6 +45,7 @@
     "@angular/compiler-cli": "^14.2.0",
     "@types/jasmine": "~4.0.0",
     "@types/node": "^16.18.108",
+    "@types/qrcode": "^1.5.5",
     "@types/xlsx": "^0.0.36",
     "jasmine-core": "~4.3.0",
     "karma": "~6.4.0",

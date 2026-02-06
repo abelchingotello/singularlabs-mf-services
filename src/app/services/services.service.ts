@@ -205,29 +205,20 @@ export class ServicesService {
   ): Observable<any> {
     let params = new HttpParams();
 
-    if (filters?.name !== undefined) {
+    if (filters.name !== undefined) {
       params = params.set('name', filters.name);
     }
 
-    if (filters?.status !== undefined) {
+    if (filters.status !== undefined) {
       params = params.set('status', filters.status);
     }
 
-    if (filters?.type !== undefined) {
+    if (filters.type !== undefined) {
       params = params.set('type', filters.type);
     }
 
-    if (filters?.client !== undefined) {
+    if (filters.client !== undefined) {
       params = params.set('idClient', filters.client);
-    }
-    if (filters?.empresa !== undefined) {
-      params = params.set('empresa', filters.empresa);
-    }
-    if (filters?.start !== undefined) {
-      params = params.set('start', filters.start);
-    }
-    if (filters?.end !== undefined) {
-      params = params.set('end', filters.end);
     }
 
     params = params.set('format', format);

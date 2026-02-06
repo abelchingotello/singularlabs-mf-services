@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { forkJoin } from 'rxjs';
 import { MasterService } from 'src/app/services/master.service';
@@ -30,7 +30,6 @@ export class AssingMassiveComponent implements OnInit {
   public requiredIdClient: string = '';
   public disableFile: boolean = false;
   //------------------
-  public returnUrl: String;
 
   constructor(
     private serviceServ: ServicesService,
@@ -38,17 +37,13 @@ export class AssingMassiveComponent implements OnInit {
     private router: Router,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
-    private cookies: CookieService,
-    private route: ActivatedRoute
+    private cookies: CookieService
   ) { }
 
   /****************************************** METODOS INICIALES **********************************************/
 
   ngOnInit(): void {
     this.listData();
-    this.route.queryParams.subscribe(params => {
-      this.returnUrl = params['returnUrl'] || '/assign';
-    });
   }
 
 
@@ -195,7 +190,7 @@ export class AssingMassiveComponent implements OnInit {
 
 
   onCancel() {
-    this.router.navigate([`../${this.returnUrl}`]);
+    this.router.navigate(['../assign']);
   }
 
   /************************************* METODOS PARA LOS INPUTS *******************************************/
