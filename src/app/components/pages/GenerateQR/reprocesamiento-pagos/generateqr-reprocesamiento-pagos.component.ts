@@ -55,12 +55,12 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     { name: 'Estado', attribute: 'status', config: { styleClass: true } },
     { name: 'Intentos', attribute: 'attempt_count' },
     {
-      name: 'Pr?ximo intento',
+      name: 'Próximo intento',
       attribute: 'next_attempt_at',
       config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } }
     },
     {
-      name: '?ltimo intento',
+      name: 'Último intento',
       attribute: 'last_attempt_at',
       config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } }
     },

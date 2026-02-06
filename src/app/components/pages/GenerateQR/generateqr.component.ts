@@ -398,6 +398,7 @@ export class GenerateQR implements OnInit {
     this.isGeneratingMassive = false;
     this.massiveForm.reset();
     this.massiveForm.get('workers')?.setValue(1);
+    this.massiveForm.get('workers')?.disable({ emitEvent: false });
     this.qrMassiveDialogRef = this.dialog.open(this.generateQrMassiveDialog, {
       width: '640px',
       maxWidth: '92vw',
@@ -497,13 +498,13 @@ export class GenerateQR implements OnInit {
     if (this.isGeneratingMassive) {
       return;
     }
-    const fileName = this.massiveForm.get('fileName')?.value;
-    const workersRaw = this.massiveForm.get('workers')?.value;
+    const raw = this.massiveForm.getRawValue();
+    const fileName = raw.fileName;
     const payload = {
       sftpPath: `in/${fileName}`,
       outputDir: 'out',
-      workers: Number(workersRaw),
-      serviceName: this.massiveForm.get('serviceName')?.value
+      workers: 1,
+      serviceName: raw.serviceName
     };
     this.isGeneratingMassive = true;
     this.spinner.spinnerOnOff();
@@ -734,7 +735,8 @@ export class GenerateQR implements OnInit {
     this.massiveForm = this.fb.group({
       serviceName: ['', [Validators.required]],
       fileName: ['', [Validators.required]],
-      workers: [1, [Validators.required, Validators.min(1)]]
+      // Fixed for batch flow: always 1 worker.
+      workers: [{ value: 1, disabled: true }]
     })
   }
 

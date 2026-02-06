@@ -263,7 +263,7 @@
         </div>
         <div>
           <div class="qr-dialog-title">Generar QR masivo</div>
-          <div class="qr-dialog-subtitle">Selecciona archivo y workers</div>
+          <div class="qr-dialog-subtitle">Selecciona servicio y archivo</div>
         </div>
       </div>
       <div class="qr-dialog-content">
@@ -297,7 +297,7 @@
 
             <mat-form-field appearance="outline" class="qr-field">
               <mat-label>Workers</mat-label>
-              <input matInput type="number" formControlName="workers" min="1" />
+              <input matInput type="number" formControlName="workers" min="1" readonly />
             </mat-form-field>
           </form>
 
@@ -312,27 +312,6 @@
               <mat-label>Job ID</mat-label>
               <input matInput readonly [value]="massiveResult.jobId || '-'" />
               <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.jobId)">
-                <mat-icon>content_copy</mat-icon>
-              </button>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="qr-field">
-              <mat-label>Job original</mat-label>
-              <input matInput readonly [value]="massiveResult.jobOriginal || '-'" />
-              <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.jobOriginal)">
-                <mat-icon>content_copy</mat-icon>
-              </button>
-            </mat-form-field>
-
-            <div class="qr-result-item">
-              <div class="qr-result-label">Status</div>
-              <div class="qr-result-value">{{ massiveResult.status || '-' }}</div>
-            </div>
-
-            <mat-form-field appearance="outline" class="qr-field">
-              <mat-label>Output path</mat-label>
-              <input matInput readonly [value]="massiveResult.outputPath || '-'" />
-              <button mat-icon-button matSuffix type="button" (click)="copyText(massiveResult.outputPath)">
                 <mat-icon>content_copy</mat-icon>
               </button>
             </mat-form-field>
