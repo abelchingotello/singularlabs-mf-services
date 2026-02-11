@@ -2,7 +2,25 @@
   <h3 class="m-0 text-dialog" mat-dialog-title>Configuracion a {{Service}}</h3>
 </div>
 
-<form [formGroup]="formConfigEntity" class="pl-3">
+<form [formGroup]="formConfigService" class="pl-3">
+
+  <h3>Habilitar Pago Multiple</h3>
+  <p>Habilite opcion para pagar mas de 1 recibo en una misma solicitud usando nuevo endpoint.</p>
+  <mat-form-field class="col-lg-6" appearance="outline">
+    <mat-label>Pago Multiple</mat-label>
+    <mat-select formControlName="paymultiple_active">
+      <mat-option value="">
+        No Habilitar
+      </mat-option>
+      <mat-option value="paymultiple">
+        Pagar sin ordenar
+      </mat-option>
+      <mat-option value="paymultiple_latest">
+        Pagar segun antiguedad
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
 
   <h3>Límite Máximo de Recaudación Diaria</h3>
   <p>Establece el monto máximo permitido de recaudación diaria para el servicio.</p>

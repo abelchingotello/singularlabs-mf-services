@@ -133,7 +133,7 @@ export class ServicesComponent implements OnInit {
     this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
     this.functionDataCurrent(this.pageSize);
     this.currentUrl = this.router.url;
-    console.log('this.currentUrl',this.currentUrl);
+    console.log('this.currentUrl', this.currentUrl);
   }
 
   async selectCategory() {
@@ -216,9 +216,9 @@ export class ServicesComponent implements OnInit {
         (response) =>
           response?.data?.nextPageKey
             ? this.services.getServicesFromCategory(
-                this.service_type.value,
-                response.data.nextPageKey,
-              )
+              this.service_type.value,
+              response.data.nextPageKey,
+            )
             : EMPTY, // ✅ Termina el flujo cuando no hay más páginas
       ),
       map((response) => response?.data?.Items ?? []),
@@ -368,6 +368,8 @@ export class ServicesComponent implements OnInit {
         serviceAmountTransactionRestriccion:
           element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
+        servicepay_multiple: element.pay_multiple,
+        servicepay_latest: element.pay_latest,
       },
     });
 
