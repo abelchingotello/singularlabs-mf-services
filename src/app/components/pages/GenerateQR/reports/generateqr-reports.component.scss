@@ -13,6 +13,51 @@
   align-items: center;
 }
 
+/* report totals cards */
+.totals-card {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+
+.totals-card .mat-card-content {
+  padding: 0;
+}
+
+.totals-content {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.totals-item {
+  background: #fff;
+  border: 1px solid #e8eef5;
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.totals-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.totals-label mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.totals-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
 .totals-item {
   display: flex;
   flex-direction: column;
@@ -86,6 +131,38 @@
 }
 
 :host ::ng-deep .anulado {
+  background: #fecaca;
+  border-color: #dc2626;
+  color: #7f1d1d;
+}
+
+:host ::ng-deep .Si,
+:host ::ng-deep .No,
+:host ::ng-deep .si,
+:host ::ng-deep .no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  min-width: 80px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  border: 1px solid transparent;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .No,
+:host ::ng-deep .no {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+:host ::ng-deep .Si,
+:host ::ng-deep .si {
   background: #fecaca;
   border-color: #dc2626;
   color: #7f1d1d;

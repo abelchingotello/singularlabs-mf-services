@@ -26,6 +26,11 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>ID QR</mat-label>
+            <input matInput formControlName="idQr" digitsOnly inputmode="numeric" pattern="[0-9]*" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Servicio</mat-label>
             <mat-select formControlName="servicio" (selectionChange)="onFilterServiceChange($event)">
               <mat-option disabled class="search-option">
@@ -47,7 +52,7 @@
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Suministro</mat-label>
-            <input matInput formControlName="suministro" />
+            <input matInput formControlName="suministro" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -178,7 +183,7 @@
               <div class="detail-row"><span>N recibo:</span><span>{{ selectedRow?.numero_recibo || '-' }}</span></div>
               <div class="detail-row"><span>Vigencia:</span><span class="status-pill" [ngClass]="selectedRow?.estado_vigencia">{{ selectedRow?.estado_vigencia || '-' }}</span></div>
               <div class="detail-row"><span>Estado pago:</span><span class="status-pill" [ngClass]="selectedRow?.estado_pago_text">{{ selectedRow?.estado_pago_text || '-' }}</span></div>
-              <div class="detail-row"><span>Estado anulado:</span><span class="status-pill" [ngClass]="selectedRow?.estado_anulado_label">{{ selectedRow?.estado_anulado_label || '-' }}</span></div>
+              <div class="detail-row"><span>Anulado:</span><span class="status-pill" [ngClass]="selectedRow?.estado_anulado_display">{{ selectedRow?.estado_anulado_display || '-' }}</span></div>
               <div class="detail-row"><span>Notificacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.notificacion_at) }}</span></div>
               <div class="detail-row"><span>Fecha pago:</span><span>{{ formatDateTimeDisplay(selectedRow?.pago_at) }}</span></div>
             </div>

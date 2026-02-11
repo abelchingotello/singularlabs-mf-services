@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GenerateQR } from './generateqr.component';
 import { GenerateQrReprocesamientoPagosComponent } from './reprocesamiento-pagos/generateqr-reprocesamiento-pagos.component';
 import { GenerateQrReportsComponent } from './reports/generateqr-reports.component';
+import { DigitsOnlyDirective } from './digits-only.directive';
 import { MatIconModule } from '@angular/material/icon';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 
@@ -19,7 +20,8 @@ registerLocaleData(localeEs);
   declarations: [
     GenerateQR,
     GenerateQrReportsComponent,
-    GenerateQrReprocesamientoPagosComponent
+    GenerateQrReprocesamientoPagosComponent,
+    DigitsOnlyDirective
   ],
   imports: [
     CommonModule,

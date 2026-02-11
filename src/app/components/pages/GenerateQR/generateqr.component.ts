@@ -52,8 +52,8 @@ export class GenerateQR implements OnInit {
       }
     },
     {
-      name: 'Estado anulado',
-      attribute: 'estado_anulado_label',
+      name: 'Anulado',
+      attribute: 'estado_anulado_display',
       config: {
         styleClass: true
       }
@@ -128,8 +128,8 @@ export class GenerateQR implements OnInit {
     { value: '3', label: 'fallido' }
   ];
   public estadoAnuladoOptions = [
-    { value: '0', label: 'vigente' },
-    { value: '1', label: 'anulado' }
+    { value: '0', label: 'No' },
+    { value: '1', label: 'Si' }
   ];
   public qrFilteredServices: ServiceItem[] = [];
   public qrAllItems: ServiceItem[] = [];
@@ -673,7 +673,8 @@ export class GenerateQR implements OnInit {
           ...item,
           amount: this.normalizeAmount(item?.amount),
           estado_pago_label: this.formatEstadoPago(item?.estado_pago),
-          estado_anulado_label: this.formatEstadoAnulado(item?.estado_anulado)
+          estado_anulado_label: this.formatEstadoAnulado(item?.estado_anulado),
+          estado_anulado_display: this.formatAnuladoSiNo(item?.estado_anulado)
         }));
         this.dataFilter = [...this.dataFilter, ...normalizedItems];
         this.dataService = [...this.dataFilter];
@@ -702,9 +703,10 @@ export class GenerateQR implements OnInit {
       end_date: [''],
       estado_pago: [''],
       estado_anulado: [''],
-      suministro: [''],
+      suministro: ['', [Validators.pattern(/^\d*$/)]],
       empresa: [''],
       jobId: [''],
+      idQr: ['', [Validators.pattern(/^\d*$/)]],
       service_name: [''],
       idService: [''],
       service_type: [''],
@@ -1186,6 +1188,7 @@ export class GenerateQR implements OnInit {
     const suministro = String(this.serviceForm?.get('suministro')?.value || '').trim();
     const empresa = String(this.serviceForm?.get('empresa')?.value || '').trim();
     const jobId = String(this.serviceForm?.get('jobId')?.value || '').trim();
+    const idQr = String(this.serviceForm?.get('idQr')?.value || '').trim();
     const filters: Record<string, any> = {};
     if (start) {
       filters['start'] = start;
@@ -1207,6 +1210,9 @@ export class GenerateQR implements OnInit {
     }
     if (jobId) {
       filters['jobId'] = jobId;
+    }
+    if (idQr) {
+      filters['idQr'] = idQr;
     }
     return filters;
   }
@@ -1260,7 +1266,6 @@ export class GenerateQR implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 
-
   private formatEstadoAnulado(value: any): string {
     if (value === null || value === undefined || value === '') {
       return '-';
@@ -1279,7 +1284,19 @@ export class GenerateQR implements OnInit {
     }
   }
 
+  private formatAnuladoSiNo(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '-';
+    }
+    const num = Number(value);
+    if (Number.isNaN(num)) {
+      return String(value);
+    }
+    return num === 1 ? 'Si' : 'No';
+  }
+
   private formatEstadoPago(value: any): string {
+
     if (value === null || value === undefined || value === '') {
       return '-';
     }

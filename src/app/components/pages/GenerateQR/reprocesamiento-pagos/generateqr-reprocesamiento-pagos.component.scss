@@ -396,3 +396,325 @@
   border-radius: 999px;
   font-weight: 600;
 }
+
+
+/* History modal (reprocess) */
+::ng-deep .reprocess-history-dialog .mat-dialog-container {
+  border-radius: 18px;
+}
+
+.reprocess-history-card {
+  padding: 12px;
+}
+
+.history-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.history-meta-item {
+  flex: 1 1 220px;
+  background: #f6f8fb;
+  border: 1px solid #e8eef5;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.history-meta-label {
+  font-size: 12px;
+  color: #6b778c;
+}
+
+.history-meta-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2d3d;
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+/* Make message column wrap nicely */
+::ng-deep .reprocess-history-card table td {
+  vertical-align: top;
+}
+
+
+
+.edit-next-attempt-form {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 1rem;
+  align-items: start;
+  padding: 16px 12px;
+}
+
+@media (max-width: 900px) {
+  .edit-next-attempt-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Schedule dialog: match the QR modal look */
+::ng-deep .service-schedule-dialog .mat-dialog-container {
+  padding: 0 !important;
+  border-radius: 16px;
+  overflow: hidden !important;
+  background: #fff;
+}
+
+::ng-deep .service-schedule-dialog .mat-dialog-content {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden !important;
+}
+
+.schedule-dialog-shell {
+  padding: 0;
+  background: #fff;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 6px;
+  background: #fff;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #e6f2ff;
+  color: #1f5fbf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-content {
+  margin: 0;
+  padding: 0 24px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 70vh;
+  background: #fff;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-card {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 12px 16px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0 0 12px;
+}
+
+::ng-deep .service-schedule-dialog .qr-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 24px 16px;
+  background: #fff;
+}
+
+::ng-deep .service-schedule-dialog * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.schedule-form-grid {
+  width: 100%;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) 180px 180px;
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.schedule-field {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field,
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-wrapper,
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-flex,
+::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-infix {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.schedule-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+
+/* Reprocess dialogs: match the QR modal look */
+::ng-deep .reprocess-history-dialog .mat-dialog-container {
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+::ng-deep .reprocess-history-dialog .mat-dialog-content {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 6px;
+  background: #fff;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #e6f2ff;
+  color: #1f5fbf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-content {
+  padding: 0 24px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-card {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 12px 16px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0 auto 12px;
+  max-width: 1000px;
+}
+
+::ng-deep .reprocess-history-dialog .qr-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 24px 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+::ng-deep .reprocess-history-dialog * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Hide dynamic-table header controls in dialogs */
+::ng-deep .reprocess-history-dialog .buttons,
+::ng-deep .reprocess-history-dialog .viewOptions {
+  display: none !important;
+}
+
+::ng-deep .reprocess-history-dialog .custom-header-row-dynamic-table {
+  margin-top: 0;
+}
+
+/* Meta cards */
+::ng-deep .reprocess-history-dialog .history-meta {
+  margin-bottom: 12px;
+}
+
+::ng-deep .reprocess-history-dialog .history-meta-item {
+  background: #f6f8fb;
+  border: 1px solid #e8eef5;
+}
+
+/* Status badges inside uni-dynamic-table (match the pill style used in other tables) */
+:host ::ng-deep .pending,
+:host ::ng-deep .processing,
+:host ::ng-deep .success,
+:host ::ng-deep .failed,
+:host ::ng-deep .skipped {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 10px !important;
+  min-width: 120px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2px !important;
+  border: 1px solid transparent !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+:host ::ng-deep .pending {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+:host ::ng-deep .processing {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #075985 !important;
+}
+
+:host ::ng-deep .success {
+  background: #bbf7d0 !important;
+  border-color: #16a34a !important;
+  color: #166534 !important;
+}
+
+:host ::ng-deep .failed {
+  background: #fecaca !important;
+  border-color: #dc2626 !important;
+  color: #7f1d1d !important;
+}
+
+:host ::ng-deep .skipped {
+  background: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+  color: #374151 !important;
+}
+

@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { finalize } from 'rxjs';
@@ -45,7 +45,7 @@ export class GenerateQrReportsComponent implements OnInit {
     { name: 'Titular', attribute: 'titular' },
     { name: 'Vigencia', attribute: 'estado_vigencia', config: { styleClass: true } },
     { name: 'Estado pago', attribute: 'estado_pago_text', config: { styleClass: true } },
-    { name: 'Estado anulado', attribute: 'estado_anulado_label', config: { styleClass: true } },
+    { name: 'Anulado', attribute: 'estado_anulado_display', config: { styleClass: true } },
     {
       name: 'Notificacion',
       attribute: 'notificacion_at',
@@ -134,8 +134,8 @@ export class GenerateQrReportsComponent implements OnInit {
 
   public estadoAnuladoOptions = [
     { value: '', label: 'NINGUNO' },
-    { value: '0', label: 'vigente' },
-    { value: '1', label: 'anulado' }
+    { value: '0', label: 'No' },
+    { value: '1', label: 'Si' }
   ];
 
   public vigenciaOptions = [
@@ -170,8 +170,9 @@ export class GenerateQrReportsComponent implements OnInit {
     this.reportForm = this.fb.group({
       start: [''],
       end: [''],
+      idQr: ['', [Validators.pattern(/^\d*$/)]],
       servicio: [''],
-      suministro: [''],
+      suministro: ['', [Validators.pattern(/^\d*$/)]],
       titular: [''],
       expiredFrom: [''],
       expiredTo: [''],
@@ -477,12 +478,18 @@ export class GenerateQrReportsComponent implements OnInit {
       }
     });
   }
-
   private normalizeReport(item: any) {
     const estadoPagoRaw = item?.estado_pago ?? item?.estadoPago ?? item?.estado;
     const estadoPagoLabel = this.formatEstadoPago(estadoPagoRaw);
-    const estadoAnuladoLabel = this.formatEstadoAnulado(item?.estado_anulado ?? item?.estadoAnulado);
-    const vigenciaLabel = estadoAnuladoLabel === 'anulado' ? 'vencido' : this.formatVigencia(item?.estado_vigencia ?? item?.vigencia);
+
+    const estadoAnuladoRaw = item?.estado_anulado ?? item?.estadoAnulado;
+    const estadoAnuladoLabel = this.formatEstadoAnulado(estadoAnuladoRaw);
+    const estadoAnuladoDisplay = this.formatAnuladoSiNo(estadoAnuladoRaw);
+    const isAnulado = Number(estadoAnuladoRaw) === 1;
+
+    const vigenciaLabel = isAnulado
+      ? 'vencido'
+      : this.formatVigencia(item?.estado_vigencia ?? item?.vigencia);
     return {
       qr_id: item?.qr_id ?? item?.id_qr ?? item?.idQr ?? item?.id,
       hash_qr: item?.hash_qr ?? item?.hash ?? item?.qrHash,
@@ -497,6 +504,7 @@ export class GenerateQrReportsComponent implements OnInit {
       estado_pago_text: item?.estado_pago_text ?? estadoPagoLabel,
       estado_pago_raw: estadoPagoRaw,
       estado_anulado_label: estadoAnuladoLabel,
+      estado_anulado_display: estadoAnuladoDisplay,
       notificacion_at: item?.notificacion_at ?? item?.notified_at ?? item?.fecha_notificacion,
       pago_at: item?.pago_at ?? item?.paid_at ?? item?.fecha_pago,
       qr_image_path: item?.qr_image_path
@@ -535,6 +543,17 @@ export class GenerateQrReportsComponent implements OnInit {
       return num === 1 ? 'anulado' : 'vigente';
     }
     return String(value).toLowerCase().replace(/_/g, ' ');
+  }
+
+  private formatAnuladoSiNo(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '-';
+    }
+    const num = Number(value);
+    if (Number.isNaN(num)) {
+      return String(value);
+    }
+    return num === 1 ? 'Si' : 'No';
   }
 
   private formatVigencia(value: any): string {
@@ -579,6 +598,7 @@ export class GenerateQrReportsComponent implements OnInit {
     if (start) filters['start'] = start;
     if (end) filters['end'] = end;
 
+    const idQr = get('idQr');
     const servicio = get('servicio');
     const suministro = get('suministro');
     const titular = get('titular');
@@ -586,6 +606,7 @@ export class GenerateQrReportsComponent implements OnInit {
     const estadoPago = get('estadoPago');
     const estadoAnulado = get('estadoAnulado');
 
+    if (idQr) filters['idQr'] = idQr;
     if (servicio) filters['servicio'] = servicio;
     if (suministro) filters['suministro'] = suministro;
     if (titular) filters['cliente'] = titular;
