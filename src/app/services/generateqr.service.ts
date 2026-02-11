@@ -158,6 +158,22 @@ export class GenerateQrService {
     return this.httpClient.get<any>(this.reprocessHistoryUrl, { params });
   }
 
+  reprocessPayments(queueIds: number[], responsable?: string): Observable<any> {
+    const body: any = { queueIds };
+    if (responsable) {
+      body.responsable = responsable;
+    }
+    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/reprocess-payments`, body);
+  }
+
+  reprocessNextAttempt(queueId: number, nextAttemptAt: string, responsable?: string): Observable<any> {
+    const body: any = { queueId, nextAttemptAt };
+    if (responsable) {
+      body.responsable = responsable;
+    }
+    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/reprocess-next-attempt`, body);
+  }
+
   notificationHistory(idQr: string): Observable<any> {
     return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/qr/notification-history`, { idQr });
   }
