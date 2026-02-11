@@ -5,9 +5,12 @@ import { PageEvent } from '@angular/material/paginator';
 import { EMPTY } from 'rxjs';
 import { expand, finalize, map, scan } from 'rxjs/operators';
 import { GenerateQrService } from 'src/app/services/generateqr.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
+import { DynamicTableComponent } from '../../../library/dynamic-table/dynamic-table.component';
+import jwtDecode from 'jwt-decode';
 
 interface ServiceItem {
   id: string;
@@ -24,8 +27,17 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
   private scheduleDialogRef?: MatDialogRef<any>;
   @ViewChild('historyDialog') historyDialog!: TemplateRef<any> | null;
   private historyDialogRef?: MatDialogRef<any>;
+  @ViewChild('editNextAttemptDialog') editNextAttemptDialog!: TemplateRef<any> | null;
+  private editNextAttemptDialogRef?: MatDialogRef<any>;
+
+
+  @ViewChild('queueTable') queueTable?: DynamicTableComponent;
   scheduleForm: FormGroup;
   queueForm: FormGroup;
+
+  editNextAttemptForm: FormGroup;
+  editingQueueRow: any = null;
+  isUpdatingNextAttempt = false;
 
   scheduleColumns: any[] = [
     { name: 'Servicio', attribute: 'service' },
@@ -49,18 +61,18 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
   queueColumns: any[] = [
     { name: 'Instruction ID', attribute: 'instruction_id' },
     { name: 'ID QR', attribute: 'id_qr' },
-    { name: 'Service ID', attribute: 'service_id' },
+    { name: 'Servicio', attribute: 'service_name' },
     { name: 'Suministro', attribute: 'supply_number' },
     { name: 'Monto', attribute: 'amount' },
     { name: 'Estado', attribute: 'status', config: { styleClass: true } },
     { name: 'Intentos', attribute: 'attempt_count' },
     {
-      name: 'Pr?ximo intento',
+      name: 'Próximo intento',
       attribute: 'next_attempt_at',
       config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } }
     },
     {
-      name: '?ltimo intento',
+      name: 'Último intento',
       attribute: 'last_attempt_at',
       config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } }
     },
@@ -76,12 +88,15 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       config: {
         type: 'buttonicons',
         actions: [
+          { hide: false, bgClass: 'yellow', toolTip: 'Editar fecha reproceso', icon: 'edit', value: 'edit_next_attempt' },
           { hide: false, bgClass: 'gray', toolTip: 'Ver historial', icon: 'visibility', value: 'view_history' }
         ]
       }
     }
   ];
   queueData: any[] = [];
+  selectedQueueIds: number[] = [];
+  isReprocessingSelected = false;
   queuePage = 1;
   queuePageSize = 20;
   queueTotal = 0;
@@ -108,6 +123,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     private fb: FormBuilder,
     private services: ServicesService,
     private generateQrService: GenerateQrService,
+    private authService: AuthService,
     private spinner: SpinnerService,
     private toastr: MytoastrService,
     private dialog: MatDialog
@@ -118,12 +134,17 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       close_time: ['', Validators.required],
     });
 
+    this.editNextAttemptForm = this.fb.group({
+      date: ['', Validators.required],
+      time: ['', Validators.required]
+    });
+
     this.queueForm = this.fb.group({
       status: [''],
-      instructionId: [''],
+      instructionId: ['', [Validators.pattern(/^\d*$/)]],
       serviceId: [''],
-      idQr: [''],
-      supplyNumber: [''],
+      idQr: ['', [Validators.pattern(/^\d*$/)]],
+      supplyNumber: ['', [Validators.pattern(/^\d*$/)]],
       responsable: [''],
       dateFrom: [''],
       dateTo: [''],
@@ -140,7 +161,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       width: '980px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'service-schedule-dialog'
+      panelClass: ['service-schedule-dialog']
     });
   }
 
@@ -347,6 +368,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
   }
 
   loadQueue(): void {
+    this.clearQueueSelection();
     const formValue = this.queueForm.getRawValue();
     const filters: Record<string, any> = {
       status: formValue.status || undefined,
@@ -370,7 +392,9 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
         const items = Array.isArray(response?.items) ? response.items : [];
         this.queueData = items.map((item: any) => ({
           ...item,
-          status: item.status || '-',
+          service_name: item.service_name || item.serviceName || '-',
+          // Keep status normalized so dynamic-table styleClass matches our CSS selectors.
+          status: String(item.status || '-').toLowerCase(),
           styleClass: String(item.status || '').toLowerCase(),
           amount: item.amount ?? '-',
           attempt_count: item.attempt_count ?? '-',
@@ -400,13 +424,175 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     this.loadQueue();
   }
 
+
+
+  onQueueSelection(selected: any[]): void {
+    const rows = Array.isArray(selected) ? selected : [];
+    const ids: number[] = [];
+    for (const row of rows) {
+      const id = this.getQueueId(row);
+      if (id !== null) {
+        ids.push(id);
+      }
+    }
+    // unique
+    this.selectedQueueIds = Array.from(new Set(ids));
+  }
+
+  clearQueueSelection(): void {
+    this.selectedQueueIds = [];
+    this.queueTable?.clearSelection();
+  }
+
+  reprocessSelected(): void {
+    if (!this.selectedQueueIds.length || this.isReprocessingSelected) {
+      return;
+    }
+    this.isReprocessingSelected = true;
+    const responsable = this.getResponsable();
+    this.spinner.spinnerOnOff();
+    this.generateQrService.reprocessPayments(this.selectedQueueIds, responsable).pipe(
+      finalize(() => {
+        this.isReprocessingSelected = false;
+        this.spinner.spinnerOnOff();
+      })
+    ).subscribe({
+      next: () => {
+        this.toastr.showSuccess('OK', 'Reproceso encolado');
+        this.clearQueueSelection();
+        this.loadQueue();
+      },
+      error: (error) => this.toastr.handleHttpError(error)
+    });
+  }
+
+  public getQueueId(row: any): number | null {
+    const value = row?.queue_id ?? row?.id ?? row?.queueId;
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  private getResponsable(): string {
+    const user = this.authService.getUser?.();
+    const candidate = user?.username || user?.user_name || user?.name || user?.full_name || user?.email || user?.user || user?.nombre;
+    if (candidate) {
+      return String(candidate);
+    }
+    try {
+      const token = this.authService.getToken?.();
+      if (token) {
+        const decoded: any = jwtDecode(token);
+        return String(decoded?.username || decoded?.email || decoded?.['cognito:username'] || decoded?.sub || '');
+      }
+    } catch {
+      return '';
+    }
+    return '';
+  }
   onQueueAction(event: any): void {
     const action = event?.action || event?.value || event?.event || event?.type;
     const row = event?.element || event?.row || event?.data || event;
-    if (action !== 'view_history' || !row) {
+    if (!row) {
       return;
     }
-    this.openHistory(row);
+
+    if (action === 'edit_next_attempt') {
+      this.openEditNextAttempt(row);
+      return;
+    }
+
+    if (action === 'view_history') {
+      this.openHistory(row);
+    }
+  }
+
+  private pad2(value: number): string {
+    return String(value).padStart(2, '0');
+  }
+
+  private formatTime(date: Date): string {
+    return `${this.pad2(date.getHours())}:${this.pad2(date.getMinutes())}`;
+  }
+
+  private parseDateTimeToForm(value: any): { date: Date | null; time: string } {
+    if (!value) {
+      return { date: null, time: '' };
+    }
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) {
+      return { date: null, time: '' };
+    }
+    const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const time = this.formatTime(d);
+    return { date, time };
+  }
+
+  private openEditNextAttempt(row: any): void {
+    const queueId = this.getQueueId(row);
+    if (queueId === null || !this.editNextAttemptDialog) {
+      return;
+    }
+
+    this.editingQueueRow = row;
+    this.isUpdatingNextAttempt = false;
+
+    const parsed = this.parseDateTimeToForm(row?.next_attempt_at);
+    const fallback = new Date();
+
+    this.editNextAttemptForm.reset({
+      date: parsed.date || fallback,
+      time: parsed.time || this.formatTime(fallback)
+    });
+
+    this.editNextAttemptDialogRef = this.dialog.open(this.editNextAttemptDialog, {
+      width: '720px',
+      maxWidth: '95vw',
+      panelClass: ['reprocess-history-dialog']
+    });
+  }
+
+  confirmUpdateNextAttempt(): void {
+    if (this.editNextAttemptForm.invalid || this.isUpdatingNextAttempt) {
+      this.editNextAttemptForm.markAllAsTouched();
+      return;
+    }
+
+    const queueId = this.getQueueId(this.editingQueueRow);
+    if (queueId === null) {
+      return;
+    }
+
+    const dateVal: any = this.editNextAttemptForm.get('date')?.value;
+    const timeVal = String(this.editNextAttemptForm.get('time')?.value || '').trim();
+    const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
+
+    if (Number.isNaN(date.getTime()) || !/^\d{2}:\d{2}$/.test(timeVal)) {
+      this.toastr.showError('Error', 'Fecha u hora invalida');
+      return;
+    }
+
+    const yyyy = date.getFullYear();
+    const MM = this.pad2(date.getMonth() + 1);
+    const dd = this.pad2(date.getDate());
+    const nextAttemptAt = `${yyyy}-${MM}-${dd}T${timeVal}:00`;
+
+    this.isUpdatingNextAttempt = true;
+    const responsable = this.getResponsable();
+
+    this.spinner.spinnerOnOff();
+    this.generateQrService.reprocessNextAttempt(queueId, nextAttemptAt, responsable).pipe(
+      finalize(() => {
+        this.isUpdatingNextAttempt = false;
+        this.spinner.spinnerOnOff();
+      })
+    ).subscribe({
+      next: () => {
+        this.toastr.showSuccess('OK', 'Fecha de reproceso actualizada');
+        this.editNextAttemptDialogRef?.close();
+        this.loadQueue();
+      },
+      error: (error) => this.toastr.handleHttpError(error)
+    });
   }
 
   private openHistory(row: any): void {
@@ -425,7 +611,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       width: '980px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'service-schedule-dialog'
+      panelClass: ['reprocess-history-dialog']
     });
     this.loadHistory();
   }
@@ -443,12 +629,20 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       next: (response) => {
         this.historyTotal = response?.total ?? 0;
         const items = Array.isArray(response?.items) ? response.items : [];
-        this.historyData = items.map((item: any) => ({
-          ...item,
-          status: item.status || '-',
-          styleClass: String(item.status || '').toLowerCase(),
-          created_at: item.created_at || null
-        }));
+        this.historyData = items.map((item: any) => {
+          const code = item?.error_code || item?.errorCode || '';
+          const msg = item?.error_message || item?.errorMessage || item?.message || '';
+          const message = code && msg ? `${code}: ${msg}` : (msg || code || '-');
+          return {
+            ...item,
+            // Normalize so badge CSS applies.
+            status: String(item.status || '-').toLowerCase(),
+            styleClass: String(item.status || '').toLowerCase(),
+            action: item.action || '-',
+            message,
+            created_at: item.created_at || null
+          };
+        });
       },
       error: (error) => this.toastr.handleHttpError(error)
     });

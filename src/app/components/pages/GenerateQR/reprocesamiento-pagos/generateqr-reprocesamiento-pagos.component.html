@@ -7,7 +7,7 @@
           <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary"
             (click)="openScheduleDialog()">
             <mat-icon>schedule</mat-icon>
-            Registrar horario servicio
+             Ver horarios de servicio
           </button>
         </div>
       </div>
@@ -86,6 +86,7 @@
 
         <mat-card class="qr-dialog-card">
           <h3 class="mt-2 text-default">Horarios registrados</h3>
+          <div class="schedule-table-wrap">
           <uni-dynamic-table
             [columns]="scheduleColumns"
             [data]="scheduleData"
@@ -98,6 +99,7 @@
             (pageChange)="onPageChange($event)"
             (clickButtonEvent)="onScheduleAction($event)">
           </uni-dynamic-table>
+          </div>
 
         </mat-card>
       </mat-dialog-content>
@@ -140,7 +142,7 @@
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Instruction ID</mat-label>
-            <input matInput formControlName="instructionId" />
+            <input matInput formControlName="instructionId" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -150,12 +152,12 @@
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>ID QR</mat-label>
-            <input matInput formControlName="idQr" />
+            <input matInput formControlName="idQr" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Suministro</mat-label>
-            <input matInput formControlName="supplyNumber" />
+            <input matInput formControlName="supplyNumber" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -164,12 +166,12 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Monto m?n</mat-label>
+            <mat-label>Monto mín</mat-label>
             <input matInput type="number" formControlName="minAmount" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Monto m?x</mat-label>
+            <mat-label>Monto máx</mat-label>
             <input matInput type="number" formControlName="maxAmount" />
           </mat-form-field>
         </form>
@@ -215,17 +217,94 @@
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
         <uni-dynamic-table
+          #queueTable
           [columns]="queueColumns"
           [data]="queueData"
-          element_id="instruction_id"
+          [actionsOptions]="true"
+          element_id="ALL"
           [lengthTable]="queueTotal"
           [paginationinFrontend]="false"
           (pageChange)="onQueuePageChange($event)"
           (clickButtonEvent)="onQueueAction($event)"
+          (selectedIdsChange)="onQueueSelection($event)"
+          [refreshFunction]="loadQueue.bind(this)"
           [showExport]="false">
+
+          <button title="Limpiar seleccion" type="button" class="btn button-secondary" (click)="clearQueueSelection()"
+            [disabled]="!selectedQueueIds?.length || isReprocessingSelected">
+            <mat-icon>close</mat-icon>
+            Limpiar seleccion
+          </button>
+
+          <button title="Reprocesar seleccionados" type="button" class="btn button-primary" (click)="reprocessSelected()"
+            [disabled]="!selectedQueueIds?.length || isReprocessingSelected">
+            <mat-icon>autorenew</mat-icon>
+            {{ isReprocessingSelected ? 'Reprocesando...' : 'Reprocesar seleccionados' }}
+          </button>
+
         </uni-dynamic-table>
       </mat-card-content>
     </mat-card>
+
+
+    <ng-template #editNextAttemptDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>event</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Editar fecha de reproceso</div>
+          <div class="qr-dialog-subtitle">Actualiza el proximo intento de un registro</div>
+        </div>
+      </div>
+
+      <mat-dialog-content class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <div class="history-meta">
+            <div class="history-meta-item">
+              <div class="history-meta-label">Queue ID</div>
+              <div class="history-meta-value">{{ getQueueId(editingQueueRow) || '-' }}</div>
+            </div>
+            <div class="history-meta-item">
+              <div class="history-meta-label">Instruction ID</div>
+              <div class="history-meta-value">{{ editingQueueRow?.instruction_id || '-' }}</div>
+            </div>
+            <div class="history-meta-item">
+              <div class="history-meta-label">ID QR</div>
+              <div class="history-meta-value">{{ editingQueueRow?.id_qr || '-' }}</div>
+            </div>
+          </div>
+
+          <form [formGroup]="editNextAttemptForm" class="edit-next-attempt-form">
+            <mat-form-field appearance="outline" class="schedule-field">
+              <mat-label>Fecha reproceso</mat-label>
+              <input matInput [matDatepicker]="nextAttemptPicker" formControlName="date" />
+              <mat-datepicker-toggle matSuffix [for]="nextAttemptPicker"></mat-datepicker-toggle>
+              <mat-datepicker #nextAttemptPicker></mat-datepicker>
+              <mat-error *ngIf="editNextAttemptForm.get('date')?.touched && editNextAttemptForm.get('date')?.invalid">
+                Fecha requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="schedule-field schedule-time">
+              <mat-label>Hora reproceso</mat-label>
+              <input matInput type="time" formControlName="time" />
+              <mat-error *ngIf="editNextAttemptForm.get('time')?.touched && editNextAttemptForm.get('time')?.invalid">
+                Hora requerida
+              </mat-error>
+            </mat-form-field>
+          </form>
+        </mat-card>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end" class="qr-dialog-actions">
+        <button mat-button mat-dialog-close [disabled]="isUpdatingNextAttempt">Cancelar</button>
+        <button mat-raised-button color="primary" type="button" (click)="confirmUpdateNextAttempt()"
+          [disabled]="editNextAttemptForm.invalid || isUpdatingNextAttempt">
+          {{ isUpdatingNextAttempt ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </mat-dialog-actions>
+    </ng-template>
 
     <ng-template #historyDialog>
       <div class="qr-dialog-header">
@@ -238,19 +317,37 @@
         </div>
       </div>
       <mat-dialog-content class="qr-dialog-content">
-        <uni-dynamic-table
-          [columns]="[
-            { name: 'Status', attribute: 'status', config: { styleClass: true } },
-            { name: 'Responsable', attribute: 'responsable' },
-            { name: 'Mensaje', attribute: 'message' },
-            { name: 'Creado', attribute: 'created_at' }
-          ]"
-          [data]="historyData"
-          [lengthTable]="historyTotal"
-          [paginationinFrontend]="false"
-          (pageChange)="onHistoryPageChange($event)"
-          [showExport]="false">
-        </uni-dynamic-table>
+        <mat-card class="qr-dialog-card reprocess-history-card">
+          <div class="history-meta">
+            <div class="history-meta-item">
+              <div class="history-meta-label">Queue ID</div>
+              <div class="history-meta-value">{{ historyQueueId || '-' }}</div>
+            </div>
+            <div class="history-meta-item">
+              <div class="history-meta-label">Total</div>
+              <div class="history-meta-value">{{ historyTotal || 0 }}</div>
+            </div>
+          </div>
+
+          <uni-dynamic-table
+            [actionsOptions]="false"
+            [viewOptionsTable]="false"
+            [viewCheckboxHeader]="false"
+            [showExport]="false"
+            [columns]="[
+              { name: 'Status', attribute: 'status', config: { styleClass: true } },
+              { name: 'Responsable', attribute: 'responsable' },
+              { name: 'Accion', attribute: 'action' },
+              { name: 'Mensaje', attribute: 'message' },
+              { name: 'Creado', attribute: 'created_at', config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } } }
+            ]"
+            [data]="historyData"
+            [lengthTable]="historyTotal"
+            [paginationinFrontend]="false"
+            (pageChange)="onHistoryPageChange($event)"
+            [showExport]="false">
+          </uni-dynamic-table>
+        </mat-card>
       </mat-dialog-content>
       <mat-dialog-actions align="end" class="qr-dialog-actions">
         <button mat-button mat-dialog-close>Cerrar</button>

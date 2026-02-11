@@ -87,7 +87,7 @@ export class AssingIndividualComponent implements OnInit {
     this.initialForm();
     this.functionDataCurrent = this.searchService.bind(this);
     this.functionDataCurrent(this.pageSize);
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.returnUrl = params['returnUrl'] || '/assign';
     });
   }

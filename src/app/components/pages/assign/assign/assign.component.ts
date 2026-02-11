@@ -22,11 +22,11 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class AssignComponent implements OnInit {
   public columns: any[] = [
-    { name: 'Cliente', attribute: 'nameClient' },
     { name: 'Id del servicio', attribute: 'id' },
     { name: 'Nombre', attribute: 'name' },
     //{ 'name': 'Descripción', 'attribute': 'description' },
     { name: 'Tipo de servicio', attribute: 'serviceTypeName' },
+    { name: 'Cliente', attribute: 'nameClient' },
     { name: 'Comision Fija', attribute: 'ownFixedComission' },
     { name: 'Comision Porcentual', attribute: 'ownPctComission' },
     {
@@ -95,15 +95,6 @@ export class AssignComponent implements OnInit {
     this.listData();
     this.functionDataCurrent = this.dataInitial.bind(this);
     this.functionDataCurrent(this.pageSize);
-    this.currentUrl = this.router.url;
-  }
-
-  onUppercaseInput(event: Event, controlName: string): void {
-    const inputElement = event.target as HTMLInputElement;
-    const uppercasedValue = inputElement.value.toUpperCase();
-    this.assignServiceForm
-      .get(controlName)
-      ?.setValue(uppercasedValue, { emitEvent: false });
   }
 
   formService() {
@@ -238,15 +229,9 @@ export class AssignComponent implements OnInit {
   //Redireccionar a asignación individual(1) o masiva(2)
   redirectAsign(type: number) {
     if (type === 1) {
-      this.router.navigate(
-        ['../assign/individual'],
-        { queryParams: { returnUrl: this.currentUrl } }
-      );
+      this.router.navigate(['../assign/individual']);
     } else if (type === 2) {
-      this.router.navigate(
-        ['../assign/massive'],
-        { queryParams: { returnUrl: this.currentUrl } }
-      );
+      this.router.navigate(['../assign/massive']);
     }
   }
 
