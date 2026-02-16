@@ -514,3 +514,40 @@
 :host ::ng-deep .table-custom td:last-child .btn-custom {
   margin: 0 4px 0 0;
 }
+
+
+/* Reports table: widen QR ID column */
+:host ::ng-deep .reports-table-wrap .table-custom th:first-child,
+:host ::ng-deep .reports-table-wrap .table-custom td:first-child {
+  min-width: 220px;
+  width: 220px;
+  max-width: 220px;
+  white-space: normal;
+}
+
+
+:host ::ng-deep .reports-table-wrap .table-custom th:nth-child(4),
+:host ::ng-deep .reports-table-wrap .table-custom td:nth-child(4) {
+  min-width: 220px;
+  width: 220px;
+}
+
+:host ::ng-deep .reports-table-wrap .table-custom th:nth-child(8),
+:host ::ng-deep .reports-table-wrap .table-custom td:nth-child(8) {
+  min-width: 210px;
+  width: 210px;
+}
+
+
+/* Reports table: keep actions in one horizontal row */
+:host ::ng-deep .reports-table-wrap .table-custom th:last-child,
+:host ::ng-deep .reports-table-wrap .table-custom td:last-child {
+  min-width: 170px;
+  width: 170px;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .reports-table-wrap .table-custom td:last-child .btn-custom {
+  display: inline-flex;
+}
+

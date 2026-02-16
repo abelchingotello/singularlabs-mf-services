@@ -96,7 +96,7 @@ export class GenerateQrReportsComponent implements OnInit {
   public dataService: any[] = [];
   public dataFilter: any[] = [];
   public listFilters: any = {};
-  public pageSize: any = 10;
+  public pageSize: any = 5;
   public page: number = 1;
   public count: number = null;
   public totalCount: number = 0;
@@ -183,6 +183,7 @@ export class GenerateQrReportsComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
+    console.log('onPageChange report', event);
     const sizeChanged = event.pageSize !== this.pageSize;
     this.pageSize = event.pageSize;
     this.page = event.pageIndex + 1;
@@ -448,6 +449,12 @@ export class GenerateQrReportsComponent implements OnInit {
   private loadReports() {
     this.spinner.spinnerOnOff();
     const page = this.page && this.page > 0 ? this.page : 1;
+    const requiredLength = page * this.pageSize;
+    if (this.dataFilter?.length >= requiredLength) {
+      this.dataService = [...this.dataFilter];
+      this.spinner.spinnerOnOff();
+      return;
+    }
     this.generateQrService.listReports(page, this.pageSize, this.listFilters).pipe(
       finalize(() => this.spinner.spinnerOnOff())
     ).subscribe({
@@ -462,7 +469,10 @@ export class GenerateQrReportsComponent implements OnInit {
                 ? data
                 : [];
         const normalized = items.map((item: any) => this.normalizeReport(item));
-        this.dataFilter = normalized;
+        if (page === 1) {
+          this.dataFilter = [];
+        }
+        this.dataFilter = [...this.dataFilter, ...normalized];
         this.dataService = [...this.dataFilter];
         this.count = data?.total ?? data?.data?.total ?? normalized.length;
         this.totalCount = data?.totals?.count ?? data?.totals?.total ?? this.count ?? 0;
@@ -670,3 +680,6 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
+
+
+

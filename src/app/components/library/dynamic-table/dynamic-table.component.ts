@@ -76,6 +76,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() paginationinFrontend: any;
   @Input() shouldExport: boolean = false;
   @Input() showExport: boolean = true;
+  @Input() pageSizeOptions: number[] = [5, 10, 20, 50];
+  @Input() currentPageIndex: number = 0;
 
   @Output() toggleChange = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<PageEvent>();
@@ -249,13 +251,10 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   onPageChange(event: PageEvent) {
-    const from = event.pageIndex * event.pageSize;
-    const to = from + event.pageSize;
-
-    if (from < event.length) {
-      this.pageChange.emit(event);
-    }
+    // Always propagate paginator changes to parent (backend pagination).
+    this.pageChange.emit(event);
     this.pageSize = event.pageSize;
+    this.currentPageIndex = event.pageIndex;
   }
 
   onCellClick(value: any) {

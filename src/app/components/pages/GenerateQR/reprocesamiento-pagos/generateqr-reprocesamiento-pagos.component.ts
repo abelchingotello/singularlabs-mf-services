@@ -334,6 +334,11 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     this.filterServices();
   }
 
+
+  private normalizeStatus(status: any): string {
+    return String(status || '').trim().toLowerCase();
+  }
+
   private formatDateParam(value: any): string {
     if (!value) {
       return '';
@@ -350,6 +355,33 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     return String(value);
   }
 
+  private formatHistoryMessage(code: any, msg: any): string {
+    const codeText = String(code || '').trim();
+    const msgText = String(msg || '').trim();
+    const baseMessage = codeText && msgText ? `${codeText}: ${msgText}` : (msgText || codeText || '-');
+    if (baseMessage === '-') {
+      return baseMessage;
+    }
+
+    const recommendationRegex = /\b(recomendaci(?:o|\u00f3)n|recommendation)\s*:\s*/i;
+    const match = baseMessage.match(recommendationRegex);
+    if (!match || match.index === undefined) {
+      return baseMessage;
+    }
+
+    const summary = baseMessage.slice(0, match.index).trim();
+    const recommendation = baseMessage.slice(match.index + match[0].length).trim();
+    if (!recommendation) {
+      return summary || baseMessage;
+    }
+
+    if (!summary) {
+      return `Recomendacion:\n${recommendation}`;
+    }
+
+    return `${summary}\n\nRecomendacion:\n${recommendation}`;
+  }
+
   clearQueueFilters(): void {
     this.queueForm.reset({
       status: '',
@@ -364,11 +396,18 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       maxAmount: ''
     });
     this.queuePage = 1;
+    this.queueData = [];
+    this.clearQueueSelection();
     this.loadQueue();
   }
 
-  loadQueue(): void {
+  searchQueue(): void {
+    this.queuePage = 1;
+    this.queueData = [];
     this.clearQueueSelection();
+    this.loadQueue();
+  }
+  loadQueue(): void {
     const formValue = this.queueForm.getRawValue();
     const filters: Record<string, any> = {
       status: formValue.status || undefined,
@@ -383,25 +422,40 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       maxAmount: formValue.maxAmount || undefined
     };
 
+    const page = this.queuePage && this.queuePage > 0 ? this.queuePage : 1;
     this.spinner.spinnerOnOff();
-    this.generateQrService.listReprocessQueue(this.queuePage, this.queuePageSize, filters).pipe(
+    this.generateQrService.listReprocessQueue(page, this.queuePageSize, filters).pipe(
       finalize(() => this.spinner.spinnerOnOff())
     ).subscribe({
       next: (response) => {
         this.queueTotal = response?.total ?? 0;
         const items = Array.isArray(response?.items) ? response.items : [];
-        this.queueData = items.map((item: any) => ({
+        const normalized = items.map((item: any) => ({
           ...item,
           service_name: item.service_name || item.serviceName || '-',
-          // Keep status normalized so dynamic-table styleClass matches our CSS selectors.
-          status: String(item.status || '-').toLowerCase(),
-          styleClass: String(item.status || '').toLowerCase(),
+          status: this.normalizeStatus(item.status),
+          styleClass: this.normalizeStatus(item.status),
           amount: item.amount ?? '-',
           attempt_count: item.attempt_count ?? '-',
           next_attempt_at: item.next_attempt_at || null,
           last_attempt_at: item.last_attempt_at || null,
           created_at: item.created_at || null
         }));
+
+        if (page === 1) {
+          this.queueData = [...normalized];
+        } else {
+          const currentIds = new Set(this.queueData.map(row => this.getQueueId(row)).filter(id => id !== null));
+          const append = normalized.filter(row => {
+            const id = this.getQueueId(row);
+            if (id === null) {
+              return true;
+            }
+            return !currentIds.has(id);
+          });
+          this.queueData = [...this.queueData, ...append];
+        }
+
         this.todayStats = response?.today ?? {
           pending: 0,
           processing: 0,
@@ -413,19 +467,16 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       error: (error) => this.toastr.handleHttpError(error)
     });
   }
-
   onQueuePageChange(event: PageEvent): void {
     const sizeChanged = event.pageSize !== this.queuePageSize;
     this.queuePageSize = event.pageSize;
     this.queuePage = event.pageIndex + 1;
     if (sizeChanged) {
       this.queuePage = 1;
+      this.queueData = [];
     }
     this.loadQueue();
   }
-
-
-
   onQueueSelection(selected: any[]): void {
     const rows = Array.isArray(selected) ? selected : [];
     const ids: number[] = [];
@@ -620,8 +671,9 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     if (!this.historyQueueId) {
       return;
     }
+    const page = this.historyPage && this.historyPage > 0 ? this.historyPage : 1;
     this.spinner.spinnerOnOff();
-    this.generateQrService.listReprocessHistory(this.historyPage, this.historyPageSize, {
+    this.generateQrService.listReprocessHistory(page, this.historyPageSize, {
       queueId: this.historyQueueId
     }).pipe(
       finalize(() => this.spinner.spinnerOnOff())
@@ -629,32 +681,40 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       next: (response) => {
         this.historyTotal = response?.total ?? 0;
         const items = Array.isArray(response?.items) ? response.items : [];
-        this.historyData = items.map((item: any) => {
+        const normalized = items.map((item: any) => {
           const code = item?.error_code || item?.errorCode || '';
           const msg = item?.error_message || item?.errorMessage || item?.message || '';
-          const message = code && msg ? `${code}: ${msg}` : (msg || code || '-');
+          const message = this.formatHistoryMessage(code, msg);
           return {
             ...item,
-            // Normalize so badge CSS applies.
-            status: String(item.status || '-').toLowerCase(),
-            styleClass: String(item.status || '').toLowerCase(),
+            status: this.normalizeStatus(item.status),
+            styleClass: this.normalizeStatus(item.status),
             action: item.action || '-',
             message,
             created_at: item.created_at || null
           };
         });
+
+        if (page === 1) {
+          this.historyData = [...normalized];
+        } else {
+          const currentIds = new Set(this.historyData.map(row => row?.id).filter(id => id !== undefined && id !== null));
+          const append = normalized.filter(row => row?.id === undefined || row?.id === null || !currentIds.has(row.id));
+          this.historyData = [...this.historyData, ...append];
+        }
       },
       error: (error) => this.toastr.handleHttpError(error)
     });
   }
-
   onHistoryPageChange(event: PageEvent): void {
     const sizeChanged = event.pageSize !== this.historyPageSize;
     this.historyPageSize = event.pageSize;
     this.historyPage = event.pageIndex + 1;
     if (sizeChanged) {
       this.historyPage = 1;
+      this.historyData = [];
     }
     this.loadHistory();
   }
+
 }

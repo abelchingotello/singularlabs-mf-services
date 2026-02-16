@@ -182,7 +182,7 @@
               <mat-icon>filter_alt_off</mat-icon>
               Limpiar
             </button>
-            <button type="button" class="btn button-primary" (click)="loadQueue()">
+            <button type="button" class="btn button-primary" (click)="searchQueue()">
               <mat-icon>search</mat-icon>
               Buscar
             </button>
@@ -216,7 +216,8 @@
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <uni-dynamic-table
+        <div class="queue-table-wrap">
+<uni-dynamic-table
           #queueTable
           [columns]="queueColumns"
           [data]="queueData"
@@ -230,19 +231,20 @@
           [refreshFunction]="loadQueue.bind(this)"
           [showExport]="false">
 
-          <button title="Limpiar seleccion" type="button" class="btn button-secondary" (click)="clearQueueSelection()"
+          <button title="Limpiar" type="button" class="btn button-secondary" (click)="clearQueueSelection()"
             [disabled]="!selectedQueueIds?.length || isReprocessingSelected">
             <mat-icon>close</mat-icon>
-            Limpiar seleccion
+            Limpiar
           </button>
 
-          <button title="Reprocesar seleccionados" type="button" class="btn button-primary" (click)="reprocessSelected()"
+          <button title="Reprocesar" type="button" class="btn button-primary" (click)="reprocessSelected()"
             [disabled]="!selectedQueueIds?.length || isReprocessingSelected">
             <mat-icon>autorenew</mat-icon>
-            {{ isReprocessingSelected ? 'Reprocesando...' : 'Reprocesar seleccionados' }}
+            {{ isReprocessingSelected ? 'Reprocesando...' : 'Reprocesar' }}
           </button>
 
         </uni-dynamic-table>
+        </div>
       </mat-card-content>
     </mat-card>
 
@@ -343,6 +345,8 @@
             ]"
             [data]="historyData"
             [lengthTable]="historyTotal"
+            [currentPageIndex]="historyPage - 1"
+            [pageSizeOptions]="[5, 10, 20, 50]"
             [paginationinFrontend]="false"
             (pageChange)="onHistoryPageChange($event)"
             [showExport]="false">

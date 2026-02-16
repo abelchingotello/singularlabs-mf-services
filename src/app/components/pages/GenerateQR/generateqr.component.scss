@@ -355,3 +355,41 @@
 ::ng-deep .service-schedule-dialog .mat-dialog-container {
   padding: 0;
 }
+
+
+/* GenerateQR table: widen ID QR column */
+:host ::ng-deep .generateqr-table-wrap .table-custom th:first-child,
+:host ::ng-deep .generateqr-table-wrap .table-custom td:first-child {
+  min-width: 220px;
+  width: 220px;
+  max-width: 220px;
+  white-space: normal;
+}
+
+
+/* GenerateQR table: horizontal scroll */
+:host ::ng-deep .generateqr-table-wrap .container-view {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+
+:host ::ng-deep .generateqr-table-wrap .table-custom th:nth-child(9),
+:host ::ng-deep .generateqr-table-wrap .table-custom td:nth-child(9) {
+  min-width: 180px;
+  width: 180px;
+}
+
+
+/* GenerateQR table: keep actions in one horizontal row */
+:host ::ng-deep .generateqr-table-wrap .table-custom th:last-child,
+:host ::ng-deep .generateqr-table-wrap .table-custom td:last-child {
+  min-width: 180px;
+  width: 180px;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .generateqr-table-wrap .table-custom td:last-child .btn-custom {
+  display: inline-flex;
+}
+

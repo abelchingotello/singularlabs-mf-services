@@ -17,7 +17,10 @@ export class DialogServiceConfigComponent implements OnInit {
   public minBalanceDB: number;
   public amountDailyRestriccionDB: number;
   public amountTransactionRestriccionDB: number;
-  public formConfigEntity: FormGroup;
+  public maxConceptPayDB: number;
+  public paymultipleDB: boolean;
+  public paylatestDB: boolean;
+  public formConfigService: FormGroup;
   public activedSpinnerSend: boolean = false;
 
   constructor(
@@ -35,12 +38,20 @@ export class DialogServiceConfigComponent implements OnInit {
     this.Service = (this.data.serviceName)
     if (this.data.serviceAmountDailyRestriccion != 'N/A') this.amountDailyRestriccionDB = Number(this.data.serviceAmountDailyRestriccion)
     if (this.data.serviceAmountTransactionRestriccion != 'N/A') this.amountTransactionRestriccionDB = Number(this.data.serviceAmountTransactionRestriccion)
-    console.log('minBalanceDB', this.minBalanceDB)
+    if (this.data.servicepay_multiple) this.paymultipleDB = this.data.servicepay_multiple
+    if (this.data.servicepay_latest) this.paylatestDB = this.data.servicepay_latest
+    if (this.data.servicemax_concept_pay) this.maxConceptPayDB = this.data.servicemax_concept_pay
+
     this.initialForm();
-    /*
-    this.formConfigEntity.reset({
-      minBalance: '2'
-    });*/
+
+    if (this.data.servicepay_latest) {
+      this.formConfigService.get('paymultiple_active').setValue('paymultiple_latest')
+    } else if (this.data.servicepay_multiple) {
+      this.formConfigService.get('paymultiple_active').setValue('paymultiple')
+    } else {
+      this.formConfigService.get('paymultiple_active').setValue('')
+    }
+
     this.masterService.getItemsMasterTable("1").subscribe({
       next: (data) => {
         this.stateMaster = data;
@@ -50,11 +61,12 @@ export class DialogServiceConfigComponent implements OnInit {
   }
 
   initialForm() {
-    this.formConfigEntity = this.fb.group({
+    this.formConfigService = this.fb.group({
 
+      maxConceptPay: [{ value: this.maxConceptPayDB, disabled: false }],
       amountDailyRestriccion: [{ value: this.amountDailyRestriccionDB, disabled: false }],
       amountTransactionRestriccion: [{ value: this.amountTransactionRestriccionDB, disabled: false }],
-      minBalance: [{ value: this.minBalanceDB, disabled: false }],
+      paymultiple_active: [""],
       btnActualizar: ['']
     });
   }
@@ -71,6 +83,27 @@ export class DialogServiceConfigComponent implements OnInit {
     let updates: any = {};
     let removes: any = {};
 
+    if (this.paymultiple_active === "paymultiple_latest") {
+      if (!this.paylatestDB) {
+        updates.PAY_LATEST = true
+        if (!this.paymultipleDB) updates.PAY_MULTIPLE = true;
+      }
+    } else if (this.paymultiple_active === "paymultiple") {
+      if (this.paymultipleDB) {
+        if (this.paylatestDB) {
+          updates.PAY_MULTIPLE = true;
+          updates.PAY_LATEST = false;
+        }
+      } else {
+        updates.PAY_MULTIPLE = true;
+      }
+    } else if (this.paymultiple_active == "") {
+      if (this.paymultipleDB) {
+        updates.PAY_MULTIPLE = false;
+        if (this.paylatestDB) updates.PAY_LATEST = false;
+      }
+    }
+
     // Restricción diaria
     if (this.amountDailyRestriccion !== this.amountDailyRestriccionDB) {
       if (this.amountDailyRestriccion) {
@@ -86,6 +119,15 @@ export class DialogServiceConfigComponent implements OnInit {
         updates.AMOUNT_TRANSACTION_RESTRICCION = this.amountTransactionRestriccion;
       } else {
         removes.AMOUNT_TRANSACTION_RESTRICCION = true;
+      }
+    }
+
+    // Restricción por transacción
+    if (this.maxConceptPay !== this.maxConceptPayDB) {
+      if (this.maxConceptPay) {
+        updates.MAX_CONCEPT_PAY = this.maxConceptPay;
+      } else {
+        removes.MAX_CONCEPT_PAY = true;
       }
     }
 
@@ -121,15 +163,17 @@ export class DialogServiceConfigComponent implements OnInit {
     });
   }
 
-
-  get minBalance() {
-    return this.formConfigEntity.get('minBalance')?.value;
-  }
   get amountTransactionRestriccion() {
-    return this.formConfigEntity.get('amountTransactionRestriccion')?.value;
+    return this.formConfigService.get('amountTransactionRestriccion')?.value;
   }
   get amountDailyRestriccion() {
-    return this.formConfigEntity.get('amountDailyRestriccion')?.value;
+    return this.formConfigService.get('amountDailyRestriccion')?.value;
+  }
+  get paymultiple_active() {
+    return this.formConfigService.get('paymultiple_active')?.value;
+  }
+  get maxConceptPay() {
+    return this.formConfigService.get('maxConceptPay')?.value;
   }
 
   loadingChange(loading: boolean) {
@@ -142,5 +186,8 @@ export interface DialogData {
   serviceName: any,
   serviceId: any,
   serviceAmountTransactionRestriccion: any,
-  serviceAmountDailyRestriccion: any
+  serviceAmountDailyRestriccion: any,
+  servicepay_multiple: any,
+  servicemax_concept_pay: any,
+  servicepay_latest: any
 }

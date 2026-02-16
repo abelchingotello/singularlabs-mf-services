@@ -133,7 +133,7 @@ export class ServicesComponent implements OnInit {
     this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
     this.functionDataCurrent(this.pageSize);
     this.currentUrl = this.router.url;
-    console.log('this.currentUrl',this.currentUrl);
+    console.log('this.currentUrl', this.currentUrl);
   }
 
   async selectCategory() {
@@ -149,6 +149,7 @@ export class ServicesComponent implements OnInit {
     this.selectedCategory = true;
     await this.cargarServicios();
   }
+
   onUppercaseInput(event: Event, controlName: string): void {
     const inputElement = event.target as HTMLInputElement;
     const uppercasedValue = inputElement.value.toUpperCase();
@@ -216,9 +217,9 @@ export class ServicesComponent implements OnInit {
         (response) =>
           response?.data?.nextPageKey
             ? this.services.getServicesFromCategory(
-                this.service_type.value,
-                response.data.nextPageKey,
-              )
+              this.service_type.value,
+              response.data.nextPageKey,
+            )
             : EMPTY, // ✅ Termina el flujo cuando no hay más páginas
       ),
       map((response) => response?.data?.Items ?? []),
@@ -359,15 +360,17 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  openDialogConfigService(element) {
+  openDialogConfigService(element: any) {
     const dialogRef = this.dialog.open(DialogServiceConfigComponent, {
       width: '600px',
       data: {
         serviceName: element.name,
         serviceId: element.id,
-        serviceAmountTransactionRestriccion:
-          element.amountTransactionRestriccion,
+        serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
+        servicepay_multiple: element.pay_multiple,
+        servicepay_latest: element.pay_latest,
+        servicemax_concept_pay: element.max_concept_pay,
       },
     });
 
