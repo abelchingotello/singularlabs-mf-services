@@ -135,7 +135,7 @@
                 </tr>
             </table>
         </div>
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" aria-label="Selecciona la página" (page)="onPageChange($event)">
+        <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize" aria-label="Selecciona la página" (page)="onPageChange($event)">
         </mat-paginator>
     </mat-tab>
     <mat-tab *ngIf="selectedTab === 'tab2'">
@@ -185,7 +185,7 @@
                     No hay datos para mostrar
                 </ng-template>
             </div>
-            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Selecciona la página"
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize" showFirstLastButtons aria-label="Selecciona la página"
                 (page)="onPageChange($event)">
             </mat-paginator>
         </div>
