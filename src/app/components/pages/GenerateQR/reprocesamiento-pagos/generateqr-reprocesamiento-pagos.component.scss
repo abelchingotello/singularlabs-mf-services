@@ -718,3 +718,163 @@
   color: #374151 !important;
 }
 
+
+/* Mobile fix: service schedule form layout */
+@media (max-width: 768px) {
+  :host ::ng-deep .service-schedule-dialog .qr-dialog-content {
+    padding: 0 12px 16px !important;
+  }
+
+  .schedule-form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 8px 0 0 !important;
+  }
+
+  .schedule-form-grid .schedule-field,
+  .schedule-form-grid .schedule-time,
+  :host ::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field,
+  :host ::ng-deep .service-schedule-dialog .schedule-form-grid .mat-form-field-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  :host ::ng-deep .service-schedule-dialog .schedule-time .mat-form-field-infix {
+    padding: 0.65em 0 !important;
+  }
+
+  .schedule-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  .schedule-actions button {
+    width: 100% !important;
+  }
+}
+
+
+/* Reprocess queue table: widen Instruction ID column */
+:host ::ng-deep .queue-table-wrap .table-custom th:nth-child(2),
+:host ::ng-deep .queue-table-wrap .table-custom td:nth-child(2) {
+  min-width: 220px;
+  width: 220px;
+}
+
+
+/* Force status badge styles inside history modal table */
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.success,
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.pending,
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.processing,
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.failed,
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.skipped {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 10px !important;
+  min-width: 120px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border: 1px solid transparent !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.success {
+  background: #bbf7d0 !important;
+  border-color: #16a34a !important;
+  color: #166534 !important;
+}
+
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.pending {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.processing {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #075985 !important;
+}
+
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.failed {
+  background: #fecaca !important;
+  border-color: #dc2626 !important;
+  color: #7f1d1d !important;
+}
+
+:host ::ng-deep .reprocess-history-dialog .table-custom td .ellipsis-cell.skipped {
+  background: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+  color: #374151 !important;
+}
+
+
+/* Dialog overlay is outside :host, so apply status badges without :host scope */
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.success,
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.pending,
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.processing,
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.failed,
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.skipped {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 10px !important;
+  min-width: 120px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border: 1px solid transparent !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.success {
+  background: #bbf7d0 !important;
+  border-color: #16a34a !important;
+  color: #166534 !important;
+}
+
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.pending {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.processing {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #075985 !important;
+}
+
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.failed {
+  background: #fecaca !important;
+  border-color: #dc2626 !important;
+  color: #7f1d1d !important;
+}
+
+::ng-deep .reprocess-history-dialog .table-custom .ellipsis-cell.skipped {
+  background: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+  color: #374151 !important;
+}
+
+/* History modal message: separate summary and recommendation */
+::ng-deep .reprocess-history-dialog .reprocess-history-card .table-custom th:nth-child(4),
+::ng-deep .reprocess-history-dialog .reprocess-history-card .table-custom td:nth-child(4) {
+  min-width: 380px;
+}
+
+::ng-deep .reprocess-history-dialog .reprocess-history-card .table-custom td:nth-child(4) .ellipsis-cell {
+  display: block;
+  white-space: pre-line !important;
+  line-height: 1.45;
+}

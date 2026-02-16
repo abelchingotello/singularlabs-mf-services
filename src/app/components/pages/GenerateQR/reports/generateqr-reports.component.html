@@ -142,10 +142,12 @@
 
     <mat-card class="custom-border-radius-1-25">
       <mat-card-content>
-        <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr"
-          [refreshFunction]="searchData.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
-          (clickButtonEvent)="clickButton($event)" [showExport]="false">
-        </uni-dynamic-table>
+        <div class="reports-table-wrap">
+          <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr"
+            [refreshFunction]="searchData.bind(this)" [currentPageIndex]="page - 1" [pageSizeOptions]="[5, 10, 20, 50]" (pageChange)="onPageChange($event)" [lengthTable]="count"
+            (clickButtonEvent)="clickButton($event)" [showExport]="false">
+          </uni-dynamic-table>
+        </div>
       </mat-card-content>
     </mat-card>
 
@@ -327,4 +329,7 @@
         </mat-card>
       </div>
     </ng-template>
+
+
+
 
