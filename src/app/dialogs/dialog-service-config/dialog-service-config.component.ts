@@ -17,6 +17,7 @@ export class DialogServiceConfigComponent implements OnInit {
   public minBalanceDB: number;
   public amountDailyRestriccionDB: number;
   public amountTransactionRestriccionDB: number;
+  public maxConceptPayDB: number;
   public paymultipleDB: boolean;
   public paylatestDB: boolean;
   public formConfigService: FormGroup;
@@ -39,6 +40,7 @@ export class DialogServiceConfigComponent implements OnInit {
     if (this.data.serviceAmountTransactionRestriccion != 'N/A') this.amountTransactionRestriccionDB = Number(this.data.serviceAmountTransactionRestriccion)
     if (this.data.servicepay_multiple) this.paymultipleDB = this.data.servicepay_multiple
     if (this.data.servicepay_latest) this.paylatestDB = this.data.servicepay_latest
+    if (this.data.servicemax_concept_pay) this.maxConceptPayDB = this.data.servicemax_concept_pay
 
     this.initialForm();
 
@@ -61,6 +63,7 @@ export class DialogServiceConfigComponent implements OnInit {
   initialForm() {
     this.formConfigService = this.fb.group({
 
+      maxConceptPay: [{ value: this.maxConceptPayDB, disabled: false }],
       amountDailyRestriccion: [{ value: this.amountDailyRestriccionDB, disabled: false }],
       amountTransactionRestriccion: [{ value: this.amountTransactionRestriccionDB, disabled: false }],
       paymultiple_active: [""],
@@ -119,6 +122,15 @@ export class DialogServiceConfigComponent implements OnInit {
       }
     }
 
+    // Restricción por transacción
+    if (this.maxConceptPay !== this.maxConceptPayDB) {
+      if (this.maxConceptPay) {
+        updates.MAX_CONCEPT_PAY = this.maxConceptPay;
+      } else {
+        removes.MAX_CONCEPT_PAY = true;
+      }
+    }
+
     // Si no hay cambios, no enviar nada
     if (Object.keys(updates).length === 0 && Object.keys(removes).length === 0) {
       this.myToastr.showWarning('No se detectaron cambios para actualizar', '');
@@ -160,6 +172,9 @@ export class DialogServiceConfigComponent implements OnInit {
   get paymultiple_active() {
     return this.formConfigService.get('paymultiple_active')?.value;
   }
+  get maxConceptPay() {
+    return this.formConfigService.get('maxConceptPay')?.value;
+  }
 
   loadingChange(loading: boolean) {
     this.activedSpinnerSend = loading;
@@ -173,5 +188,6 @@ export interface DialogData {
   serviceAmountTransactionRestriccion: any,
   serviceAmountDailyRestriccion: any,
   servicepay_multiple: any,
+  servicemax_concept_pay: any,
   servicepay_latest: any
 }

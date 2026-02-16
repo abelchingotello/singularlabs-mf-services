@@ -149,6 +149,7 @@ export class ServicesComponent implements OnInit {
     this.selectedCategory = true;
     await this.cargarServicios();
   }
+
   onUppercaseInput(event: Event, controlName: string): void {
     const inputElement = event.target as HTMLInputElement;
     const uppercasedValue = inputElement.value.toUpperCase();
@@ -359,17 +360,17 @@ export class ServicesComponent implements OnInit {
     }
   }
 
-  openDialogConfigService(element) {
+  openDialogConfigService(element: any) {
     const dialogRef = this.dialog.open(DialogServiceConfigComponent, {
       width: '600px',
       data: {
         serviceName: element.name,
         serviceId: element.id,
-        serviceAmountTransactionRestriccion:
-          element.amountTransactionRestriccion,
+        serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
         servicepay_multiple: element.pay_multiple,
         servicepay_latest: element.pay_latest,
+        servicemax_concept_pay: element.max_concept_pay,
       },
     });
 
