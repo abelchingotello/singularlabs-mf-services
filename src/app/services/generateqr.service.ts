@@ -41,6 +41,8 @@ export class GenerateQrService {
         }
       });
     }
+
+    console.log('[QR LIST REQUEST]', `${this.listUrl}?${params.toString()}`);
     return this.httpClient.get<any>(this.listUrl, { params });
   }
 
