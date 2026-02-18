@@ -318,6 +318,9 @@ export class ServicesComponent implements OnInit {
         serviceId: element.id,
         serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
+        servicepay_multiple: element.pay_multiple,
+        servicemax_concept_pay: element.max_concept_pay,
+        servicepay_latest: element.pay_latest,
       }
     });
 
