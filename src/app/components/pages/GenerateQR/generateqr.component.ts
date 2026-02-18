@@ -1037,8 +1037,8 @@ export class GenerateQR implements OnInit {
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
-        console.error('Error durante la exportaci?n:', error);
-        this.mytoastr.showError('Error durante la exportaci?n', '');
+        console.error('Error durante la exportación:', error);
+        this.mytoastr.showError('Error durante la exportación', '');
       }
     });
   }
