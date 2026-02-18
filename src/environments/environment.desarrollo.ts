@@ -3,4 +3,6 @@ export const environment = {
   URL_API_GATEWAY:'https://rrmnpgfzii.execute-api.us-east-1.amazonaws.com/sandbox',
   URL_API_GENERATE_QR: 'https://n48ne1w1vb.execute-api.us-east-1.amazonaws.com/dev',
   URL_API_GENERATE_QR_API_KEY: '',
+  URL_API_GENERATE_QR_USERNAME: 'qrligopay',
+  URL_API_GENERATE_QR_PASSWORD: 'QrLigo@2026!Tmp9',
 };
