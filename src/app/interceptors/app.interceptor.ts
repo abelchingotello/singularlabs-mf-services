@@ -7,9 +7,8 @@ import {
   HTTP_INTERCEPTORS,
   HttpErrorResponse
 } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, from, Observable, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { CompanyService } from '../services/company.service';
 import { Router } from '@angular/router';
 import { MytoastrService } from '../services/mytoastr';
 import { environment } from 'src/environments/environment';
@@ -19,59 +18,90 @@ export class AppInterceptor implements HttpInterceptor {
 
   constructor(
     private authService: AuthService,
-    // private companyService: CompanyService,
     private router: Router,
-    private myToastr : MytoastrService,
-    private companyService: CompanyService,
+    private myToastr: MytoastrService,
   ) { }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const isGenerateQrApi = request.url.startsWith(environment.URL_API_GENERATE_QR);
+    const isGenerateQrLogin = isGenerateQrApi && request.url.includes('/v1/auth/cognito/login');
+    const isGenerateQrRefresh = isGenerateQrApi && request.url.includes('/v1/auth/cognito/refresh');
+    const skipGenerateQrAuth = request.headers.has('X-Skip-GenerateQr-Auth') || isGenerateQrLogin || isGenerateQrRefresh;
+
     let intReq = request;
-    const skipAuthForQr = request.url.startsWith(environment.URL_API_GENERATE_QR);
-    const token = this.authService.getToken();
-    // console.log("TOKENNNN: ",token)
-    const companyId = this.companyService.getCompanyId();
-    // const companyId = this.companyService.getCompanyId();
 
-    // if ((request.method === 'POST' || request.method === 'PUT') && (!company_id || company_id === 'null' || company_id === 'undefined' )) {
-    //   // Create an error response for invalid company_id
-    //   return throwError(() => new HttpErrorResponse({
-    //     status: 400.1,
-    //     statusText: 'Bad Request',
-    //     error: 'Invalid companyId: companyId is required for POST and PUT requests.'
-    //   }));
-    // }
+    if (intReq.headers.has('X-Skip-GenerateQr-Auth')) {
+      intReq = intReq.clone({ headers: intReq.headers.delete('X-Skip-GenerateQr-Auth') });
+    }
 
-    if (request.url.startsWith(environment.URL_API_GENERATE_QR) && environment.URL_API_GENERATE_QR_API_KEY) {
+    if (isGenerateQrApi && environment.URL_API_GENERATE_QR_API_KEY) {
       intReq = intReq.clone({
         headers: intReq.headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY)
       });
     }
 
-    if (token && !skipAuthForQr) {
+    if (isGenerateQrApi && !skipGenerateQrAuth) {
+      return from(this.authService.getValidGenerateQrToken()).pipe(
+        switchMap((token) => {
+          const authReq = intReq.clone({
+            headers: intReq.headers.set('Authorization', `Bearer ${token}`)
+          });
+          return this.forwardWithGenerateQrRetry(authReq, next);
+        })
+      );
+    }
 
-      const apiKey = '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm'; 
+    const skipAuthForQr = isGenerateQrApi;
+    const token = this.authService.getToken();
+    if (token && !skipAuthForQr) {
+      const apiKey = '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm';
       intReq = intReq.clone({
         headers: intReq.headers
-        .set('Authorization','Bearer ' + token)
-        .set('x-api-key', apiKey),
-        // params: request.params.set('companyId', companyId)
+          .set('Authorization', 'Bearer ' + token)
+          .set('x-api-key', apiKey),
       });
     }
+
     return next.handle(intReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          // Redirige al usuario a la página de inicio de sesión cuando el token caduca
-          this.myToastr.showError('Tu sesión ha caducado.','Por favor, inicia sesión nuevamente.');
+          this.myToastr.showError('Tu sesion ha caducado.', 'Por favor, inicia sesion nuevamente.');
           setTimeout(() => {
             this.router.navigate(['/sign-in']);
           }, 1000);
         }
-        // Devuelve el error para que otras partes de la aplicación puedan manejarlo si es necesario
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private forwardWithGenerateQrRetry(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const hasRetried = request.headers.get('X-GenerateQr-Retry') === '1';
+    const reqWithoutRetryHeader = request.headers.has('X-GenerateQr-Retry')
+      ? request.clone({ headers: request.headers.delete('X-GenerateQr-Retry') })
+      : request;
+
+    return next.handle(reqWithoutRetryHeader).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (!hasRetried && (error.status === 401 || error.status === 403)) {
+          return from(this.authService.getValidGenerateQrToken(true)).pipe(
+            switchMap((token) => {
+              const retryReq = reqWithoutRetryHeader.clone({
+                headers: reqWithoutRetryHeader.headers
+                  .set('Authorization', `Bearer ${token}`)
+                  .set('X-GenerateQr-Retry', '1')
+              });
+              return this.forwardWithGenerateQrRetry(retryReq, next);
+            }),
+            catchError((refreshError: HttpErrorResponse) => {
+              return throwError(() => refreshError);
+            })
+          );
+        }
         return throwError(() => error);
       })
     );
   }
 }
 
-export const interceptorSpringProvider = [{ provide: HTTP_INTERCEPTORS, useClass: AppInterceptor, multi: true }]
+export const interceptorSpringProvider = [{ provide: HTTP_INTERCEPTORS, useClass: AppInterceptor, multi: true }];

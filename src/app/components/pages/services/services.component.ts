@@ -11,40 +11,29 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
-import {
-  expand,
-  filter,
-  forkJoin,
-  EMPTY,
-  scan,
-  startWith,
-  lastValueFrom,
-  finalize,
-  map,
-} from 'rxjs';
+import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
 import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
 
 @Component({
   selector: 'uni-services',
   templateUrl: './services.component.html',
-  styleUrls: ['./services.component.scss'],
+  styleUrls: ['./services.component.scss']
 })
 export class ServicesComponent implements OnInit {
+
   public columns: any[] = [
-    { name: 'ID Servicio', attribute: 'id' },
-    { name: 'ID Servicio - Proveedor', attribute: 'id_serviceProv' },
-    { name: 'Nombre', attribute: 'name' },
-    { name: 'Descripción', attribute: 'description' },
-    { name: 'Comision Fija', attribute: 'fixedcomission' },
-    { name: 'Comision Porcentual', attribute: 'pctcomission' },
-    { name: 'Tipo de servicio', attribute: 'serviceTypeName' },
-    { name: 'Proveedor', attribute: 'nameProvider' },
+    { 'name': 'ID Servicio', 'attribute': 'id' },
+    { 'name': 'ID Servicio - Proveedor', 'attribute': 'id_serviceProv' },
+    { 'name': 'Nombre', 'attribute': 'name' },
+    { 'name': 'Descripción', 'attribute': 'description' },
+    { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
+    { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
+    { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
+    { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     {
-      name: 'Estado',
-      attribute: 'status',
-      config: {
-        styleClass: true,
-      },
+      'name': 'Estado', 'attribute': 'status', 'config': {
+        'styleClass': true
+      }
     },
     {
       name: 'Acciones',
@@ -57,24 +46,24 @@ export class ServicesComponent implements OnInit {
             bgClass: 'yellow',
             toolTip: 'Editar Servicio',
             icon: 'edit',
-            value: 'edit',
+            value: 'edit'
           },
           {
             hide: false,
             bgClass: 'gray',
             toolTip: 'Configurar Servicio',
             icon: 'settings_applications',
-            value: 'config_service',
-          },
-        ],
-      },
+            value: 'config_service'
+          }
+        ]
+      }
     },
   ];
   public options: any[] = [
     { value: 'Servicio', id: '1' },
     { value: 'Entidad-Servicio', id: '2' },
     { value: 'Client-Servicio', id: '3' },
-  ];
+  ]
 
   public pageSize: any = 5;
   public pageKey: any[];
@@ -83,12 +72,12 @@ export class ServicesComponent implements OnInit {
   public dataFilter: any = [];
   public dataService: any[];
   public functionDataCurrent: (pageSize: any) => any;
-  public disabledEditOption: any;
+  public disabledEditOption: any
   public editOption: any;
   public selectedIds: any;
   public stateMaster: any;
   public dataIdService: any;
-  public optionId: any;
+  public optionId: any
   public categoriesService: any[] = [];
   public filteredServices: ServiceItem[] = []; // Lista filtrada que se mostrará
   public listServicesSelected: ServiceItem[] = [];
@@ -104,7 +93,7 @@ export class ServicesComponent implements OnInit {
   public selectedCategory: boolean = false;
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
-  public currentUrl: string;
+
 
   constructor(
     private router: Router,
@@ -115,25 +104,23 @@ export class ServicesComponent implements OnInit {
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private personService: PersonService,
-    public dialog: MatDialog,
+    public dialog: MatDialog
   ) {
     this.pagUtils = new PaginationUtils();
   }
 
   ngOnInit(): void {
-    this.formService(); //inicializa los inputs como vacios
-    this.dataMaster(); //carga lista de estados
-    this.listData(); //carga lista de tipos de servicios
+    this.formService();//inicializa los inputs como vacios
+    this.dataMaster();//carga lista de estados
+    this.listData();//carga lista de tipos de servicios
     // Suscribirse a cambios y convertir a mayúsculas
-    this.service_name?.valueChanges.subscribe((value) => {
+    this.service_name?.valueChanges.subscribe(value => {
       if (value) {
         this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
       }
     });
     this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
     this.functionDataCurrent(this.pageSize);
-    this.currentUrl = this.router.url;
-    console.log('this.currentUrl', this.currentUrl);
   }
 
   async selectCategory() {
@@ -141,54 +128,44 @@ export class ServicesComponent implements OnInit {
       this.selectedCategory = false;
       this.filteredServices = [];
       this.listServicesSelected = [];
-      this.serviceForm.get('idService')?.setValue('');
-      this.serviceForm.get('service_name')?.setValue('');
+      this.serviceForm.get('idService')?.setValue('')
+      this.serviceForm.get('service_name')?.setValue('')
       return;
     }
-    this.serviceForm.get('service_name')?.setValue('');
+    this.serviceForm.get('service_name')?.setValue('')
     this.selectedCategory = true;
     await this.cargarServicios();
   }
 
-  onUppercaseInput(event: Event, controlName: string): void {
-    const inputElement = event.target as HTMLInputElement;
-    const uppercasedValue = inputElement.value.toUpperCase();
-    this.serviceForm
-      .get(controlName)
-      ?.setValue(uppercasedValue, { emitEvent: false });
-  }
-
   onServicesChange(event: any) {
     const selectedIds: string[] = event.value;
-    const idsCategoriaActual = new Set(this.allItems1.map((s) => s.id));
+    const idsCategoriaActual = new Set(this.allItems1.map(s => s.id));
 
     // Crear la lista de objetos seleccionados en esta categoría
     const selectedObjects = this.allItems1
-      .filter((s) => selectedIds.includes(s.id))
-      .map((s) => ({ id: s.id, name: s.name }));
+      .filter(s => selectedIds.includes(s.id))
+      .map(s => ({ id: s.id, name: s.name }));
 
     // Mantener los servicios seleccionados de otras categorías
     const filteredPrev = this.listServicesSelected.filter(
-      (item) => !idsCategoriaActual.has(item.id),
+      item => !idsCategoriaActual.has(item.id)
     );
 
     // Unir y eliminar duplicados
     this.listServicesSelected = [...filteredPrev, ...selectedObjects].filter(
-      (item, index, self) => index === self.findIndex((t) => t.id === item.id),
+      (item, index, self) => index === self.findIndex(t => t.id === item.id)
     );
 
     // Actualizar el control 'idService' con los IDs seleccionados
-    this.serviceForm
-      .get('idService')
-      ?.setValue(this.listServicesSelected.map((s) => s.id));
+    this.serviceForm.get('idService')?.setValue(this.listServicesSelected.map(s => s.id));
   }
 
   filterServices() {
     const value = this.serviceFilter?.toLowerCase() || '';
-    this.filteredServices = this.allItems1.filter((service) =>
-      service.name.toLowerCase().includes(value),
+    this.filteredServices = this.allItems1.filter(service =>
+      service.name.toLowerCase().includes(value)
     );
-    this.spinner.spinnerOnOff;
+    this.spinner.spinnerOnOff
   }
 
   async cargarServicios(): Promise<void> {
@@ -197,34 +174,30 @@ export class ServicesComponent implements OnInit {
       const allItems = await lastValueFrom(
         this.loadAllServices().pipe(
           filter((items: any) => items.length > 0),
-          finalize(() => this.spinner.spinnerOnOff()),
-        ),
+          finalize(() => this.spinner.spinnerOnOff())
+        )
       );
       this.filteredServices = allItems;
       this.allItems1 = allItems;
       this.serviceFilter = '';
       this.filterServices();
     } catch (error) {
-      console.error('❌ Error al cargar servicios:', error);
+      console.error("❌ Error al cargar servicios:", error);
       this.filteredServices = [];
-      this.mytoastr.showError('', 'No tiene Servicios');
+      this.mytoastr.showError('', 'No tiene Servicios')
     }
   }
 
   loadAllServices() {
     return this.services.getServicesFromCategory(this.service_type.value).pipe(
-      expand(
-        (response) =>
-          response?.data?.nextPageKey
-            ? this.services.getServicesFromCategory(
-              this.service_type.value,
-              response.data.nextPageKey,
-            )
-            : EMPTY, // ✅ Termina el flujo cuando no hay más páginas
+      expand(response =>
+        response?.data?.nextPageKey
+          ? this.services.getServicesFromCategory(this.service_type.value, response.data.nextPageKey)
+          : EMPTY // ✅ Termina el flujo cuando no hay más páginas
       ),
-      map((response) => response?.data?.Items ?? []),
+      map(response => response?.data?.Items ?? []),
       scan((acc, items) => acc.concat(items), []),
-      startWith([]),
+      startWith([])
     );
   }
 
@@ -237,62 +210,46 @@ export class ServicesComponent implements OnInit {
     const listIds = this.servicesId;
     this.spinner.spinnerOnOff();
     // return
-    console.log('pag key:');
+    console.log("pag key:");
     console.log(this.pageKey);
-    this.services
-      .getServices(
-        input,
-        inputStatus,
-        inputType,
-        null,
-        this.count,
-        null,
-        pageSize,
-        this.pageKey,
-        undefined,
-        inputId,
-        provider,
-        listIds,
-      )
-      .subscribe({
-        next: (data) => {
-          if (data.statusCode == 201) {
-            this.mytoastr.showWarning(data.messages, '');
-            return;
-          }
-          //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
-          //console.log(...data.data.Items);
-          this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
+    this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey, undefined, inputId, provider, listIds).subscribe({
+      next: (data) => {
+        if (data.statusCode == 201) {
+          this.mytoastr.showWarning(data.messages, '')
+          return
+        }
+        //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
+        //console.log(...data.data.Items);
+        this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
 
-          this.dataService = this.dataFilter.map((item) => ({
-            ...item,
-            serviceTypeName: item.serviceType?.name || '',
-          }));
-          //console.log("this.dataFilter: "+this.dataFilter);
-          //console.log("this.dataService: "+this.dataService);
-          console.log('data.data.nextPageKey:');
-          console.log(data.data.nextPageKey);
-          console.log('this.count:');
-          console.log(this.count);
-          console.log('data.data.Count:');
-          console.log(data.data.Count);
-          if (this.dataService.length == this.count) {
-            //se recuperaron todos los datos
-            this.pageKey = null;
-          } else {
-            this.pageKey = data.data.nextPageKey ?? null;
-          }
-          this.count = data.data.Count ?? 0;
-        },
-        error: (err) => {
-          console.log(err);
-          this.spinner.spinnerOnOff();
-        },
-        complete: () => {
-          this.spinner.spinnerOnOff();
-          this.close = true;
-        },
-      });
+        this.dataService = this.dataFilter.map(item => ({
+          ...item,
+          serviceTypeName: item.serviceType?.name || ''
+        }));
+        //console.log("this.dataFilter: "+this.dataFilter);
+        //console.log("this.dataService: "+this.dataService);
+        console.log("data.data.nextPageKey:");
+        console.log(data.data.nextPageKey);
+        console.log("this.count:");
+        console.log(this.count);
+        console.log("data.data.Count:");
+        console.log(data.data.Count);
+        if (this.dataService.length == this.count) {//se recuperaron todos los datos
+          this.pageKey = null;
+        } else {
+          this.pageKey = data.data.nextPageKey ?? null;
+        }
+        this.count = data.data.Count ?? 0;
+      },
+      error: (err) => {
+        console.log(err);
+        this.spinner.spinnerOnOff();
+      },
+      complete: () => {
+        this.spinner.spinnerOnOff();
+        this.close = true
+      }
+    })
   }
 
   formService() {
@@ -302,15 +259,12 @@ export class ServicesComponent implements OnInit {
       service_type: [''],
       service_id: [''],
       provider: [''],
-      status: [''],
-    });
+      status: ['']
+    })
   }
 
   addService() {
-    this.router.navigate(
-      ['service/add'],
-      { queryParams: { returnUrl: this.currentUrl } }
-    );
+    this.router.navigate(['service/add'])
   }
 
   updateService() {
@@ -322,22 +276,16 @@ export class ServicesComponent implements OnInit {
   }
 
   searchData() {
-    if (
-      !this.service_name.value &&
-      !this.status.value &&
-      !this.service_type.value &&
-      !this.service_id.value &&
-      !this.provider.value
-    ) {
-      this.mytoastr.showWarning('Ingrese un valor válido', '');
-      return;
+    if (!this.service_name.value && !this.status.value && !this.service_type.value && !this.service_id.value && !this.provider.value) {
+      this.mytoastr.showWarning('Ingrese un valor válido', '')
+      return
     }
     this.clearData();
     this.dataInitial(this.pageSize);
   }
 
   cleanSearch() {
-    this.service_name.setValue('');
+    this.service_name.setValue('')
     this.close = false;
     this.serviceFilter = '';
     this.filteredServices = [];
@@ -348,38 +296,41 @@ export class ServicesComponent implements OnInit {
   }
 
   clickButton(event) {
-    console.log('event', event);
-    const { value, element } = event;
-    if (value == 'edit') {
-      console.log('element: ', element);
-      this.editElement(element.id);
+    console.log("event", event)
+    const { value, element } = event
+    if (value == "edit") {
+      console.log("element: ", element)
+      this.editElement(element.id)
     }
-    if (value == 'config_service') {
-      console.log('element: ', element);
-      this.openDialogConfigService(element);
+    if (value == "config_service") {
+      console.log("element: ", element)
+      this.openDialogConfigService(element)
     }
   }
 
-  openDialogConfigService(element: any) {
+  openDialogConfigService(element) {
+
     const dialogRef = this.dialog.open(DialogServiceConfigComponent, {
+
       width: '600px',
       data: {
         serviceName: element.name,
         serviceId: element.id,
         serviceAmountTransactionRestriccion: element.amountTransactionRestriccion,
         serviceAmountDailyRestriccion: element.amountDailyRestriccion,
-        servicepay_multiple: element.pay_multiple,
-        servicepay_latest: element.pay_latest,
-        servicemax_concept_pay: element.max_concept_pay,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((response) => {
-      if (response) {
-        console.log('result en afterClosed of openDialogMinBalance', response);
-        this.reload();
       }
     });
+
+    dialogRef.afterClosed().subscribe(
+      response => {
+        if (response) {
+          console.log('result en afterClosed of openDialogMinBalance', response)
+          this.reload();
+        }
+      });
+
+
+
   }
 
   editElement(id: any) {
@@ -410,7 +361,7 @@ export class ServicesComponent implements OnInit {
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
-        console.error('Error loading master table data:', error);
+        console.error("Error loading master table data:", error);
       },
       complete: () => {
         this.spinner.spinnerOnOff();
@@ -443,21 +394,14 @@ export class ServicesComponent implements OnInit {
     this.dataInitial(this.pageSize);
   }
 
+
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
     console.log('onPageChange', event);
     console.log('pageKey', this.pageKey);
     console.log('pageSize', this.pageSize);
-    this.pageSize = this.pagUtils?.updatePageSize(
-      event.pageSize,
-      this.pageSize,
-    );
-    this.pagUtils?.onPageChange(
-      event,
-      this.pageSize,
-      this.functionDataCurrent.bind(this),
-      this.pageKey,
-    );
+    this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
+    this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
   }
 
   exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
@@ -473,61 +417,60 @@ export class ServicesComponent implements OnInit {
     };
 
     // Eliminar propiedades undefined
-    Object.keys(exportFilters).forEach((key) => {
+    Object.keys(exportFilters).forEach(key => {
       if (exportFilters[key] === undefined) {
         delete exportFilters[key];
       }
     });
     const inbx = 'srv';
     const token = localStorage.getItem('fcmToken');
-    this.services
-      .exportServices(fileType, exportFilters, inbx, token)
-      .subscribe({
-        next: (response) => {
-          this.spinner.spinnerOnOff();
-          if (response.statusCode === 200) {
-            this.mytoastr.showWarning('', 'Procesando Archivo...');
-          } else {
-            this.mytoastr.showError('', 'Error al enviar la solicitud');
-          }
-        },
-        error: (error) => {
-          this.spinner.spinnerOnOff();
-          console.error('Error durante la exportación:', error);
-          this.mytoastr.showError('Error durante la exportación', '');
-        },
-      });
+    this.services.exportServices(fileType, exportFilters, inbx, token).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.mytoastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.mytoastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error('Error durante la exportación:', error);
+        this.mytoastr.showError('Error durante la exportación', '');
+      }
+    });
   }
 
   /******************************************** METODOS GET ****************************************/
 
   get service_name() {
-    return this.serviceForm.get('service_name');
+    return this.serviceForm.get('service_name')
   }
 
   get service_type() {
-    return this.serviceForm?.get('service_type');
+    return this.serviceForm?.get('service_type')
   }
 
   get status() {
-    return this.serviceForm.get('status');
+    return this.serviceForm.get('status')
   }
 
   get service_id() {
-    return this.serviceForm.get('service_id');
+    return this.serviceForm.get('service_id')
   }
 
   get provider() {
-    return this.serviceForm.get('provider');
+    return this.serviceForm.get('provider')
   }
 
   get servicesNames(): string {
-    return this.listServicesSelected.map((s) => s.name).join(', ');
+    return this.listServicesSelected.map(s => s.name).join(', ');
   }
 
   get servicesId(): string {
-    return this.listServicesSelected.map((s) => s.id).join(', ');
+    return this.listServicesSelected.map(s => s.id).join(', ');
   }
+
 }
 
 interface ServiceItem {
