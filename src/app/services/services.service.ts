@@ -7,16 +7,23 @@ import { ResponseDTO } from '../interfaces/responseInterface';
 import { ServiceTableInterface } from '../interfaces/serviceTableInterface';
 import { PageInterface } from '../interfaces/PageInterface';
 
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ServicesService {
+
   public servicePayment = new BehaviorSubject<any[]>([]);
+
+
 
   private url = `${environment.URL_API_GATEWAY}`;
   //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient
+  ) { }
+
 
   registerService(data: any): Observable<any> {
     return this.httpClient.post<any>(`${this.url}/services/register`, data);
@@ -27,10 +34,7 @@ export class ServicesService {
   }
 
   registerServiceImport(data: any, valueImport: any): Observable<any> {
-    return this.httpClient.post<any>(
-      `${this.url}/services/register/massive?import=${valueImport}`,
-      data,
-    );
+    return this.httpClient.post<any>(`${this.url}/services/register/massive?import=${valueImport}`, data);
   }
 
   // getServices(name:string): Observable<any>{
@@ -39,21 +43,8 @@ export class ServicesService {
   //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
   // }
 
-  getServices(
-    name: string,
-    status: string,
-    type: string,
-    category: string,
-    count: number,
-    idClient?: any,
-    limit?: any,
-    pageKey?: any[],
-    getAssignAll?: boolean,
-    id_service?: string,
-    id_prov?: string,
-    listIds?: any,
-  ): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
-    let params = new HttpParams();
+  getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string, listIds?: any): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+    let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
     }
@@ -93,15 +84,10 @@ export class ServicesService {
     if (listIds !== '') {
       params = params.set('listIds', listIds);
     }
-    return this.httpClient.get<
-      ResponseDTO<PageInterface<ServiceTableInterface>>
-    >(`${this.url}/services`, { params: params });
+    return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
-  getServicesPageKey(
-    limit?: number,
-    pageKey?: any[],
-  ): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getServicesPageKey(limit?: number, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams();
     if (limit !== undefined) {
       params = params.set('limit', limit);
@@ -109,13 +95,11 @@ export class ServicesService {
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
-    return this.httpClient.get<
-      ResponseDTO<PageInterface<ServiceTableInterface>>
-    >(`${this.url}/services`, { params: params });
+    return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
 
   getServicesFromCategory(category: string, pageKey?: any[]): Observable<any> {
-    let params = new HttpParams();
+    let params = new HttpParams()
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
@@ -126,14 +110,13 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services`, { params: params });
   }
 
+
   getTypeServices(name?: string): Observable<any> {
-    let params = new HttpParams();
+    let params = new HttpParams()
     if (name) {
       params = params.set('name', name);
     }
-    return this.httpClient.get<any>(`${this.url}/services/type`, {
-      params: params,
-    });
+    return this.httpClient.get<any>(`${this.url}/services/type`, { params: params });
   }
 
   getServicesData(limit?: any, pageKey?: any[]): Observable<any> {
@@ -152,10 +135,7 @@ export class ServicesService {
   }
 
   getIdServices(id: string): Observable<ResponseDTO<ServiceByIdInterface>> {
-    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(
-      `${this.url}/services/${id}`,
-      null,
-    );
+    return this.httpClient.post<ResponseDTO<ServiceByIdInterface>>(`${this.url}/services/${id}`, null);
   }
 
   getIdServicePerson(id: string, type?: string): Observable<any> {
@@ -165,9 +145,7 @@ export class ServicesService {
       params = params.set('idClient', type);
     }
 
-    return this.httpClient.get<any>(`${this.url}/services/${id}`, {
-      params: params,
-    });
+    return this.httpClient.get<any>(`${this.url}/services/${id}`, { params: params });
   }
 
   updateService(data: any, id: any): Observable<any> {
@@ -191,17 +169,18 @@ export class ServicesService {
   }
 
   detailService(id: string, value: string, ers: string): Observable<any> {
-    let params = new HttpParams().set('value', value).set('ers', ers);
-    return this.httpClient.post<any>(`${this.url}/services/${id}/bills`, null, {
-      params: params,
-    });
+    let params = new HttpParams()
+      .set('value', value)
+      .set('ers', ers);
+    return this.httpClient.post<any>(`${this.url}/services/${id}/bills`, null, { params: params });
   }
+
 
   exportServices(
     format: 'xlsx' | 'csv',
     filters: any,
     bandeja: string,
-    token: any,
+    token: any
   ): Observable<any> {
     let params = new HttpParams();
 

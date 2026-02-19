@@ -1,4 +1,4 @@
-import { HttpBackend, HttpClient } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import jwtDecode from 'jwt-decode';
@@ -142,6 +142,19 @@ export class AuthService {
     sessionStorage.removeItem(this.generateQrAuthStorageKey);
   }
 
+  private getGenerateQrAuthHttpOptions(): { headers?: HttpHeaders } {
+    const apiKey = String(environment.URL_API_GENERATE_QR_API_KEY || '').trim();
+    if (!apiKey) {
+      return {};
+    }
+
+    return {
+      headers: new HttpHeaders({
+        'x-api-key': apiKey
+      })
+    };
+  }
+
   private isGenerateQrTokenStillValid(session: GenerateQrAuthSession | null): boolean {
     if (!this.getGenerateQrBearerToken(session) || !session?.expiresAt) {
       return false;
@@ -157,11 +170,18 @@ export class AuthService {
       throw new Error('Credenciales de QR no configuradas en environment');
     }
 
+    const loginUrl = `${environment.URL_API_GENERATE_QR}/v1/auth/cognito/login`;
+    const loginPayload = {
+      username,
+      password
+    };
+    console.log('[QR AUTH LOGIN REQUEST]', {
+      url: loginUrl,
+      body: loginPayload
+    });
+
     const response: any = await firstValueFrom(
-      this.rawHttpClient.post(`${environment.URL_API_GENERATE_QR}/v1/auth/cognito/login`, {
-        username,
-        password
-      })
+      this.rawHttpClient.post(loginUrl, loginPayload, this.getGenerateQrAuthHttpOptions())
     );
 
     const session = this.setGenerateQrAuthSession(response, username);
@@ -181,7 +201,7 @@ export class AuthService {
       this.rawHttpClient.post(`${environment.URL_API_GENERATE_QR}/v1/auth/cognito/refresh`, {
         refreshToken: session.refreshToken,
         username: session.username
-      })
+      }, this.getGenerateQrAuthHttpOptions())
     );
 
     const updatedSession = this.setGenerateQrAuthSession(response, session.username);
