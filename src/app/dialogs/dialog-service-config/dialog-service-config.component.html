@@ -20,7 +20,7 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field class="col-lg-6" appearance="outline">
+  <mat-form-field class="col-lg-6" appearance="outline" *ngIf="paymultiple_active !==''">
     <mat-label>Numero Maximo de recibos</mat-label>
     <input matInput type="number" placeholder="Numero Maximo de recibos a pagar..." formControlName="maxConceptPay">
   </mat-form-field>
