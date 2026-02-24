@@ -127,6 +127,14 @@
   margin: 0;
 }
 
+
+.workers-toggle {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  margin-bottom: -4px;
+  color: #374151;
+}
+
 :host ::ng-deep .qr-dialog .mat-form-field,
 :host ::ng-deep .qr-dialog .mat-form-field-wrapper,
 :host ::ng-deep .qr-dialog .mat-form-field-flex,

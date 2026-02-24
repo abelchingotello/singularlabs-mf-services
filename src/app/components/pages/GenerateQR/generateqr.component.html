@@ -300,9 +300,16 @@
               </mat-select>
             </mat-form-field>
 
+            <div class="workers-toggle">
+              <mat-slide-toggle [checked]="massiveWorkersEditEnabled"
+                (change)="onMassiveWorkersEditToggle($event.checked)">
+                Habilitar edicion de workers
+              </mat-slide-toggle>
+            </div>
+
             <mat-form-field appearance="outline" class="qr-field">
               <mat-label>Workers</mat-label>
-              <input matInput type="number" formControlName="workers" min="1" readonly />
+              <input matInput type="number" formControlName="workers" min="1" />
             </mat-form-field>
           </form>
 
