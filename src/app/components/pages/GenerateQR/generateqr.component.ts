@@ -145,6 +145,7 @@ export class GenerateQR implements OnInit {
   public massiveServiceFilter: string = '';
   public massiveFilteredServices: ServiceItem[] = [];
   public massiveSelectedServiceName: string = '';
+  public massiveWorkersEditEnabled: boolean = false;
   private qrDialogRef?: MatDialogRef<any>;
   private qrResultDialogRef?: MatDialogRef<any>;
   private cancelDialogRef?: MatDialogRef<any>;
@@ -396,14 +397,31 @@ export class GenerateQR implements OnInit {
       this.cargarServicios();
     }
     this.isGeneratingMassive = false;
+    this.massiveWorkersEditEnabled = false;
     this.massiveForm.reset();
-    this.massiveForm.get('workers')?.setValue(1);
+    this.massiveForm.get('workers')?.setValue(1, { emitEvent: false });
     this.massiveForm.get('workers')?.disable({ emitEvent: false });
     this.qrMassiveDialogRef = this.dialog.open(this.generateQrMassiveDialog, {
       width: '640px',
       maxWidth: '92vw',
       panelClass: 'qr-dialog'
     });
+  }
+
+  onMassiveWorkersEditToggle(enabled: boolean) {
+    this.massiveWorkersEditEnabled = enabled;
+    const workersControl = this.massiveForm.get('workers');
+    if (!workersControl) {
+      return;
+    }
+
+    if (enabled) {
+      workersControl.enable({ emitEvent: false });
+      return;
+    }
+
+    workersControl.setValue(1, { emitEvent: false });
+    workersControl.disable({ emitEvent: false });
   }
 
   onMassiveServiceChange(event: any) {
@@ -503,7 +521,7 @@ export class GenerateQR implements OnInit {
     const payload = {
       sftpPath: `in/${fileName}`,
       outputDir: 'out',
-      workers: 1,
+      workers: Number(raw.workers) || 1,
       serviceName: raw.serviceName
     };
     this.isGeneratingMassive = true;
@@ -737,8 +755,7 @@ export class GenerateQR implements OnInit {
     this.massiveForm = this.fb.group({
       serviceName: ['', [Validators.required]],
       fileName: ['', [Validators.required]],
-      // Fixed for batch flow: always 1 worker.
-      workers: [{ value: 1, disabled: true }]
+      workers: [{ value: 1, disabled: true }, [Validators.required, Validators.min(1)]]
     })
   }
 
