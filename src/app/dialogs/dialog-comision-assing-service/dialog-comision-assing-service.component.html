@@ -1,0 +1,64 @@
+<div class="bg-dialog  mb-3 p-3">
+    <h3 class="m-0 text-dialog">ACTUALIZACION DE COMISION PARA RECAUDADORES</h3>
+</div>
+
+<form [formGroup]="formCommissionClient">
+
+
+    <mat-form-field appearance="outline" class="col-md-3 ">
+        <mat-label>Servicio</mat-label>
+        <input formControlName="serviceName" type="text" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-3 ">
+        <mat-label>Tipo de servicio</mat-label>
+        <input formControlName="servicetype" type="text" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-3 ">
+        <mat-label>Cliente</mat-label>
+        <input formControlName="clientName" type="text" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-3 ">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="serviceStatus">
+            <mat-option *ngFor="let state of stateMaster" [value]="state.master_name">{{state.master_name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-3 ">
+        <mat-label>Tipo de Comision</mat-label>
+        <mat-select formControlName="serviceTypeComission" (selectionChange)="onTypeComissionChange($event)">
+            <mat-option value="MULTIPLE">MULTIPLE </mat-option>
+            <mat-option value="FIJO">FIJO </mat-option>
+            <mat-option value="PORCENTUAL">PORCENTUAL </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="service_comision_type.value === 'FIJO' ||service_comision_type.value ===  'MULTIPLE'"
+        appearance="outline" class="col-md-3 ">
+        <mat-label>Comision Fija</mat-label>
+        <input formControlName="serviceComisionFixed" type="number" matInput min="0" step="0.01">
+    </mat-form-field>
+
+    <mat-form-field *ngIf="service_comision_type.value === 'PORCENTUAL' ||service_comision_type.value ===  'MULTIPLE'"
+        appearance="outline" class="col-md-3 ">
+        <mat-label>Comision Porcentual</mat-label>
+        <input formControlName="serviceComisionPrc" type="number" matInput min="0" step="0.001">
+    </mat-form-field>
+
+    <mat-form-field *ngIf="service_comision_type.value ===  'MULTIPLE'" appearance="outline" class="col-md-3 ">
+        <mat-label>Criterio</mat-label>
+        <input formControlName="serviceComisionCriterio" type="number" matInput min="0" step="0.001">
+    </mat-form-field>
+</form>
+
+<div class="d-flex justify-content-end m-2">
+
+    <button mat-button class="btn button-tertiary" cdkFocusInitial (click)="updateServic()">
+        <mat-icon>save</mat-icon>
+        Guardar
+    </button>
+</div>

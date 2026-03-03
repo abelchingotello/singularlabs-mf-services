@@ -18,10 +18,6 @@ export class PersonService {
     return this.httpClient.post(`${this.url}/person`, data);
   }
 
-  postIdPerson(id:string):Observable<any> {
-    return this.httpClient.post(`${this.url}/person/${id}`,null);
-  }
-
 
   getPerson(typeEntity?:string,nameAlias?:string, activeOnly?: boolean):Observable<any> {
     let params = new HttpParams();
@@ -30,6 +26,8 @@ export class PersonService {
     if(nameAlias) params = params.set('nameAlias', nameAlias);
     
     if(activeOnly) params = params.set('activeOnly', JSON.stringify(activeOnly));
+
+    if (activeOnly) params = params.set('activeOnly', JSON.stringify(activeOnly));
 
     return this.httpClient.get(`${this.url}/person/entity`, {params:params});
   }

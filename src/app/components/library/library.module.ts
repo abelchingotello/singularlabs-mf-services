@@ -21,15 +21,16 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { InputPhoneComponent } from './input-phone/input-phone.component';
-import { UserFormComponent } from './user-form/user-form.component';
 import { SearchSelectComponent } from './search-select/search-select.component';
 import { ContactFormComponent } from './contact-form/contact-form.component';
+import { IconTypeComponent } from './icons_type/icons_type.component'
 
 @NgModule({
   declarations: [
     SpinnerComponent,
     ImageCardComponent,
     SearchSelectComponent,
+
   ],
   imports: [
     CommonModule,
@@ -52,17 +53,17 @@ import { ContactFormComponent } from './contact-form/contact-form.component';
     MatChipsModule,
     MatListModule,
     InputPhoneComponent,
-    UserFormComponent,
     ContactFormComponent,
-    DynamicTableComponent
+    DynamicTableComponent,
+    IconTypeComponent
   ],
-  exports:[
+  exports: [
     SpinnerComponent,
     ImageCardComponent,
     InputPhoneComponent,
-    UserFormComponent,
     ContactFormComponent,
-    DynamicTableComponent
+    DynamicTableComponent,
+    IconTypeComponent
   ]
 })
 export class LibraryModule { }

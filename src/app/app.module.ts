@@ -13,11 +13,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { DialogCommissionAssingServiceComponent } from './dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DialogServiceStatusComponent
+    DialogServiceStatusComponent,
+    DialogCommissionAssingServiceComponent
   ],
   imports: [
     BrowserModule,

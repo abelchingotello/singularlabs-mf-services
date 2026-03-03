@@ -86,7 +86,7 @@ export class DialogServiceStatusComponent implements OnInit {
     }
     console.log("UPDATE1:",data)
     // return
-    this.service.updateService(data).subscribe(
+  /*  this.service.updateService(data).subscribe(
       (data) => {
         console.log("respuesta del servicio", data)
         if(data?.statusCode !==200){
@@ -97,7 +97,7 @@ export class DialogServiceStatusComponent implements OnInit {
         this.mytoastr.showSuccess('Actualización correcta','')
       },
 
-    )
+    )*/
   }
   updateServicEntity(){
     const data = {
