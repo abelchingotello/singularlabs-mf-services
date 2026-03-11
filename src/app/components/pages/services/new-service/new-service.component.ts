@@ -233,6 +233,25 @@ export class NewServiceComponent implements OnInit {
     const serviceRaw = this.serviceForm.getRawValue();
     const comissionRaw = this.comissionForm.getRawValue();
 
+    const bodyBase1 = {
+      idProvider: serviceRaw.service_prov,
+      idClient: '00000100',
+      idServiceProv: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
+      serviceName: serviceRaw.service_name,
+      userRegistration: this.userName.Username,
+      idTypeService: String(serviceRaw.service_type.master_idTypeService),
+      typeService: serviceRaw.service_type.master_name,
+      business: serviceRaw.service_type_business,
+      status: serviceRaw.service_state,
+      zone: serviceRaw.service_zone ?? null,
+      collectorName: '',
+      typeComission: comissionRaw.comission_type,
+      comissionFixed: comissionRaw.comission_fixed,
+      comissionCriterion: comissionRaw.comission_criterion,
+      comissionPCT: comissionRaw.comission_percentage,
+      indicators: this.indicatrs,
+      additionalPaymentFields: this.dataPayment
+    };
     // USANDO NOMBRES REALES DE CAMPOS
     const bodyBase = {
       ID_PROVIDER: serviceRaw.service_prov,
@@ -254,7 +273,7 @@ export class NewServiceComponent implements OnInit {
     };
 
     if (!this.idService) {
-      this.AddService(bodyBase);
+      this.AddService(bodyBase1);
     } else {
       this.updateService(bodyBase, serviceRaw, comissionRaw)
     }
@@ -291,7 +310,7 @@ export class NewServiceComponent implements OnInit {
       updates: changedBody,
       removes: removes
     };
-    
+
     this.service.updateService(dataUpdate, this.idService).subscribe({
       next: (response: any) => {
         if (response.statusCode !== 200) {
