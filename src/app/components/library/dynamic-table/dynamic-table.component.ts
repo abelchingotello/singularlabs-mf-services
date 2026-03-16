@@ -33,6 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { IconTypeComponent } from './../icons_type/icons_type.component';
 
+import { AuthService } from 'src/app/services/auth.service';
 @Component({
   selector: 'uni-dynamic-table',
   templateUrl: './dynamic-table.component.html',
@@ -106,23 +107,59 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   public pageSize = 5;
   public paginatorLength: any;
   public dataCurrent: boolean;
-  public previousDataLength = 0;
+  public previousDataLength = 0;// 1. Agregar el import
+
+  // 2. Nuevas propiedades públicas (junto a las demás)
+  public action_permision: any = {};
+  public actions_visible: boolean = false;
+
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private http: HttpClient,
+    private authService: AuthService,
     @Inject(MatPaginatorIntl) private paginatorIntl: MatPaginatorIntl
   ) {
     this.paginatorIntl.itemsPerPageLabel = 'Elementos por página';
   }
 
   ngOnInit(): void {
+    // ✅ Síncrono — Angular puede secuenciar bien ngAfterViewInit
     this.updateColumnsFromConfig();
     this.dataSource = new MatTableDataSource(this.data);
     this.dataPrint = new MatTableDataSource(this.data);
-    this.selectedTab.toLowerCase();
+
+    // ✅ Permisos se cargan aparte, sin bloquear el ciclo de vida
+    this.getPermissions(this.columns).then(() => {
+      this.updateColumnsFromConfig();
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
+  // 5. Nuevos métodos (añadir al final de la clase)
+  async getPermissions(columns: any): Promise<void> {
+    await this.authService.getPermissions();
+    const allPermissionFromRol: any = {};
+
+    const columnAction = columns.find(
+      (column: any) =>
+        column.config?.type === 'buttonicons' &&
+        column.config?.actions?.length > 0
+    );
+
+    columnAction?.config?.actions.forEach((action: any) => {
+      allPermissionFromRol[action.permission] = this.hasPermission(action.permission);
+      if (allPermissionFromRol[action.permission]) {
+        this.actions_visible = true;
+      }
+    });
+
+    this.action_permision = { ...allPermissionFromRol };
+  }
+
+  hasPermission(tag: any): boolean {
+    return this.authService.hasPermissionFromTag(tag);
+  }
   ngAfterViewInit(): void {
     this.initTable();
   }
@@ -156,8 +193,9 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
 
   /** Recalcula displayedColumns y attributeNames respetando column.hide */
   private updateColumnsFromConfig(): void {
-    // Solo columnas visibles
-    const visibleColumns = this.columns?.filter(c => c.hide !== true) || [];
+    const visibleColumns = this.columns?.filter(
+      c => !c?.config?.restriccPermission || this.actions_visible  // ← agregar condición
+    ) || [];
     this.displayedColumns = visibleColumns.map(column => column.name);
     this.attributeNames = visibleColumns.map(column => column.attribute);
   }

@@ -273,7 +273,7 @@ export class NewServiceComponent implements OnInit {
     };
 
     if (!this.idService) {
-      this.AddService(bodyBase1);
+      this.AddService({ ...bodyBase1, ...bodyBase });
     } else {
       this.updateService(bodyBase, serviceRaw, comissionRaw)
     }

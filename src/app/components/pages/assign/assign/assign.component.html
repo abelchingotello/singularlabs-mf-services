@@ -6,12 +6,14 @@
 
       <div class="row">
         <div class="col lg-6 d-flex justify-content-end align-items-end mr-3">
-          <button type="button" class=" mb-2 mb-md-0 custom-button btn me-2 button-tertiary" (click)="redirectAsign(1)">
+          <button type="button" class=" mb-2 mb-md-0 custom-button btn me-2 button-tertiary" (click)="redirectAsign(1)"
+            *ngIf="authService.permissions?.['services-assign-individual']">
             <mat-icon>add</mat-icon>
             <span class="custom-span-icon-responsive">Añadir</span>
           </button>
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary" (click)="redirectAsign(2)">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary" (click)="redirectAsign(2)"
+            *ngIf="authService.permissions?.['services-assign-massive']">
             <mat-icon>upload_file</mat-icon>
             <span class="custom-span-icon-responsive">Importar</span>
           </button>
