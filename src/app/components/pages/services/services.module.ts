@@ -26,7 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
     LibraryModule,
     ReactiveFormsModule,
     MatIconModule,
-    FormsModule
-  ]
+    FormsModule,
+]
 })
 export class ServicesModule { }

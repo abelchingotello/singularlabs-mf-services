@@ -11,6 +11,7 @@ import {
   OnChanges,
   SimpleChanges,
   Inject,
+  OnDestroy,
 } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent, MatPaginatorIntl } from '@angular/material/paginator';
@@ -34,6 +35,10 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { IconTypeComponent } from './../icons_type/icons_type.component';
 
 import { AuthService } from 'src/app/services/auth.service';
+// Agregar import
+import { Subscription } from 'rxjs';
+
+// Agregar propiedad para manejar la suscripción
 @Component({
   selector: 'uni-dynamic-table',
   templateUrl: './dynamic-table.component.html',
@@ -58,7 +63,7 @@ import { AuthService } from 'src/app/services/auth.service';
     IconTypeComponent,
   ],
 })
-export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
+export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() columns: any[] = [];
   @Input() data: any[] = [];
   @Input() actionsOptions?: boolean;
@@ -113,6 +118,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   public action_permision: any = {};
   public actions_visible: boolean = false;
 
+  private permissionsSub: Subscription;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -124,18 +130,41 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnInit(): void {
-    // ✅ Síncrono — Angular puede secuenciar bien ngAfterViewInit
     this.updateColumnsFromConfig();
     this.dataSource = new MatTableDataSource(this.data);
     this.dataPrint = new MatTableDataSource(this.data);
 
-    // ✅ Permisos se cargan aparte, sin bloquear el ciclo de vida
-    this.getPermissions(this.columns).then(() => {
+    // ✅ Suscribirse al observable en vez de llamar getPermissions()
+    // BehaviorSubject emite el valor actual inmediatamente + futuros cambios de rol
+    this.permissionsSub = this.authService.permissions$.subscribe(permissions => {
+      if (!permissions || Object.keys(permissions).length === 0) return;
+
+      const allPermissionFromRol: any = {};
+      this.actions_visible = false; // resetear en cada emisión
+
+      const columnAction = this.columns.find(
+        (column: any) =>
+          column.config?.type === 'buttonicons' &&
+          column.config?.actions?.length > 0
+      );
+
+      columnAction?.config?.actions.forEach((action: any) => {
+        allPermissionFromRol[action.permission] = this.authService.hasPermissionFromTag(action.permission);
+        if (allPermissionFromRol[action.permission]) {
+          this.actions_visible = true;
+        }
+      });
+
+      this.action_permision = { ...allPermissionFromRol };
       this.updateColumnsFromConfig();
       this.changeDetectorRef.detectChanges();
     });
   }
 
+  // Limpiar suscripción al destruir el componente
+  ngOnDestroy(): void {
+    this.permissionsSub?.unsubscribe();
+  }
   // 5. Nuevos métodos (añadir al final de la clase)
   async getPermissions(columns: any): Promise<void> {
     await this.authService.getPermissions();

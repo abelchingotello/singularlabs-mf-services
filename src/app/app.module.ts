@@ -22,7 +22,7 @@ import { DialogServiceConfigComponent } from './dialogs/dialog-service-config/di
     AppComponent,
     DialogServiceStatusComponent,
     DialogCommissionAssingServiceComponent,
-    DialogServiceConfigComponent
+    DialogServiceConfigComponent,
   ],
   imports: [
     BrowserModule,

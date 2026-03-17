@@ -4,7 +4,9 @@ import { environment } from 'src/environments/environment';
 import jwtDecode from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
 import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
+// Agregar propiedad para manejar la suscripción
 interface GenerateQrAuthSession {
   username: string;
   tokenType: string;
@@ -28,8 +30,10 @@ export class AuthService {
   private generateQrAuthPromise: Promise<string> | null = null;
   private readonly generateQrAuthStorageKey = 'qr_cognito_auth_session';
   private readonly generateQrRefreshWindowMs = 2 * 60 * 1000;
-  public permissions: any = [];
-  public allPermission: Map<string, any> = new Map();
+
+  private permissionsSubject = new BehaviorSubject<any>({});
+  permissions$ = this.permissionsSubject.asObservable();
+  public permissions: any = {}; public allPermission: Map<string, any> = new Map();
   private lastRolId: string
 
   constructor(
@@ -38,6 +42,13 @@ export class AuthService {
     private httpBackend: HttpBackend
   ) {
     this.rawHttpClient = new HttpClient(this.httpBackend);
+    window.addEventListener('roleChanged', async (event: any) => {
+      const role = event.detail;
+
+      if (role?.role_id !== this.lastRolId) {
+        await this.getPermissions();
+      }
+    });
   }
 
   //Verificar si el usuario esta logeado en api gateway
@@ -175,9 +186,9 @@ export class AuthService {
   }
 
   async getPermissions() {
-    let { role_id } = this.getRole()
+    let { role_id } = this.getRole();
+    if (role_id === this.lastRolId) return;
     await this.getAllPermissions()
-    this.lastRolId = role_id
     role_id = role_id.split("#")[1]
     const { items } = await firstValueFrom(this.httpClient.get<any>(`${this.url}/roles/${role_id}`));
     let permissions = {}
@@ -188,7 +199,9 @@ export class AuthService {
       }
     });
 
-    this.permissions = { ...permissions }
+    this.permissions = { ...permissions };
+    this.permissionsSubject.next(this.permissions);
+    this.lastRolId = role_id
   }
 
 
