@@ -1,10 +1,12 @@
-import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import jwtDecode from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
 import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
+// Agregar propiedad para manejar la suscripción
 interface GenerateQrAuthSession {
   username: string;
   tokenType: string;
@@ -29,12 +31,24 @@ export class AuthService {
   private readonly generateQrAuthStorageKey = 'qr_cognito_auth_session';
   private readonly generateQrRefreshWindowMs = 2 * 60 * 1000;
 
+  private permissionsSubject = new BehaviorSubject<any>({});
+  permissions$ = this.permissionsSubject.asObservable();
+  public permissions: any = {}; public allPermission: Map<string, any> = new Map();
+  private lastRolId: string
+
   constructor(
     private httpClient: HttpClient,
     private cookieService: CookieService,
     private httpBackend: HttpBackend
   ) {
     this.rawHttpClient = new HttpClient(this.httpBackend);
+    window.addEventListener('roleChanged', async (event: any) => {
+      const role = event.detail;
+
+      if (role?.role_id !== this.lastRolId) {
+        await this.getPermissions();
+      }
+    });
   }
 
   //Verificar si el usuario esta logeado en api gateway
@@ -154,6 +168,42 @@ export class AuthService {
       })
     };
   }
+
+
+  hasPermissionFromTag(tag) {
+    const permiso = this.permissions[tag]
+    return permiso === true
+  }
+
+  async getAllPermissions() {
+    let params = new HttpParams().set('group', '5');
+    const items = await firstValueFrom(this.httpClient.get<any>(`${this.url}/master/group`, { params: params }))
+    items.forEach((permiso: any) => {
+      if (permiso.SK) {
+        this.allPermission.set(permiso.SK, permiso);
+      }
+    });
+  }
+
+  async getPermissions() {
+    let { role_id } = this.getRole();
+    if (role_id === this.lastRolId) return;
+    await this.getAllPermissions()
+    role_id = role_id.split("#")[1]
+    const { items } = await firstValueFrom(this.httpClient.get<any>(`${this.url}/roles/${role_id}`));
+    let permissions = {}
+    items.map((item: any) => {
+      const permission = this.allPermission.get(item.process_permissionId);
+      if (item.process_permissionId != "PERMISO#0" && permission?.master_tag) {
+        permissions[permission.master_tag] = true
+      }
+    });
+
+    this.permissions = { ...permissions };
+    this.permissionsSubject.next(this.permissions);
+    this.lastRolId = role_id
+  }
+
 
   private isGenerateQrTokenStillValid(session: GenerateQrAuthSession | null): boolean {
     if (!this.getGenerateQrBearerToken(session) || !session?.expiresAt) {

@@ -5,17 +5,20 @@
       <div class="row">
         <div class="col  d-flex justify-content-end align-items-end ">
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2 " (click)="addService()">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2 " (click)="addService()"
+            *ngIf="authService.permissions?.['services-create-individual']">
             <mat-icon>add</mat-icon>
             <span class="custom-span-icon-responsive">Añadir</span>
           </button>
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" (click)="createService()">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" (click)="createService()"
+            *ngIf="authService.permissions?.['services-create-massive']">
             <mat-icon>upload_file</mat-icon>
             <span class="custom-span-icon-responsive">Importar-Crear</span>
           </button>
 
-          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary " (click)="updateService()">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary " (click)="updateService()"
+            *ngIf="authService.permissions?.['services-updates-massive']">
             <mat-icon>upload_file</mat-icon>
             <span class="custom-span-icon-responsive">Importar-Actualizar</span>
           </button>

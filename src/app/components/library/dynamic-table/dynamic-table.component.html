@@ -31,7 +31,8 @@
                 <mat-icon>print</mat-icon>
             </button>
             <ng-container *ngIf="showExport">
-                <button mat-flat-button matTooltip="Exportar" matTooltipPosition="above" [matMenuTriggerFor]="typesExport">
+                <button mat-flat-button matTooltip="Exportar" matTooltipPosition="above"
+                    [matMenuTriggerFor]="typesExport">
                     <span class="material-symbols-outlined">
                         export_notes
                     </span>
@@ -68,7 +69,7 @@
 
                 <!-- Columnas dinámicas -->
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.name">
-                    <ng-container *ngIf="column.hide !== true">
+                    <ng-container *ngIf="!column?.config?.restriccPermission || actions_visible">
                         <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.attribute"
                             class="custom-headercell-dynamictable">
                             {{ column.name }}
@@ -85,9 +86,12 @@
 
                             <!-- Botones -->
                             <ng-template #buttonIcon>
-                                <ng-container *ngIf="column.config?.type === 'buttonicons'; else normalCell">
+                                <ng-container
+                                    *ngIf="column.config?.type === 'buttonicons' && (column.config.restriccPermission?this.actions_visible:true); else normalCell">
                                     <ng-container *ngFor="let action of column.config?.actions">
-                                        <button *ngIf="!action.hide" class="btn m-1 btn-custom bg-button {{action.bgClass}}"
+                                        <button
+                                            *ngIf="column.config.restriccPermission ? action.permission ? this.action_permision[action.permission] : true : true"
+                                            class="btn m-1 btn-custom bg-button {{action.bgClass}}"
                                             (click)="onClickButton(action.value , element)"
                                             matTooltip="{{action.toolTip}}" matTooltipPosition="above">
                                             <mat-icon>{{action.icon}}</mat-icon>
@@ -135,7 +139,8 @@
                 </tr>
             </table>
         </div>
-        <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize" aria-label="Selecciona la página" (page)="onPageChange($event)">
+        <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize"
+            aria-label="Selecciona la página" (page)="onPageChange($event)">
         </mat-paginator>
     </mat-tab>
     <mat-tab *ngIf="selectedTab === 'tab2'">
@@ -185,8 +190,8 @@
                     No hay datos para mostrar
                 </ng-template>
             </div>
-            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize" showFirstLastButtons aria-label="Selecciona la página"
-                (page)="onPageChange($event)">
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="currentPageIndex" [pageSize]="pageSize"
+                showFirstLastButtons aria-label="Selecciona la página" (page)="onPageChange($event)">
             </mat-paginator>
         </div>
     </mat-tab>

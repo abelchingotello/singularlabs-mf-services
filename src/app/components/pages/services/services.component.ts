@@ -13,6 +13,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
 import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'uni-services',
@@ -40,20 +41,21 @@ export class ServicesComponent implements OnInit {
       attribute: '',
       config: {
         type: 'buttonicons',
+        restriccPermission: true,
         actions: [
           {
-            hide: false,
             bgClass: 'yellow',
             toolTip: 'Editar Servicio',
             icon: 'edit',
-            value: 'edit'
+            value: 'edit',
+            permission: "services-updates-individual"
           },
           {
-            hide: false,
             bgClass: 'gray',
             toolTip: 'Configurar Servicio',
             icon: 'settings_applications',
-            value: 'config_service'
+            value: 'config_service',
+            permission: "services-config"
           }
         ]
       }
@@ -104,7 +106,8 @@ export class ServicesComponent implements OnInit {
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private personService: PersonService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public authService: AuthService,
   ) {
     this.pagUtils = new PaginationUtils();
   }

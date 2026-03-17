@@ -14,6 +14,7 @@ import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { DialogCommissionAssingServiceComponent } from 'src/app/dialogs/dialog-comision-assing-service/dialog-comision-assing-service.component';
 import { environment } from 'src/environments/environment'
 import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'uni-assign',
@@ -43,16 +44,16 @@ export class AssignComponent implements OnInit {
     {
       name: 'Acciones',
       attribute: '',
-      hide: this.router.url !== "/assign/admin",
       config: {
         type: 'buttonicons',
+        restriccPermission: true,
         actions: [
           {
-            hide: false,
             bgClass: 'yellow',
             toolTip: 'Editar Comision',
             icon: 'edit',
-            value: 'edit'
+            value: 'edit',
+            permission: "services-assign-edit"
           }
         ]
       }
@@ -83,6 +84,7 @@ export class AssignComponent implements OnInit {
     private services: ServicesService,
     private mytoastr: MytoastrService,
     private dialog: MatDialog,
+    public readonly authService: AuthService,
   ) {
     this.pagUtils = new PaginationUtils();
   }
@@ -105,7 +107,7 @@ export class AssignComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS', undefined, true),
       this.masterService.getItemsMasterTable('14'), // CategoriaService
       this.masterService.getItemsMasterTable('1') // EStados
     ]).subscribe({
