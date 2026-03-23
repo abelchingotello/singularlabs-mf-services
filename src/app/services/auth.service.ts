@@ -220,7 +220,7 @@ export class AuthService {
       throw new Error('Credenciales de QR no configuradas en environment');
     }
 
-    const loginUrl = `${environment.URL_API_GENERATE_QR}/v1/auth/cognito/login`;
+    const loginUrl = `${environment.URL_API_GENERATE_QR}/v1/auth/login`;
     const loginPayload = {
       username,
       password
@@ -242,26 +242,6 @@ export class AuthService {
     return token;
   }
 
-  private async refreshGenerateQr(session: GenerateQrAuthSession): Promise<string> {
-    if (!session?.refreshToken || !session?.username) {
-      throw new Error('No existe refreshToken para QR');
-    }
-
-    const response: any = await firstValueFrom(
-      this.rawHttpClient.post(`${environment.URL_API_GENERATE_QR}/v1/auth/cognito/refresh`, {
-        refreshToken: session.refreshToken,
-        username: session.username
-      }, this.getGenerateQrAuthHttpOptions())
-    );
-
-    const updatedSession = this.setGenerateQrAuthSession(response, session.username);
-    const token = this.getGenerateQrBearerToken(updatedSession);
-    if (!token) {
-      throw new Error('No se obtuvo idToken/accessToken en refresh QR');
-    }
-    return token;
-  }
-
   async getValidGenerateQrToken(forceRefresh = false): Promise<string> {
     if (this.generateQrAuthPromise) {
       return this.generateQrAuthPromise;
@@ -274,14 +254,7 @@ export class AuthService {
         return this.getGenerateQrBearerToken(stored);
       }
 
-      if (stored?.refreshToken) {
-        try {
-          return await this.refreshGenerateQr(stored);
-        } catch {
-          this.clearGenerateQrAuthSession();
-        }
-      }
-
+      this.clearGenerateQrAuthSession();
       return this.loginGenerateQr();
     })();
 

@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'assign',loadChildren: () => import('./assign/assign.module').then(x => x.AssignModule)}, 
   { path: 'statusConciliation', component: StatusConciliationComponent },
   { path: 'generateqr', loadChildren: () => import('./GenerateQR/generateqr.module').then(x => x.GenerateQRModule) },
+  { path: 'generate-qr', loadChildren: () => import('./GenerateQR/generateqr.module').then(x => x.GenerateQRModule) },
   { path: 'GenerateQR', loadChildren: () => import('./GenerateQR/generateqr.module').then(x => x.GenerateQRModule) },
 ];
 
