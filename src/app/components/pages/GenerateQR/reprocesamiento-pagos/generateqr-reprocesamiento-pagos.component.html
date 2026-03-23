@@ -146,8 +146,19 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Service ID</mat-label>
-            <input matInput formControlName="serviceId" />
+            <mat-label>Servicio</mat-label>
+            <mat-select formControlName="serviceId">
+              <mat-option value="">TODOS</mat-option>
+              <mat-option disabled class="search-option">
+                <input matInput placeholder="Buscar servicio..." [(ngModel)]="queueServiceFilter"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="filterQueueServices()"
+                  (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()" />
+              </mat-option>
+              <mat-option *ngFor="let service of filteredQueueServices" [value]="service.id">
+                {{ service.name }}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -156,8 +167,8 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Suministro</mat-label>
-            <input matInput formControlName="supplyNumber" digitsOnly inputmode="numeric" pattern="[0-9]*" />
+            <mat-label>Referencia</mat-label>
+            <input matInput formControlName="reference" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">

@@ -2,12 +2,10 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { EMPTY } from 'rxjs';
-import { expand, finalize, map, scan } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { GenerateQrService } from 'src/app/services/generateqr.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
-import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { DynamicTableComponent } from '../../../library/dynamic-table/dynamic-table.component';
 import jwtDecode from 'jwt-decode';
@@ -62,7 +60,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     { name: 'Instruction ID', attribute: 'instruction_id' },
     { name: 'ID QR', attribute: 'id_qr' },
     { name: 'Servicio', attribute: 'service_name' },
-    { name: 'Suministro', attribute: 'supply_number' },
+    { name: 'Referencia', attribute: 'reference' },
     { name: 'Monto', attribute: 'amount' },
     { name: 'Estado', attribute: 'status', config: { styleClass: true } },
     { name: 'Intentos', attribute: 'attempt_count' },
@@ -108,8 +106,10 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
   historyQueueId: string | null = null;
 
   serviceFilter = '';
+  queueServiceFilter = '';
   allServices: ServiceItem[] = [];
   filteredServices: ServiceItem[] = [];
+  filteredQueueServices: ServiceItem[] = [];
   selectedServiceName = '';
 
   scheduleItems: any[] = [];
@@ -121,7 +121,6 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private services: ServicesService,
     private generateQrService: GenerateQrService,
     private authService: AuthService,
     private spinner: SpinnerService,
@@ -144,7 +143,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       instructionId: ['', [Validators.pattern(/^\d*$/)]],
       serviceId: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
-      supplyNumber: ['', [Validators.pattern(/^\d*$/)]],
+      reference: ['', [Validators.pattern(/^\d*$/)]],
       responsable: [''],
       dateFrom: [''],
       dateTo: [''],
@@ -173,20 +172,19 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
 
   loadServices(): void {
     this.spinner.spinnerOnOff();
-    this.services.getServicesFromCategory('LUZ').pipe(
-      expand(response =>
-        response?.data?.nextPageKey
-          ? this.services.getServicesFromCategory('LUZ', response.data.nextPageKey)
-          : EMPTY
-      ),
-      map(response => response?.data?.Items ?? []),
-      scan((acc: ServiceItem[], items: ServiceItem[]) => acc.concat(items), []),
+    this.generateQrService.listConfiguredServices(1, 200).pipe(
       finalize(() => this.spinner.spinnerOnOff())
     ).subscribe({
-      next: (items: ServiceItem[]) => {
-        this.allServices = items;
-        this.filteredServices = items;
+      next: (response) => {
+        const items = response?.data?.items ?? response?.items ?? [];
+        this.allServices = (items || [])
+          .filter((item: any) => this.isConfiguredQrService(item))
+          .map((item: any) => ({
+            id: item?.serviceId ?? item?.id,
+            name: item?.serviceName ?? item?.name
+          }));
         this.filterServices();
+        this.filterQueueServices();
       },
       error: (error) => {
         this.toastr.handleHttpError(error);
@@ -198,6 +196,23 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     const term = (this.serviceFilter || '').toLowerCase();
     this.filteredServices = this.allServices.filter(service =>
       service.name?.toLowerCase().includes(term)
+    );
+  }
+
+  filterQueueServices(): void {
+    const term = (this.queueServiceFilter || '').toLowerCase();
+    this.filteredQueueServices = this.allServices.filter(service =>
+      service.name?.toLowerCase().includes(term)
+    );
+  }
+
+  private isConfiguredQrService(item: any): boolean {
+    const hasBusinessCode = Boolean(String(item?.businessCode || item?.business_code || '').trim());
+    return Boolean(
+      hasBusinessCode
+      && item?.mappingActive === true
+      && item?.providerActive === true
+      && item?.sftpConfigured === true
     );
   }
 
@@ -388,13 +403,15 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       instructionId: '',
       serviceId: '',
       idQr: '',
-      supplyNumber: '',
+      reference: '',
       responsable: '',
       dateFrom: '',
       dateTo: '',
       minAmount: '',
       maxAmount: ''
     });
+    this.queueServiceFilter = '';
+    this.filterQueueServices();
     this.queuePage = 1;
     this.queueData = [];
     this.clearQueueSelection();
@@ -414,7 +431,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       instructionId: formValue.instructionId || undefined,
       serviceId: formValue.serviceId || undefined,
       idQr: formValue.idQr || undefined,
-      supplyNumber: formValue.supplyNumber || undefined,
+      reference: formValue.reference || undefined,
       responsable: formValue.responsable || undefined,
       dateFrom: this.formatDateParam(formValue.dateFrom) || undefined,
       dateTo: this.formatDateParam(formValue.dateTo) || undefined,
@@ -433,6 +450,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
         const normalized = items.map((item: any) => ({
           ...item,
           service_name: item.service_name || item.serviceName || '-',
+          reference: item.reference || item.referencia || item.supply_number || item.supplyNumber || '-',
           status: this.normalizeStatus(item.status),
           styleClass: this.normalizeStatus(item.status),
           amount: item.amount ?? '-',

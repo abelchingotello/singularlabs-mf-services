@@ -42,6 +42,23 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Pago desde</mat-label>
+            <input matInput [matDatepicker]="paymentFromPicker" formControlName="paymentFrom" />
+            <mat-datepicker-toggle matSuffix [for]="paymentFromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #paymentFromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Pago hasta</mat-label>
+            <input matInput [matDatepicker]="paymentToPicker" formControlName="paymentTo" />
+            <mat-datepicker-toggle matSuffix [for]="paymentToPicker"></mat-datepicker-toggle>
+            <mat-datepicker #paymentToPicker></mat-datepicker>
+            <mat-error *ngIf="serviceForm.hasError('invalidDateRange') && (serviceForm.get('paymentFrom').touched || serviceForm.get('paymentTo').touched)">
+              Pago desde debe ser menor o igual a pago hasta
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado pago</mat-label>
             <mat-select formControlName="estado_pago">
               <mat-option [value]="">NINGUNO</mat-option>
@@ -52,18 +69,17 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Estado anulado</mat-label>
-            <mat-select formControlName="estado_anulado">
-              <mat-option [value]="">NINGUNO</mat-option>
-              <mat-option *ngFor="let option of estadoAnuladoOptions" [value]="option.value">
+            <mat-label>Vigencia</mat-label>
+            <mat-select formControlName="vigencia">
+              <mat-option *ngFor="let option of vigenciaOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Suministro</mat-label>
-            <input matInput formControlName="suministro" digitsOnly inputmode="numeric" pattern="[0-9]*" />
+            <mat-label>Referencia</mat-label>
+            <input matInput formControlName="referencia" digitsOnly inputmode="numeric" pattern="[0-9]*" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -160,8 +176,8 @@
 
 
             <mat-form-field appearance="outline" class="qr-field">
-              <mat-label>Suministro</mat-label>
-              <input matInput formControlName="suministro" digitsOnly inputmode="numeric" pattern="[0-9]*" maxlength="10"
+              <mat-label>Referencia</mat-label>
+              <input matInput formControlName="referencia" digitsOnly inputmode="numeric" pattern="[0-9]*" maxlength="10"
                 (input)="onNumericInput($event, 10)" />
             </mat-form-field>
 

@@ -1,0 +1,502 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card title="Configuracion de Servicios y SFTP" externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
+      <mat-card class="custom-border-radius-1-25 sftp-servicios-card"></mat-card>
+    </uni-image-card>
+
+    <div class="dual-list-card">
+      <div class="page-header">
+        <div class="page-header__icon">
+          <mat-icon>storage</mat-icon>
+        </div>
+        <div>
+          <h2 class="page-title">1.- Registrar servicio para la generacion de QR</h2>
+          <p class="page-subtitle">Tener en cuenta que si no esta registrado y configurado el servicio no se podra generar QR.</p>
+        </div>
+      </div>
+
+      <div class="dual-list-toolbar">
+        <div class="dual-list-toolbar__actions">
+          <button mat-raised-button color="primary" type="button" (click)="loadServices()" [disabled]="isLoadingServices || isRegisteringService || isSavingConfiguredService">
+            {{ isLoadingServices ? 'Consultando...' : 'Recargar' }}
+          </button>
+          <button mat-raised-button color="accent" type="button" (click)="openConfiguredServiceDialog()" [disabled]="!selectedQrConfiguredService || isSavingConfiguredService || isLoadingServices">
+            Editar servicio
+          </button>
+        </div>
+      </div>
+
+      <div class="dual-list-layout" *ngIf="!isLoadingServices; else loadingState">
+        <section class="list-panel">
+          <div class="list-panel__header">
+            <h3>Servicios habilitados para Recaudador: Ligopay</h3>
+            <span>{{ ligopayServices.length }} registros</span>
+          </div>
+          <div class="list-panel__body" *ngIf="ligopayServices.length > 0; else emptyLigopay">
+            <button type="button" class="service-row service-row--compact" *ngFor="let item of ligopayServices; trackBy: trackByLigopayService"
+              [class.service-row--selected]="selectedLigopayService === item"
+              [class.service-row--disabled]="isServiceConfigured(item)"
+              (click)="selectLigopayService(item)">
+              <div class="service-row__content">
+                <div class="service-row__main">
+                  <span class="service-row__title">{{ getLigopayServiceLabel(item) }}</span>
+                  <span class="service-row__subtitle">ID: {{ getLigopayServiceIdentifier(item) }}</span>
+                </div>
+                <span class="service-badge" *ngIf="isServiceConfigured(item)">Ya registrado</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <div class="list-actions">
+          <button type="button" class="btn button-primary list-actions__button" (click)="registerService()"
+            [disabled]="!selectedLigopayService || isRegisteringService || isServiceConfigured(selectedLigopayService)">
+            {{ isRegisteringService ? 'Registrando...' : 'Agregar >' }}
+          </button>
+        </div>
+
+        <section class="list-panel">
+          <div class="list-panel__header">
+            <h3>Servicios habilitados para la generacion de QR</h3>
+            <span>{{ qrConfiguredServices.length }} registros</span>
+          </div>
+          <div class="list-panel__body" *ngIf="qrConfiguredServices.length > 0; else emptyQrServices">
+            <button type="button" class="service-row service-row--compact service-row--configured" *ngFor="let item of qrConfiguredServices; trackBy: trackByQrConfiguredService"
+              [class.service-row--selected]="selectedQrConfiguredService === item"
+              [class.service-row--ready]="isQrServiceReady(item)"
+              [class.service-row--warning]="isQrServiceWarning(item)"
+              [class.service-row--danger]="isQrServiceDanger(item)"
+              (click)="selectQrConfiguredService(item)">
+              <div class="service-row__content">
+                <div class="service-row__main">
+                  <span class="service-row__title">{{ getQrConfiguredServiceLabel(item) }}</span>
+                  <span class="service-row__subtitle">ID: {{ getQrConfiguredServiceIdentifier(item) }}</span>
+                </div>
+                <span class="service-row__meta">{{ getQrConfiguredBusinessCode(item) }}</span>
+              </div>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <ng-template #loadingState>
+        <div class="register-service-loading">Consultando servicios...</div>
+      </ng-template>
+
+      <ng-template #emptyLigopay>
+        <div class="empty-result">No hay servicios habilitados para Ligopay.</div>
+      </ng-template>
+
+      <ng-template #emptyQrServices>
+        <div class="empty-result">No hay servicios configurados para QR.</div>
+      </ng-template>
+    </div>
+
+
+    <div class="provider-section custom-border-radius-1-25">
+      <div class="page-header provider-section__header">
+        <div class="page-header__icon">
+          <mat-icon>settings_input_hdmi</mat-icon>
+        </div>
+        <div>
+          <h2 class="page-title">2.- Administrar accesos SFTP</h2>
+          <p class="page-subtitle">2.1.- Registra los accesos SFTP que tendra el servicio en la generacion QR.</p>
+          <p class="page-subtitle">2.2.- Relacione los servicios con sus respectivos accesos SFTP.</p>
+        </div>
+      </div>
+
+      <div class="provider-toolbar">
+        <button type="button" class="btn button-primary" (click)="openProviderDialog()">
+          <mat-icon>add</mat-icon>
+          Nuevo provider
+        </button>
+      </div>
+
+      <mat-card class="custom-border-radius-1-25 provider-table-card">
+        <mat-card-content>
+          <uni-dynamic-table
+            [columns]="providerColumns"
+            [data]="providerRows"
+            [refreshFunction]="loadProviders.bind(this)"
+            [currentPageIndex]="providerPage - 1"
+            [pageSizeOptions]="[5, 10, 20, 50]"
+            [lengthTable]="providerTotal"
+            [showExport]="false"
+            (pageChange)="onProviderPageChange($event)"
+            (clickButtonEvent)="onProviderAction($event)">
+          </uni-dynamic-table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="provider-section custom-border-radius-1-25">
+      <div class="page-header provider-section__header">
+        <div class="page-header__icon">
+          <mat-icon>mail</mat-icon>
+        </div>
+        <div>
+          <h2 class="page-title">3.- Administrar correos</h2>
+          <p class="page-subtitle">Registra correos de notificacion y asignalos a un servicio o de manera global.</p>
+        </div>
+      </div>
+
+      <div class="email-toolbar">
+        <form [formGroup]="notificationEmailFiltersForm" class="email-filters-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Servicio</mat-label>
+            <mat-select formControlName="serviceId">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let service of getNotificationEmailServiceOptions(); trackBy: trackByQrConfiguredService" [value]="getQrConfiguredServiceIdentifier(service)">
+                {{ getQrConfiguredServiceLabel(service) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="active">
+              <mat-option value="">Todos</mat-option>
+              <mat-option [value]="1">Activo</mat-option>
+              <mat-option [value]="0">Inactivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Incluir globales</mat-label>
+            <mat-select formControlName="includeGlobal">
+              <mat-option [value]="1">Si</mat-option>
+              <mat-option [value]="0">No</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+        <div class="email-toolbar__actions">
+          <button type="button" class="btn button-secondary" (click)="clearNotificationEmailFilters()" [disabled]="isLoadingNotificationEmails || isSavingNotificationEmail">
+            Limpiar
+          </button>
+          <button type="button" class="btn button-primary" (click)="searchNotificationEmails()" [disabled]="isLoadingNotificationEmails || isSavingNotificationEmail">
+            Buscar
+          </button>
+          <button type="button" class="btn button-primary" (click)="openNotificationEmailDialog()" [disabled]="isLoadingNotificationEmails || isSavingNotificationEmail">
+            <mat-icon>add</mat-icon>
+            Nuevo correo
+          </button>
+        </div>
+      </div>
+
+      <mat-card class="custom-border-radius-1-25 provider-table-card">
+        <mat-card-content>
+          <uni-dynamic-table
+            [columns]="notificationEmailColumns"
+            [data]="notificationEmailRows"
+            [refreshFunction]="loadNotificationEmails.bind(this)"
+            [currentPageIndex]="notificationEmailPage - 1"
+            [pageSizeOptions]="[5, 10, 20, 50]"
+            [lengthTable]="notificationEmailTotal"
+            [showExport]="false"
+            (pageChange)="onNotificationEmailPageChange($event)"
+            (clickButtonEvent)="onNotificationEmailAction($event)">
+          </uni-dynamic-table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #providerDialog>
+  <div class="provider-dialog-header">
+    <div class="page-header__icon">
+      <mat-icon>settings_input_hdmi</mat-icon>
+    </div>
+    <div>
+      <div class="provider-dialog-title">{{ editingProviderId ? 'Editar provider' : 'Nuevo provider' }}</div>
+      <div class="provider-dialog-subtitle">Configura el acceso SFTP del provider.</div>
+    </div>
+  </div>
+
+  <div class="provider-dialog-content">
+    <form [formGroup]="providerForm" class="provider-form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Provider code</mat-label>
+        <input matInput formControlName="providerCode" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Base dir</mat-label>
+        <input matInput formControlName="baseDir" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Activo</mat-label>
+        <mat-select formControlName="active">
+          <mat-option [value]="1">Activo</mat-option>
+          <mat-option [value]="0">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <div class="provider-dialog-actions">
+      <button mat-button mat-dialog-close [disabled]="isSavingProvider">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="saveProvider()" [disabled]="isSavingProvider">
+        {{ isSavingProvider ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #providerDetailDialog>
+  <div class="provider-dialog-header">
+    <div class="page-header__icon">
+      <mat-icon>visibility</mat-icon>
+    </div>
+    <div>
+      <div class="provider-dialog-title">Detalle del provider</div>
+      <div class="provider-dialog-subtitle">Visualiza el accesso SFTP y sus servicios relacionados.</div>
+    </div>
+  </div>
+
+  <div class="provider-dialog-content provider-detail-content" *ngIf="selectedProviderDetail as detail">
+    <div class="provider-detail-grid">
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Codigo</span>
+        <strong>{{ detail?.provider_code || '-' }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Nombre</span>
+        <strong>{{ detail?.name || '-' }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Usuario</span>
+        <strong>{{ detail?.username || '-' }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Password</span>
+        <strong>{{ detail?.password || '-' }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Base dir</span>
+        <strong>{{ detail?.base_dir || '-' }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Estado</span>
+        <strong><span [ngClass]="detail?.styleClass">{{ detail?.active_text }}</span></strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Servicios relacionados</span>
+        <strong>{{ detail?.serviceMappingsCount || 0 }}</strong>
+      </div>
+      <div class="provider-detail-card">
+        <span class="provider-detail-label">Actualizado</span>
+        <strong>{{ detail?.updated_at | date:'dd/MM/yyyy HH:mm' }}</strong>
+      </div>
+    </div>
+
+    <div class="provider-mappings-panel">
+      <div class="provider-mappings-panel__header">
+        <h3>Servicios mapeados</h3>
+        <span>{{ detail?.serviceMappingsCount || 0 }} registros</span>
+      </div>
+
+      <div class="provider-mappings-create">
+        <mat-form-field appearance="outline" class="provider-mappings-create__field">
+          <mat-label>Servicio QR</mat-label>
+          <mat-select [(value)]="selectedServiceNameToMap" [disabled]="isSavingMapping">
+            <mat-option *ngFor="let service of getAvailableQrServicesForProvider()" [value]="service?.service_name || service?.serviceName || service?.name">
+              {{ service?.service_name || service?.serviceName || service?.name || '-' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button type="button" class="btn button-primary" (click)="addServiceMapping()"
+          [disabled]="!selectedServiceNameToMap || isSavingMapping">
+          {{ isSavingMapping ? 'Guardando...' : 'Agregar servicio' }}
+        </button>
+      </div>
+
+      <div class="provider-mappings-list" *ngIf="detail?.serviceMappings?.length; else emptyProviderMappings">
+        <div class="provider-mapping-item" *ngFor="let mapping of detail?.serviceMappings; trackBy: trackByProviderMapping">
+          <div class="provider-mapping-main">
+            <strong>{{ mapping?.serviceName || '-' }}</strong>
+            <span>ID: {{ mapping?.serviceId || '-' }}</span>
+          </div>
+          <div class="provider-mapping-meta">
+            <span>Business code: {{ mapping?.businessCode || '-' }}</span>
+            <span>Creado: {{ mapping?.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span>Actualizado: {{ mapping?.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="provider-mapping-actions">
+            <mat-form-field appearance="outline" class="provider-mapping-actions__field">
+              <mat-label>Estado</mat-label>
+              <mat-select [(value)]="mapping.relationActive" [disabled]="isSavingMapping">
+                <mat-option [value]="1">Activo</mat-option>
+                <mat-option [value]="0">Inactivo</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <span [ngClass]="mapping?.relationActive === 1 ? 'activo' : 'inactivo'">{{ mapping?.relationActive === 1 ? 'activo' : 'inactivo' }}</span>
+
+            <button type="button" class="btn button-secondary" (click)="saveServiceMapping(mapping)" [disabled]="isSavingMapping">
+              Guardar
+            </button>
+
+            <button type="button" class="btn button-danger-outline" (click)="removeServiceMapping(mapping)" [disabled]="isSavingMapping">
+              Desvincular
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="provider-dialog-actions">
+      <button mat-button mat-dialog-close>Cerrar</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #emptyProviderMappings>
+  <div class="empty-result provider-mappings-empty">Este provider aun no tiene servicios relacionados.</div>
+</ng-template>
+
+
+
+<ng-template #notificationEmailDialog>
+  <div class="provider-dialog-header">
+    <div class="page-header__icon">
+      <mat-icon>mail</mat-icon>
+    </div>
+    <div>
+      <div class="provider-dialog-title">{{ editingNotificationEmailId ? 'Editar correo' : 'Nuevo correo' }}</div>
+      <div class="provider-dialog-subtitle">Administra los correos de notificacion por servicio o globales.</div>
+    </div>
+  </div>
+
+  <div class="provider-dialog-content">
+    <form [formGroup]="notificationEmailForm" class="provider-form-grid configured-service-form-grid">
+      <mat-form-field appearance="outline" class="configured-service-form-grid__full">
+        <mat-label>Correo</mat-label>
+        <input matInput formControlName="email" />
+        <mat-error *ngIf="notificationEmailForm.get('email')?.hasError('required')">Correo requerido.</mat-error>
+        <mat-error *ngIf="notificationEmailForm.get('email')?.hasError('email')">Ingrese un correo valido.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Servicio</mat-label>
+        <mat-select formControlName="serviceId">
+          <mat-option value="">Global</mat-option>
+          <mat-option *ngFor="let service of getNotificationEmailServiceOptions(); trackBy: trackByQrConfiguredService" [value]="getQrConfiguredServiceIdentifier(service)">
+            {{ getQrConfiguredServiceLabel(service) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="active">
+          <mat-option [value]="1">Activo</mat-option>
+          <mat-option [value]="0">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="configured-service-form-grid__full">
+        <mat-label>Descripcion</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+      </mat-form-field>
+    </form>
+
+    <div class="provider-dialog-actions">
+      <button mat-button mat-dialog-close [disabled]="isSavingNotificationEmail">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="saveNotificationEmail()" [disabled]="isSavingNotificationEmail">
+        {{ isSavingNotificationEmail ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #configuredServiceDialog>
+  <div class="provider-dialog-header">
+    <div class="page-header__icon">
+      <mat-icon>edit</mat-icon>
+    </div>
+    <div>
+      <div class="provider-dialog-title">Editar servicio QR</div>
+      <div class="provider-dialog-subtitle">Actualiza business code y datos del servicio registrado.</div>
+    </div>
+  </div>
+
+  <div class="provider-dialog-content">
+    <form [formGroup]="configuredServiceForm" class="provider-form-grid configured-service-form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Service ID</mat-label>
+        <input matInput formControlName="serviceId" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Business code</mat-label>
+        <input matInput formControlName="businessCode" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre del servicio</mat-label>
+        <input matInput formControlName="serviceName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Webhook URL</mat-label>
+        <input matInput formControlName="webhookUrl" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Webhook habilitado</mat-label>
+        <mat-select formControlName="webhookEnabled">
+          <mat-option [value]="1">Si</mat-option>
+          <mat-option [value]="0">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Skip pagos</mat-label>
+        <mat-select formControlName="skipPagos">
+          <mat-option [value]="1">Si</mat-option>
+          <mat-option [value]="0">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="configured-service-form-grid__full">
+        <mat-label>Minutos de QR</mat-label>
+        <input matInput formControlName="qrTtlMinutes" type="number" min="1" step="1" />
+        <mat-error *ngIf="configuredServiceForm.get('qrTtlMinutes')?.hasError('pattern') || configuredServiceForm.get('qrTtlMinutes')?.hasError('min')">
+          Ingrese un numero entero positivo.
+        </mat-error>
+      </mat-form-field>
+    </form>
+
+    <div class="provider-dialog-actions">
+      <button mat-button mat-dialog-close [disabled]="isSavingConfiguredService">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="saveConfiguredService()" [disabled]="isSavingConfiguredService">
+        {{ isSavingConfiguredService ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </div>
+</ng-template>

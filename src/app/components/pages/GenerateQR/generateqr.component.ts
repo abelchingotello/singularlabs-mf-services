@@ -10,7 +10,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
-import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
+import { filter, forkJoin, lastValueFrom, finalize, map } from 'rxjs';
 import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
 import { GenerateQrService } from 'src/app/services/generateqr.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -27,7 +27,7 @@ export class GenerateQR implements OnInit {
 
   public columns: any[] = [
     { name: 'ID QR', attribute: 'id_qr' },
-    { name: 'Suministro', attribute: 'suministro' },
+    { name: 'Referencia', attribute: 'referencia' },
     { name: 'Servicio', attribute: 'empresa' },
     {
       name: 'Fecha creacion',
@@ -52,8 +52,8 @@ export class GenerateQR implements OnInit {
       }
     },
     {
-      name: 'Anulado',
-      attribute: 'estado_anulado_display',
+      name: 'Vigencia',
+      attribute: 'estado_vigencia_label',
       config: {
         styleClass: true
       }
@@ -125,11 +125,14 @@ export class GenerateQR implements OnInit {
     { value: '0', label: 'pendiente' },
     { value: '1', label: 'pagado' },
     { value: '2', label: 'notificado no pagado' },
-    { value: '3', label: 'fallido' }
+    { value: '3', label: 'fallido' },
+    { value: '4', label: 'devuelto' }
   ];
-  public estadoAnuladoOptions = [
-    { value: '0', label: 'No' },
-    { value: '1', label: 'Si' }
+  public vigenciaOptions = [
+    { value: '', label: 'NINGUNO' },
+    { value: 'vigente', label: 'VIGENTE' },
+    { value: 'vencido', label: 'VENCIDO' },
+    { value: 'anulado', label: 'ANULADO' }
   ];
   public qrFilteredServices: ServiceItem[] = [];
   public qrAllItems: ServiceItem[] = [];
@@ -468,7 +471,7 @@ export class GenerateQR implements OnInit {
       return;
     }
     const payload = {
-      suministro: this.qrForm.get('suministro')?.value,
+      referencia: this.qrForm.get('referencia')?.value,
       empresa: this.qrSelectedService?.name || '',
       cliente: this.qrForm.get('titular')?.value,
       amount: this.qr_amount_cents,
@@ -643,16 +646,21 @@ export class GenerateQR implements OnInit {
   }
 
   loadAllServicesByType(serviceType: string) {
-    return this.services.getServicesFromCategory(serviceType).pipe(
-      expand(response =>
-        response?.data?.nextPageKey
-          ? this.services.getServicesFromCategory(serviceType, response.data.nextPageKey)
-          : EMPTY // Termina el flujo cuando no hay mas paginas
-      ),
-      map(response => response?.data?.Items ?? []),
-      scan((acc, items) => acc.concat(items), []),
-      startWith([])
+    return this.generateQrService.listConfiguredServices(1, 200).pipe(
+      map((response: any) => {
+        const items = response?.data?.items ?? response?.items ?? [];
+        return (items || [])
+          .filter((item: any) => this.isConfiguredQrService(item))
+          .map((item: any) => ({
+            id: item?.serviceId ?? item?.id,
+            name: item?.serviceName ?? item?.name
+          }));
+      })
     );
+  }
+
+  private isConfiguredQrService(item: any): boolean {
+    return item?.active === true || Number(item?.active) === 1;
   }
 
   dataInitial(pageSize: any) {
@@ -689,10 +697,10 @@ export class GenerateQR implements OnInit {
         }
         const normalizedItems = items.map((item: any) => ({
           ...item,
+          referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.codigo_usuario,
           amount: this.normalizeAmount(item?.amount),
           estado_pago_label: this.formatEstadoPago(item?.estado_pago),
-          estado_anulado_label: this.formatEstadoAnulado(item?.estado_anulado),
-          estado_anulado_display: this.formatAnuladoSiNo(item?.estado_anulado)
+          estado_vigencia_label: this.formatVigencia(item?.estado_vigencia ?? item?.vigencia)
         }));
         this.dataFilter = [...this.dataFilter, ...normalizedItems];
         this.dataService = [...this.dataFilter];
@@ -719,9 +727,11 @@ export class GenerateQR implements OnInit {
     this.serviceForm = this.fb.group({
       start_date: [''],
       end_date: [''],
+      paymentFrom: [''],
+      paymentTo: [''],
       estado_pago: [''],
-      estado_anulado: [''],
-      suministro: ['', [Validators.pattern(/^\d*$/)]],
+      vigencia: [''],
+      referencia: ['', [Validators.pattern(/^\d*$/)]],
       empresa: [''],
       jobId: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
@@ -731,14 +741,17 @@ export class GenerateQR implements OnInit {
       service_id: [''],
       provider: [''],
       status: ['']
-    }, { validators: this.dateRangeValidator('start_date', 'end_date') })
+    }, { validators: [
+      this.dateRangeValidator('start_date', 'end_date'),
+      this.dateRangeValidator('paymentFrom', 'paymentTo')
+    ] })
   }
 
   formQr() {
     this.qrForm = this.fb.group({
       service_type: [''],
       idService: ['', [Validators.required]],
-      suministro: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
+      referencia: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
       titular: ['', [Validators.required]],
       amount: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{2})$/), this.maxAmountValidator(500)]],
       receipt_number: ['', [Validators.pattern(/^\d+$/)]],
@@ -1034,8 +1047,8 @@ export class GenerateQR implements OnInit {
     if (exportFilters['estado'] && !exportFilters['estadoPago']) {
       exportFilters['estadoPago'] = exportFilters['estado'];
     }
-    if (exportFilters['estadoAnulado'] && !exportFilters['estado_anulado']) {
-      exportFilters['estado_anulado'] = exportFilters['estadoAnulado'];
+    if (exportFilters['estado_vigencia'] && !exportFilters['vigencia']) {
+      exportFilters['vigencia'] = exportFilters['estado_vigencia'];
     }
     if (exportFilters['empresa'] && !exportFilters['servicio']) {
       exportFilters['servicio'] = exportFilters['empresa'];
@@ -1126,7 +1139,7 @@ export class GenerateQR implements OnInit {
 
   get qrDetailTitle(): string {
     const fromResult = this.buildQrTitle(
-      this.qrResult?.suministro,
+      this.qrResult?.referencia ?? this.qrResult?.suministro,
       this.qrResult?.empresa,
       this.qrResult?.cliente
     );
@@ -1134,15 +1147,15 @@ export class GenerateQR implements OnInit {
       return fromResult;
     }
     const fromForm = this.buildQrTitle(
-      this.qrForm?.get('suministro')?.value,
+      this.qrForm?.get('referencia')?.value,
       this.qrSelectedService?.name || this.qrResult?.empresa,
       this.qrForm?.get('titular')?.value
     );
     return fromForm;
   }
 
-  private buildQrTitle(suministro: any, empresa: any, cliente: any): string {
-    const parts = [suministro, empresa, cliente]
+  private buildQrTitle(referencia: any, empresa: any, cliente: any): string {
+    const parts = [referencia, empresa, cliente]
       .filter((value: any) => value !== null && value !== undefined && String(value).trim() !== '')
       .map((value: any) => String(value).trim());
     return parts.length ? parts.join(' ') : '-';
@@ -1200,9 +1213,11 @@ export class GenerateQR implements OnInit {
   private buildListFilters(): Record<string, any> {
     const start = this.formatDateParam(this.serviceForm?.get('start_date')?.value);
     const end = this.formatDateParam(this.serviceForm?.get('end_date')?.value);
+    const paymentFrom = this.formatDateParam(this.serviceForm?.get('paymentFrom')?.value);
+    const paymentTo = this.formatDateParam(this.serviceForm?.get('paymentTo')?.value);
     const estadoPago = String(this.serviceForm?.get('estado_pago')?.value || '').trim();
-    const estadoAnulado = String(this.serviceForm?.get('estado_anulado')?.value || '').trim();
-    const suministro = String(this.serviceForm?.get('suministro')?.value || '').trim();
+    const vigencia = String(this.serviceForm?.get('vigencia')?.value || '').trim();
+    const referencia = String(this.serviceForm?.get('referencia')?.value || '').trim();
     const empresa = String(this.serviceForm?.get('empresa')?.value || '').trim();
     const jobId = String(this.serviceForm?.get('jobId')?.value || '').trim();
     const idQr = String(this.serviceForm?.get('idQr')?.value || '').trim();
@@ -1213,14 +1228,21 @@ export class GenerateQR implements OnInit {
     if (end) {
       filters['end'] = end;
     }
+    if (paymentFrom) {
+      filters['paymentFrom'] = paymentFrom;
+    }
+    if (paymentTo) {
+      filters['paymentTo'] = paymentTo;
+    }
     if (estadoPago) {
       filters['estado'] = estadoPago;
     }
-    if (estadoAnulado) {
-      filters['estadoAnulado'] = estadoAnulado;
+    if (vigencia) {
+      filters['estado_vigencia'] = vigencia;
+      filters['vigencia'] = vigencia;
     }
-    if (suministro) {
-      filters['suministro'] = suministro;
+    if (referencia) {
+      filters['referencia'] = referencia;
     }
     if (empresa) {
       filters['empresa'] = empresa;
@@ -1283,33 +1305,11 @@ export class GenerateQR implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 
-  private formatEstadoAnulado(value: any): string {
+  private formatVigencia(value: any): string {
     if (value === null || value === undefined || value === '') {
       return '-';
     }
-    const num = Number(value);
-    if (Number.isNaN(num)) {
-      return String(value);
-    }
-    switch (num) {
-      case 0:
-        return 'vigente';
-      case 1:
-        return 'anulado';
-      default:
-        return String(value);
-    }
-  }
-
-  private formatAnuladoSiNo(value: any): string {
-    if (value === null || value === undefined || value === '') {
-      return '-';
-    }
-    const num = Number(value);
-    if (Number.isNaN(num)) {
-      return String(value);
-    }
-    return num === 1 ? 'Si' : 'No';
+    return String(value).toLowerCase().replace(/\s+/g, '_');
   }
 
   private formatEstadoPago(value: any): string {
@@ -1330,6 +1330,8 @@ export class GenerateQR implements OnInit {
         return 'notificado_no_pagado';
       case 3:
         return 'fallido';
+      case 4:
+        return 'devuelto';
       default:
         return String(value);
     }
