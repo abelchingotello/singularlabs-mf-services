@@ -312,13 +312,7 @@ export class GenerateQrReportsComponent implements OnInit {
   }
 
   private isConfiguredQrService(item: any): boolean {
-    const hasBusinessCode = Boolean(String(item?.businessCode || item?.business_code || '').trim());
-    return Boolean(
-      hasBusinessCode
-      && item?.mappingActive === true
-      && item?.providerActive === true
-      && item?.sftpConfigured === true
-    );
+    return item?.active === true || Number(item?.active) === 1;
   }
 
 
