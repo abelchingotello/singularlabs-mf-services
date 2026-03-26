@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -10,6 +11,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { ServicesService } from 'src/app/services/services.service';
 import * as QRCode from 'qrcode';
 import jwtDecode from 'jwt-decode';
+import { CookieService } from 'ngx-cookie-service';
 
 interface ServiceItem {
   id: string;
@@ -39,13 +41,12 @@ export class GenerateQrReportsComponent implements OnInit {
       }
     },
     { name: 'Servicio', attribute: 'servicio' },
-    { name: 'Suministro', attribute: 'suministro' },
-    { name: 'N recibo', attribute: 'numero_recibo' },
+    { name: 'Referencia', attribute: 'referencia' },
+    { name: 'Descripcion', attribute: 'descripcion' },
     { name: 'Monto', attribute: 'monto' },
     { name: 'Titular', attribute: 'titular' },
     { name: 'Vigencia', attribute: 'estado_vigencia', config: { styleClass: true } },
     { name: 'Estado pago', attribute: 'estado_pago_text', config: { styleClass: true } },
-    { name: 'Anulado', attribute: 'estado_anulado_display', config: { styleClass: true } },
     {
       name: 'Notificacion',
       attribute: 'notificacion_at',
@@ -123,25 +124,27 @@ export class GenerateQrReportsComponent implements OnInit {
   public allItems: ServiceItem[] = [];
   public serviceFilter: string = '';
   public filterServiceSelected: ServiceItem | null = null;
+  private readonly personId: string;
+  private reportMode: 'internal' | 'external' = 'internal';
+
+  get showNotificationHistoryAction(): boolean {
+    return this.reportMode !== 'external';
+  }
 
   public estadoPagoOptions = [
     { value: '', label: 'NINGUNO' },
     { value: '0', label: 'pendiente' },
     { value: '1', label: 'pagado' },
     { value: '2', label: 'notificado no pagado' },
-    { value: '3', label: 'fallido' }
-  ];
-
-  public estadoAnuladoOptions = [
-    { value: '', label: 'NINGUNO' },
-    { value: '0', label: 'No' },
-    { value: '1', label: 'Si' }
+    { value: '3', label: 'fallido' },
+    { value: '4', label: 'devuelto' }
   ];
 
   public vigenciaOptions = [
     { value: '', label: 'NINGUNO' },
-    { value: 'vigente', label: 'vigente' },
-    { value: 'vencido', label: 'vencido' }
+    { value: 'vigente', label: 'VIGENTE' },
+    { value: 'vencido', label: 'VENCIDO' },
+    { value: 'anulado', label: 'ANULADO' }
   ];
 
   @ViewChild('detailDialog') detailDialog!: TemplateRef<any>;
@@ -157,10 +160,15 @@ export class GenerateQrReportsComponent implements OnInit {
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
     private authService: AuthService,
+    private cookieService: CookieService,
+    private route: ActivatedRoute,
     public dialog: MatDialog
-  ) {}
+  ) {
+    this.personId = this.cookieService.get('person_id');
+  }
 
   ngOnInit(): void {
+    this.reportMode = this.route.snapshot.data?.['reportMode'] === 'external' ? 'external' : 'internal';
     this.formReport();
     this.loadServices();
     this.loadReports();
@@ -170,16 +178,21 @@ export class GenerateQrReportsComponent implements OnInit {
     this.reportForm = this.fb.group({
       start: [''],
       end: [''],
+      paymentFrom: [''],
+      paymentTo: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
       servicio: [''],
-      suministro: ['', [Validators.pattern(/^\d*$/)]],
+      referencia: ['', [Validators.pattern(/^\d*$/)]],
       titular: [''],
       expiredFrom: [''],
       expiredTo: [''],
       vigencia: [''],
-      estadoPago: [''],
-      estadoAnulado: ['']
-    }, { validators: [this.dateRangeValidator('start', 'end'), this.dateRangeValidator('expiredFrom', 'expiredTo')] });
+      estadoPago: ['']
+    }, { validators: [
+      this.dateRangeValidator('start', 'end'),
+      this.dateRangeValidator('expiredFrom', 'expiredTo'),
+      this.dateRangeValidator('paymentFrom', 'paymentTo')
+    ] });
   }
 
   onPageChange(event: PageEvent) {
@@ -252,13 +265,24 @@ export class GenerateQrReportsComponent implements OnInit {
 
 
   loadServices() {
-    // reutiliza el servicio de listado con tipo LUZ
-    this.services.getServicesFromCategory('LUZ').subscribe({
+    const request$ = this.reportMode === 'external'
+      ? this.services.getExternalServicesForIdClient(this.personId)
+      : this.generateQrService.listConfiguredServices(1, 200);
+
+    request$.subscribe({
       next: (response) => {
-        const items = response?.data?.Items ?? response?.data?.items ?? response?.items ?? [];
-        this.allItems = (items || []).map((item: any) => ({
-          id: item.id,
-          name: item.name
+        const items = response?.data?.Items
+          ?? response?.data?.items
+          ?? response?.Items
+          ?? response?.items
+          ?? response?.data
+          ?? [];
+        const normalizedItems = this.reportMode === 'internal'
+          ? (items || []).filter((item: any) => this.isConfiguredQrService(item))
+          : items || [];
+        this.allItems = normalizedItems.map((item: any) => ({
+          id: item.id ?? item.serviceId,
+          name: item.name ?? item.serviceName
         }));
         this.filteredServices = [...this.allItems];
       },
@@ -285,6 +309,10 @@ export class GenerateQrReportsComponent implements OnInit {
 
   get filterServiceName(): string {
     return this.filterServiceSelected?.name || '';
+  }
+
+  private isConfiguredQrService(item: any): boolean {
+    return item?.active === true || Number(item?.active) === 1;
   }
 
 
@@ -427,12 +455,12 @@ export class GenerateQrReportsComponent implements OnInit {
     if (!this.detailQrImage) {
       return;
     }
-    const suministro = this.selectedRow?.suministro || '';
+    const referencia = this.selectedRow?.referencia || this.selectedRow?.suministro || '';
     const servicio = this.selectedRow?.servicio || '';
     const titular = this.selectedRow?.titular || '';
     const fechaRaw = this.selectedRow?.qr_created_at || '';
     const fecha = String(fechaRaw).replace('T', '_').replace(/[:\s]/g, '-');
-    const base = [suministro, servicio, titular, fecha]
+    const base = [referencia, servicio, titular, fecha]
       .filter(Boolean)
       .join('_')
       .normalize('NFD')
@@ -455,7 +483,11 @@ export class GenerateQrReportsComponent implements OnInit {
       this.spinner.spinnerOnOff();
       return;
     }
-    this.generateQrService.listReports(page, this.pageSize, this.listFilters).pipe(
+    const request$ = this.reportMode === 'external'
+      ? this.generateQrService.listExternalReports(page, this.pageSize, this.listFilters, this.personId)
+      : this.generateQrService.listReports(page, this.pageSize, this.listFilters);
+
+    request$.pipe(
       finalize(() => this.spinner.spinnerOnOff())
     ).subscribe({
       next: (data) => {
@@ -491,30 +523,21 @@ export class GenerateQrReportsComponent implements OnInit {
   private normalizeReport(item: any) {
     const estadoPagoRaw = item?.estado_pago ?? item?.estadoPago ?? item?.estado;
     const estadoPagoLabel = this.formatEstadoPago(estadoPagoRaw);
-
-    const estadoAnuladoRaw = item?.estado_anulado ?? item?.estadoAnulado;
-    const estadoAnuladoLabel = this.formatEstadoAnulado(estadoAnuladoRaw);
-    const estadoAnuladoDisplay = this.formatAnuladoSiNo(estadoAnuladoRaw);
-    const isAnulado = Number(estadoAnuladoRaw) === 1;
-
-    const vigenciaLabel = isAnulado
-      ? 'vencido'
-      : this.formatVigencia(item?.estado_vigencia ?? item?.vigencia);
+    const vigenciaLabel = this.formatVigencia(item?.estado_vigencia ?? item?.vigencia);
     return {
       qr_id: item?.qr_id ?? item?.id_qr ?? item?.idQr ?? item?.id,
       hash_qr: item?.hash_qr ?? item?.hash ?? item?.qrHash,
       qr_created_at: item?.qr_created_at ?? item?.created_at ?? item?.createdAt ?? item?.fecha_generacion,
       servicio: item?.servicio ?? item?.service ?? item?.empresa ?? item?.service_name,
-      suministro: item?.suministro ?? item?.supply ?? item?.codigo_usuario,
+      referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.supply ?? item?.codigo_usuario,
       monto: this.normalizeAmount(item?.monto ?? item?.amount),
       titular: item?.titular ?? item?.cliente ?? item?.customer ?? item?.client_name,
       qr_expired_at: item?.qr_expired_at ?? item?.expired_at ?? item?.expiredAt ?? item?.fecha_vencimiento,
+      descripcion: item?.descripcion ?? item?.description ?? item?.numero_recibo ?? item?.receipt_number ?? item?.recibo ?? '',
       numero_recibo: item?.numero_recibo ?? item?.receipt_number ?? item?.recibo ?? '',
       estado_vigencia: vigenciaLabel,
       estado_pago_text: item?.estado_pago_text ?? estadoPagoLabel,
       estado_pago_raw: estadoPagoRaw,
-      estado_anulado_label: estadoAnuladoLabel,
-      estado_anulado_display: estadoAnuladoDisplay,
       notificacion_at: item?.notificacion_at ?? item?.notified_at ?? item?.fecha_notificacion,
       pago_at: item?.pago_at ?? item?.paid_at ?? item?.fecha_pago,
       qr_image_path: item?.qr_image_path
@@ -529,48 +552,27 @@ export class GenerateQrReportsComponent implements OnInit {
     if (!Number.isNaN(num)) {
       switch (num) {
         case 0:
-          return 'pendiente qr generado';
+          return 'pendiente';
         case 1:
-          return 'pendiente sin pagar';
-        case 2:
           return 'pagado';
+        case 2:
+          return 'notificado_no_pagado';
         case 3:
           return 'fallido';
+        case 4:
+          return 'devuelto';
         default:
-          return String(value).toLowerCase();
+          return String(value).toLowerCase().replace(/\s+/g, '_');
       }
     }
-    const lower = String(value).toLowerCase().replace(/_/g, ' ');
-    return lower;
-  }
-
-  private formatEstadoAnulado(value: any): string {
-    if (value === null || value === undefined || value === '') {
-      return '-';
-    }
-    const num = Number(value);
-    if (!Number.isNaN(num)) {
-      return num === 1 ? 'anulado' : 'vigente';
-    }
-    return String(value).toLowerCase().replace(/_/g, ' ');
-  }
-
-  private formatAnuladoSiNo(value: any): string {
-    if (value === null || value === undefined || value === '') {
-      return '-';
-    }
-    const num = Number(value);
-    if (Number.isNaN(num)) {
-      return String(value);
-    }
-    return num === 1 ? 'Si' : 'No';
+    return String(value).toLowerCase().replace(/\s+/g, '_');
   }
 
   private formatVigencia(value: any): string {
     if (value === null || value === undefined || value === '') {
       return '-';
     }
-    return String(value).toLowerCase().replace(/_/g, ' ');
+    return String(value).toLowerCase().replace(/\s+/g, '_');
   }
 
   private normalizeAmount(value: any): string {
@@ -604,27 +606,32 @@ export class GenerateQrReportsComponent implements OnInit {
     const end = this.formatDateParam(this.reportForm?.get('end')?.value);
     const expiredFrom = this.formatDateParam(this.reportForm?.get('expiredFrom')?.value);
     const expiredTo = this.formatDateParam(this.reportForm?.get('expiredTo')?.value);
+    const paymentFrom = this.formatDateParam(this.reportForm?.get('paymentFrom')?.value);
+    const paymentTo = this.formatDateParam(this.reportForm?.get('paymentTo')?.value);
 
     if (start) filters['start'] = start;
     if (end) filters['end'] = end;
+    if (paymentFrom) filters['paymentFrom'] = paymentFrom;
+    if (paymentTo) filters['paymentTo'] = paymentTo;
 
     const idQr = get('idQr');
     const servicio = get('servicio');
-    const suministro = get('suministro');
+    const referencia = get('referencia');
     const titular = get('titular');
     const vigencia = get('vigencia');
     const estadoPago = get('estadoPago');
-    const estadoAnulado = get('estadoAnulado');
 
     if (idQr) filters['idQr'] = idQr;
     if (servicio) filters['servicio'] = servicio;
-    if (suministro) filters['suministro'] = suministro;
+    if (referencia) filters['referencia'] = referencia;
     if (titular) filters['cliente'] = titular;
     if (expiredFrom) filters['expiredFrom'] = expiredFrom;
     if (expiredTo) filters['expiredTo'] = expiredTo;
-    if (vigencia) filters['vigencia'] = vigencia;
+    if (vigencia) {
+      filters['vigencia'] = vigencia;
+      filters['estado_vigencia'] = vigencia;
+    }
     if (estadoPago) filters['estadoPago'] = estadoPago;
-    if (estadoAnulado) filters['estadoAnulado'] = estadoAnulado;
 
     return filters;
   }
@@ -680,6 +687,9 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
+
+
+
 
 
 

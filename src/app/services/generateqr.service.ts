@@ -1,6 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -15,11 +16,21 @@ export class GenerateQrService {
   private serviceScheduleUrl = `${environment.URL_API_GENERATE_QR}/v1/service-schedule`;
   private reprocessQueueUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/queue`;
   private reprocessHistoryUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/history`;
-  private URL1= `${environment.URL_API_GATEWAY}/export`;
+  private qrServicesUrl = `${environment.URL_API_GENERATE_QR}/v1/services`;
+  private sftpProviderConfigsUrl = `${environment.URL_API_GENERATE_QR}/v1/sftp/provider-configs`;
+  private serviceSftpProviderUrl = `${environment.URL_API_GENERATE_QR}/v1/service-sftp-provider`;
+  private notificationEmailsUrl = `${environment.URL_API_GENERATE_QR}/v1/notification-emails`;
+  private URL1 = `${environment.URL_API_GATEWAY}/export`;
+
+  private rawHttpClient: HttpClient;
 
   constructor(
     private httpClient: HttpClient,
-  ) { }
+    private authService: AuthService,
+    private httpBackend: HttpBackend,
+  ) {
+    this.rawHttpClient = new HttpClient(this.httpBackend);
+  }
 
   generateIndividual(payload: any): Observable<any> {
     return this.httpClient.post<any>(this.url, payload);
@@ -96,6 +107,114 @@ export class GenerateQrService {
     return this.httpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/reports/qr`, { params });
   }
 
+  listExternalReports(page?: number, pageSize?: number, filters?: Record<string, any>, idClient?: string): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    if (environment.URL_API_GENERATE_QR_API_KEY) {
+      headers = headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY);
+    }
+
+    let params = new HttpParams();
+    if (page !== undefined) {
+      params = params.set('page', page);
+    }
+    if (pageSize !== undefined) {
+      params = params.set('pageSize', pageSize);
+    }
+    if (idClient) {
+      params = params.set('idClient', idClient);
+    }
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+    return this.rawHttpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/reports/qr-external-services`, { params, headers });
+  }
+
+  listConfiguredServices(page: number = 1, pageSize: number = 50): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('pageSize', pageSize);
+    return this.httpClient.get<any>(this.qrServicesUrl, { params });
+  }
+
+  registerConfiguredService(serviceName: string): Observable<any> {
+    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/service/register`, { serviceName });
+  }
+
+  updateConfiguredService(serviceId: string, payload: any): Observable<any> {
+    return this.httpClient.put<any>(`${this.qrServicesUrl}/${serviceId}`, payload);
+  }
+
+  listSftpProviderConfigs(page: number = 1, pageSize: number = 50, filters?: Record<string, any>): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('pageSize', pageSize);
+
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+
+    return this.httpClient.get<any>(this.sftpProviderConfigsUrl, { params });
+  }
+
+  createSftpProviderConfig(payload: any): Observable<any> {
+    return this.httpClient.post<any>(this.sftpProviderConfigsUrl, payload);
+  }
+
+  getSftpProviderConfig(providerId: number | string): Observable<any> {
+    return this.httpClient.get<any>(`${this.sftpProviderConfigsUrl}/${providerId}`);
+  }
+
+  updateSftpProviderConfig(providerId: number | string, payload: any): Observable<any> {
+    return this.httpClient.put<any>(`${this.sftpProviderConfigsUrl}/${providerId}`, payload);
+  }
+
+
+  listServiceSftpProvider(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) {
+      params = params.set('page', page);
+    }
+    if (pageSize !== undefined) {
+      params = params.set('pageSize', pageSize);
+    }
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+    return this.httpClient.get<any>(this.serviceSftpProviderUrl, { params });
+  }
+
+  upsertServiceSftpProvider(serviceName: string, providerId: number | string, active: number): Observable<any> {
+    return this.httpClient.post<any>(this.serviceSftpProviderUrl, {
+      serviceName,
+      providerId,
+      active
+    });
+  }
+
+  deleteServiceSftpProvider(serviceId: string): Observable<any> {
+    return this.httpClient.delete<any>(`${this.serviceSftpProviderUrl}/${serviceId}`);
+  }
+
+
   listServiceSchedule(page?: number, pageSize?: number, serviceName?: string): Observable<any> {
     let params = new HttpParams();
     if (page !== undefined) {
@@ -165,7 +284,7 @@ export class GenerateQrService {
     if (responsable) {
       body.responsable = responsable;
     }
-    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/reprocess-payments`, body);
+    return this.httpClient.post<any>(`${environment.URL_API_REPROCESS}/v1/reprocess-payments`, body);
   }
 
   reprocessNextAttempt(queueId: number, nextAttemptAt: string, responsable?: string): Observable<any> {
@@ -180,6 +299,39 @@ export class GenerateQrService {
     return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/qr/notification-history`, { idQr });
   }
 
+
+  listNotificationEmails(page: number = 1, pageSize: number = 20, filters?: Record<string, any>): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('pageSize', pageSize);
+
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value);
+        }
+      });
+    }
+
+    return this.httpClient.get<any>(this.notificationEmailsUrl, { params });
+  }
+
+  getNotificationEmail(notificationEmailId: number | string): Observable<any> {
+    return this.httpClient.get<any>(`${this.notificationEmailsUrl}/${notificationEmailId}`);
+  }
+
+  createNotificationEmail(payload: any): Observable<any> {
+    return this.httpClient.post<any>(this.notificationEmailsUrl, payload);
+  }
+
+  updateNotificationEmail(notificationEmailId: number | string, payload: any): Observable<any> {
+    return this.httpClient.put<any>(`${this.notificationEmailsUrl}/${notificationEmailId}`, payload);
+  }
+
+  deleteNotificationEmail(notificationEmailId: number | string): Observable<any> {
+    return this.httpClient.delete<any>(`${this.notificationEmailsUrl}/${notificationEmailId}`);
+  }
 
   exportServices(
     format: 'xlsx' | 'csv',
@@ -204,6 +356,7 @@ export class GenerateQrService {
 
     return this.httpClient.get(`${this.URL1}`, { params });
   }
-
 }
+
+
 

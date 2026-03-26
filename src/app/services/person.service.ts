@@ -54,6 +54,7 @@ export class PersonService {
 
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
+
   getPersonForStatusConciliation(typeEntity: string, nameAlias: string, count:number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (typeEntity) {

@@ -275,8 +275,10 @@
 :host ::ng-deep .pagado,
 :host ::ng-deep .notificado_no_pagado,
 :host ::ng-deep .fallido,
+:host ::ng-deep .devuelto,
 :host ::ng-deep .vigente,
-:host ::ng-deep .anulado {
+:host ::ng-deep .anulado,
+:host ::ng-deep .vencido {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -315,13 +317,20 @@
   color: #7f1d1d;
 }
 
+:host ::ng-deep .devuelto {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
 :host ::ng-deep .vigente {
   background: #dcfce7;
   border-color: #22c55e;
   color: #166534;
 }
 
-:host ::ng-deep .anulado {
+:host ::ng-deep .anulado,
+:host ::ng-deep .vencido {
   background: #fecaca;
   border-color: #dc2626;
   color: #7f1d1d;

@@ -1,29 +1,31 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ServiceByIdInterface } from '../interfaces/serviceByIdInterface';
 import { ResponseDTO } from '../interfaces/responseInterface';
 import { ServiceTableInterface } from '../interfaces/serviceTableInterface';
 import { PageInterface } from '../interfaces/PageInterface';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class ServicesService {
-
   public servicePayment = new BehaviorSubject<any[]>([]);
-
-
 
   private url = `${environment.URL_API_GATEWAY}`;
   //private url = `${environment.URL_API_LOCAL}`; //LAMBDA LOCAL
 
-  constructor(
-    private httpClient: HttpClient
-  ) { }
+  private rawHttpClient: HttpClient;
 
+  constructor(
+    private httpClient: HttpClient,
+    private authService: AuthService,
+    private httpBackend: HttpBackend
+  ) {
+    this.rawHttpClient = new HttpClient(this.httpBackend);
+  }
 
   registerService(data: any): Observable<any> {
     return this.httpClient.post<any>(`${this.url}/services/register`, data);
@@ -37,14 +39,8 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/register/massive?import=${valueImport}`, data);
   }
 
-  // getServices(name:string): Observable<any>{
-  //   let params = new HttpParams()
-  //   .set('name', name);
-  //   return this.httpClient.get<any>(`${this.url}/services`,{params: params});
-  // }
-
   getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string, listIds?: any): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
-    let params = new HttpParams()
+    let params = new HttpParams();
     if (name) {
       params = params.set('name', name);
     }
@@ -60,15 +56,12 @@ export class ServicesService {
     if (type) {
       params = params.set('type', type);
     }
-
     if (category) {
       params = params.set('category', category);
     }
-
     if (limit !== undefined) {
       params = params.set('limit', limit);
     }
-
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
@@ -81,11 +74,37 @@ export class ServicesService {
     if (getAssignAll !== undefined) {
       params = params.set('getAssignAll', getAssignAll);
     }
-    if (listIds !== '') {
+    if (listIds !== undefined && listIds !== null && listIds !== '') {
       params = params.set('listIds', listIds);
     }
     return this.httpClient.get<ResponseDTO<PageInterface<ServiceTableInterface>>>(`${this.url}/services`, { params: params });
   }
+
+  getServicesByClientIdLowercase(idclient: string, count: number = 0, limit: number = 200): Observable<any> {
+    const params = new HttpParams()
+      .set('count', count)
+      .set('limit', limit)
+      .set('idclient', idclient);
+
+    return this.httpClient.get<any>(`${this.url}/services`, { params });
+  }
+  getExternalServicesForIdClient(idclient: string, count: number = 0, limit: number = 200): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    headers = headers.set('x-api-key', '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm');
+
+    const params = new HttpParams()
+      .set('count', count)
+      .set('limit', limit)
+      .set('format', 'true')
+      .set('idclient', idclient);
+
+    return this.rawHttpClient.get<any>(`${this.url}/services`, { params, headers });
+  }
+
 
   getServicesPageKey(limit?: number, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams();
@@ -99,20 +118,18 @@ export class ServicesService {
   }
 
   getServicesFromCategory(category: string, pageKey?: any[]): Observable<any> {
-    let params = new HttpParams()
+    let params = new HttpParams();
     if (pageKey !== undefined) {
       params = params.set('pageKey', JSON.stringify(pageKey));
     }
     params = params.set('category', category);
-
     params = params.set('count', 0);
     params = params.set('limit', 200);
     return this.httpClient.get<any>(`${this.url}/services`, { params: params });
   }
 
-
   getTypeServices(name?: string): Observable<any> {
-    let params = new HttpParams()
+    let params = new HttpParams();
     if (name) {
       params = params.set('name', name);
     }
@@ -140,11 +157,9 @@ export class ServicesService {
 
   getIdServicePerson(id: string, type?: string): Observable<any> {
     let params = new HttpParams();
-
     if (type) {
       params = params.set('idClient', type);
     }
-
     return this.httpClient.get<any>(`${this.url}/services/${id}`, { params: params });
   }
 
@@ -169,12 +184,11 @@ export class ServicesService {
   }
 
   detailService(id: string, value: string, ers: string): Observable<any> {
-    let params = new HttpParams()
+    const params = new HttpParams()
       .set('value', value)
       .set('ers', ers);
     return this.httpClient.post<any>(`${this.url}/services/${id}/bills`, null, { params: params });
   }
-
 
   exportServices(
     format: 'xlsx' | 'csv',

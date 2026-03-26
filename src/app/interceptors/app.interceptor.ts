@@ -24,9 +24,10 @@ export class AppInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const isGenerateQrApi = request.url.startsWith(environment.URL_API_GENERATE_QR);
-    const isGenerateQrLogin = isGenerateQrApi && request.url.includes('/v1/auth/cognito/login');
-    const isGenerateQrRefresh = isGenerateQrApi && request.url.includes('/v1/auth/cognito/refresh');
-    const skipGenerateQrAuth = request.headers.has('X-Skip-GenerateQr-Auth') || isGenerateQrLogin || isGenerateQrRefresh;
+    const isReprocessApi = Boolean(environment.URL_API_REPROCESS) && request.url.startsWith(environment.URL_API_REPROCESS);
+    const isGenerateQrProtectedApi = isGenerateQrApi || isReprocessApi;
+    const isGenerateQrLogin = isGenerateQrApi && request.url.includes('/v1/auth/login');
+    const skipGenerateQrAuth = request.headers.has('X-Skip-GenerateQr-Auth') || isGenerateQrLogin;
 
     let intReq = request;
 
@@ -34,13 +35,13 @@ export class AppInterceptor implements HttpInterceptor {
       intReq = intReq.clone({ headers: intReq.headers.delete('X-Skip-GenerateQr-Auth') });
     }
 
-    if (isGenerateQrApi && environment.URL_API_GENERATE_QR_API_KEY) {
+    if (isGenerateQrProtectedApi && environment.URL_API_GENERATE_QR_API_KEY) {
       intReq = intReq.clone({
         headers: intReq.headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY)
       });
     }
 
-    if (isGenerateQrApi && !skipGenerateQrAuth) {
+    if (isGenerateQrProtectedApi && !skipGenerateQrAuth) {
       return from(this.authService.getValidGenerateQrToken()).pipe(
         switchMap((token) => {
           const authReq = intReq.clone({
@@ -51,7 +52,7 @@ export class AppInterceptor implements HttpInterceptor {
       );
     }
 
-    const skipAuthForQr = isGenerateQrApi;
+    const skipAuthForQr = isGenerateQrProtectedApi;
     const token = this.authService.getToken();
     if (token && !skipAuthForQr) {
       const apiKey = '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm';
