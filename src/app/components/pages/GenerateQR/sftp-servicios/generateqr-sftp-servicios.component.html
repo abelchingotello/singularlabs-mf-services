@@ -485,10 +485,7 @@
 
       <mat-form-field appearance="outline" class="configured-service-form-grid__full">
         <mat-label>Minutos de QR</mat-label>
-        <input matInput formControlName="qrTtlMinutes" type="number" min="1" step="1" />
-        <mat-error *ngIf="configuredServiceForm.get('qrTtlMinutes')?.hasError('pattern') || configuredServiceForm.get('qrTtlMinutes')?.hasError('min')">
-          Ingrese un numero entero positivo.
-        </mat-error>
+        <input matInput formControlName="qrTtlMinutes" type="number" step="1" />
       </mat-form-field>
     </form>
 
