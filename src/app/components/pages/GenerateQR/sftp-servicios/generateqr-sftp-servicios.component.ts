@@ -143,7 +143,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       webhookUrl: [''],
       webhookEnabled: [0],
       skipPagos: [0],
-      qrTtlMinutes: ['', [Validators.pattern(/^\d+$/), Validators.min(1)]]
+      qrTtlMinutes: ['']
     });
 
     this.notificationEmailFiltersForm = this.fb.group({
@@ -305,7 +305,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       webhookUrl: this.configuredServiceForm.get('webhookUrl')?.value,
       webhookEnabled: Number(this.configuredServiceForm.get('webhookEnabled')?.value ?? 0),
       skipPagos: Number(this.configuredServiceForm.get('skipPagos')?.value ?? 0),
-      qrTtlMinutes: this.configuredServiceForm.get('qrTtlMinutes')?.value
+      qrTtlMinutes: Number(this.configuredServiceForm.get('qrTtlMinutes')?.value || 0)
     };
 
     this.isSavingConfiguredService = true;
