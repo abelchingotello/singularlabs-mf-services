@@ -13,6 +13,7 @@ import { PersonService } from 'src/app/services/person.service';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'uni-assing-individual',
@@ -180,7 +181,7 @@ export class AssingIndividualComponent implements OnInit {
   searchService(pageSize: any) {
     this.spinner.spinnerOnOff();
     //Obtenemos los servicios que se encuentran habilitados
-    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value?.master_name, this.count, this.isQrAssign ? "81018500" : "00000100", pageSize, this.pageKey).subscribe({
+    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value?.master_name, this.count, this.isQrAssign ? environment.URL_API_SERVICES_IDCLIENT : "00000100", pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '');

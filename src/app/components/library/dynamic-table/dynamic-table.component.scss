@@ -262,7 +262,7 @@ $button-colors: (
     }
 
     @each $name, $colors in $button-colors {
-        &.#{$name} {
+        &.#{"" + $name} {
             background-color: nth($colors, 1);
             color: nth($colors, 2);
         }
