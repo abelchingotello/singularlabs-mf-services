@@ -35,6 +35,10 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/assign`, data);
   }
 
+  registerServiceQrAssign(data: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.url}/services/assign/qr`, data);
+  }
+
   registerServiceImport(data: any, valueImport: any): Observable<any> {
     return this.httpClient.post<any>(`${this.url}/services/register/massive?import=${valueImport}`, data);
   }
@@ -69,10 +73,13 @@ export class ServicesService {
       params = params.set('count', count);
     }
     if (idClient != null) {
-      params = params.set('idClient', idClient);
+      params = params.set('idclient', idClient);
     }
     if (getAssignAll !== undefined) {
       params = params.set('getAssignAll', getAssignAll);
+      if (idClient != null) {
+        params = params.set('idClient', idClient);
+      }
     }
     if (listIds !== undefined && listIds !== null && listIds !== '') {
       params = params.set('listIds', listIds);

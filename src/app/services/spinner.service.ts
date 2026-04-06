@@ -12,7 +12,6 @@ export class SpinnerService {
 
   spinnerOnOff(): void {
     this.spinnerVisible = !this.spinnerVisible;
-    console.log('Spinner', this.spinnerVisible)
   }
 
   getSpinnerVisible(): boolean {
