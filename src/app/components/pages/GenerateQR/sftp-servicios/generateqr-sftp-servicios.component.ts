@@ -133,6 +133,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', Validators.required],
       baseDir: [''],
+      port: [''],
       active: [1, Validators.required]
     });
 
@@ -380,6 +381,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
         username: '',
         password: '',
         baseDir: '',
+        port: '',
         active: 1
       });
       this.providerDialogRef = this.dialog.open(this.providerDialog, {
@@ -404,6 +406,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
           username: item?.username || '',
           password: item?.password || '',
           baseDir: item?.base_dir || item?.baseDir || '',
+          port: item?.port ?? '',
           active: item?.active ?? 1
         });
         this.providerDialogRef = this.dialog.open(this.providerDialog, {
@@ -425,12 +428,14 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       return;
     }
 
+    const portValue = this.providerForm.get('port')?.value;
     const payload = {
       providerCode: this.providerForm.get('providerCode')?.value,
       name: this.providerForm.get('name')?.value,
       username: this.providerForm.get('username')?.value,
       password: this.providerForm.get('password')?.value,
       baseDir: this.providerForm.get('baseDir')?.value || '',
+      port: portValue === '' || portValue === null || portValue === undefined ? null : Number(portValue),
       active: Number(this.providerForm.get('active')?.value ?? 1)
     };
 

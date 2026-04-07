@@ -13,6 +13,7 @@ import { PersonService } from 'src/app/services/person.service';
 import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'uni-assing-individual',
@@ -65,6 +66,7 @@ export class AssingIndividualComponent implements OnInit {
   public disableEntities = false;
   public disableAll = false;
 
+  public isQrAssign = false
 
   constructor(
     private serviceServ: ServicesService,
@@ -80,6 +82,7 @@ export class AssingIndividualComponent implements OnInit {
   /****************************************** METODOS INICIALES **********************************************/
 
   ngOnInit(): void {
+    this.isQrAssign = this.router.url === "/generateqr/assign";
     this.listData();
     this.initialForm();
     this.functionDataCurrent = this.searchService.bind(this);
@@ -102,7 +105,7 @@ export class AssingIndividualComponent implements OnInit {
     this.spinner.spinnerOnOff();
     forkJoin([
       this.masterService.getItemsMasterTable('15'), // tipoComission
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true),
+      this.personService.getPerson(this.isQrAssign ? 'USER LIGO PAY' : 'RECAUDADORA DE SERVICIOS', undefined, true),
       this.masterService.getItemsMasterTable('14') // CategoriaService
     ]).subscribe({
       next: (response) => {
@@ -124,10 +127,61 @@ export class AssingIndividualComponent implements OnInit {
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
 
+  registerServiceQrAssign() {
+    this.spinner.spinnerOnOff();
+    let dataRegister = this.data.map(value => ({
+      ID_PROVIDER: '00000100',// ID ´PROVEEDOR
+      ID_CLIENT: value.idPerson, //ID DE RECAUDADORA
+      ID_SERVICE_PROV: this.dataServiceSelected.id_serviceProv, //id de convenio
+      PROV_ORIGIN: this.dataServiceSelected.idProvider,//codigo proveedor origen
+      ID_SERVICE: this.dataServiceSelected.id, //id del servicio
+      SERVICE_NAME: this.dataServiceSelected.name, //nnomb de servicio
+      USER_REG: this.cookies.get('person_id') || 'desconocido',
+      ID_TYPE_SERVICE: this.dataServiceSelected.serviceType.id,
+      TYPE_SERVICE: this.dataServiceSelected.serviceType.name,//master
+      SERVICE_CATEGORY: this.dataServiceSelected.serviceType.name,//master
+      BUSINESS: this.dataServiceSelected.business, //nombre de negocio
+      STATUS: this.dataServiceSelected.status,
+      ZONE: 'MULTIDEPARTAMENTAL',
+      DATE: new Date().toISOString(),
+      PREFIX: "SERVICE"
+    }))
+
+    console.log("dataRegister: ", dataRegister)
+
+
+    this.serviceServ.registerServiceQrAssign(dataRegister).subscribe({
+      next: (response) => {
+        if (response.statusCode == 207) {
+          // this.spinner.spinnerOnOff();
+          this.mytoastr.showWarning('Error : Algunos servicios ya fueron asignados', '')
+          return
+        }
+        if (response.statusCode == 400) {
+          // this.spinner.spinnerOnOff();
+          this.mytoastr.showWarning('No se asignó ningún ítem o ya fueron asignados anteriormente', '')
+          return
+        }
+        if (response.statusCode == 200) {
+          this.mytoastr.showSuccess('Todos los Servicios asignados con éxito', '')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error(error)
+      },
+      complete: () => {
+        this.clearRegister();
+        this.spinner.spinnerOnOff();
+
+      }
+    })
+  }
+
   searchService(pageSize: any) {
     this.spinner.spinnerOnOff();
     //Obtenemos los servicios que se encuentran habilitados
-    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value?.master_name, this.count, pageSize, this.pageKey).subscribe({
+    this.serviceServ.getServices(this.service.value, 'HABILITADO', null, this.categoryService.value?.master_name, this.count, this.isQrAssign ? environment.URL_API_SERVICES_IDCLIENT : "00000100", pageSize, this.pageKey).subscribe({
       next: (data) => {
         if (data.statusCode == 201) {
           this.mytoastr.showWarning(data.messages, '');
@@ -155,7 +209,6 @@ export class AssingIndividualComponent implements OnInit {
     })
   }
 
-
   clearFormAndData() {
     this.count = null;
     this.pageKey = undefined;
@@ -175,22 +228,15 @@ export class AssingIndividualComponent implements OnInit {
     this.searchService(this.pageSize);
   }
 
-
-  // De una persona a varios servicios
   registerServiceAssign() {
-    //Comprobar si existe al menos un servicio seleccionado
     if (!this.dataServiceSelectedIds || this.dataServiceSelectedIds.length === 0) {
       this.mytoastr.showWarning('Error', 'Debe seleccionar un servicio para asignar.');
       return;
     }
-    // Comprobar si existe un solo servicio seleccionado
     if (this.dataServiceSelectedIds.length > 1) {
       this.mytoastr.showWarning('Error', 'Debe seleccionar un solo servicio para asignar.');
       return;
     }
-    //Si pasa a esta parte es pq existe un solo servicio seleccionado(dataServiceSelected)
-
-    //Limpiar cuando se cambie de tipo de comisión
     let dataRegister = this.data.map(value => ({
       idProvider: '00000100',// ID ´PROVEEDOR
       idClient: value.idPerson, //ID DE RECAUDADORA
@@ -248,8 +294,6 @@ export class AssingIndividualComponent implements OnInit {
     }
   }
 
-
-
   /*********************************************** METODOS PARA EL PAGINADO Y OTROS *****************************************/
   onPageChange(event: PageEvent) {
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
@@ -280,7 +324,7 @@ export class AssingIndividualComponent implements OnInit {
   /****************************************** OTHER METHODS **********************************************/
   getRecaudador() {
     this.spinner.spinnerOnOff();
-    this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true).subscribe({
+    this.personService.getPerson(this.isQrAssign ? "USER LIGO PAY" : 'RECAUDADORA DE SERVICIOS', undefined, true).subscribe({
       next: (response) => {
         this.data = this.convertData(response.data)
       },

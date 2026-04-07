@@ -4,7 +4,7 @@
             externImage="https://img.freepik.com/vector-gratis/red-social-servicio-citas-online-chat-comunicacion-internet-personaje-dibujos-animados-nina-mirando-perfiles-foto-ilustracion-concepto-redes-sociales_335657-2041.jpg?semt=ais_hybrid&w=740"
             size="8%">
         </uni-image-card>
-        <form [formGroup]="formAssign" class="form-grid mt-3 mb-0" >
+        <form [formGroup]="formAssign" class="form-grid mt-3 mb-0">
             <mat-card class="custom-border-radius-1-25">
                 <mat-card-content>
                     <h2 class="mt-4 ml-3 text-default"> Datos de Búsqueda </h2>
@@ -39,8 +39,7 @@
                     <uni-dynamic-table [columns]="columnsTableService" [data]="dataServiceTable" [actionsOptions]="true"
                         [viewOptionsTable]="false" [viewCheckboxHeader]="false" element_id="id" [pageKey]="pageKey"
                         (selectedIdsChange)="handleSelectedIds($event)" (selectedChange)="selectedHandle($event)"
-                        [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)"
-                        [lengthTable]="count">
+                        [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count">
                     </uni-dynamic-table>
                 </mat-card-content>
             </mat-card>
@@ -60,45 +59,46 @@
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
+                        <ng-container *ngIf="!isQrAssign">
+                            <mat-form-field appearance="outline" class="col-md-3">
+                                <mat-label>Tipo Comisión</mat-label>
+                                <mat-select formControlName="comission">
+                                    <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
+                                        type.master_name }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
 
-                        <mat-form-field appearance="outline" class="col-md-3">
-                            <mat-label>Tipo Comisión</mat-label>
-                            <mat-select formControlName="comission">
-                                <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
-                                    type.master_name }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                            <mat-form-field appearance="outline" *ngIf="isComisionFixed()" class="col-md-3">
+                                <mat-label>Comisión Fija</mat-label>
+                                <input formControlName="fixed" (blur)="validComissionFixed()" matInput type="number"
+                                    min="0" step="0.01" />
+                            </mat-form-field>
 
-                        <mat-form-field appearance="outline" *ngIf="isComisionFixed()" class="col-md-3">
-                            <mat-label>Comisión Fija</mat-label>
-                            <input formControlName="fixed" (blur)="validComissionFixed()" matInput type="number" min="0"
-                                step="0.01" />
-                        </mat-form-field>
+                            <mat-form-field appearance="outline" *ngIf="isComisionPorcent()">
+                                <mat-label>Comisión Porcentual</mat-label>
+                                <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
 
-                        <mat-form-field appearance="outline" *ngIf="isComisionPorcent()">
-                            <mat-label>Comisión Porcentual</mat-label>
-                            <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
-                        </mat-form-field>
-
-                        <mat-form-field appearance="outline" *ngIf="isComisionMultiple()">
-                            <mat-label>Comisión Múltiple</mat-label>
-                            <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
-                        </mat-form-field>
+                            <mat-form-field appearance="outline" *ngIf="isComisionMultiple()">
+                                <mat-label>Comisión Múltiple</mat-label>
+                                <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
+                            </mat-form-field>
+                        </ng-container>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
-                            <button type="button" class="btn button-secondary" (click)="onCancel()">
+                            <button *ngIf="!isQrAssign" type="button" class="btn button-secondary" (click)="onCancel()">
                                 <mat-icon>clear</mat-icon>
                                 Cancelar
                             </button>
                             <button type="button" class="btn button-primary" [disabled]="disabledBtnRegister()"
-                                (click)="registerServiceAssign()">
+                                (click)="isQrAssign? registerServiceQrAssign(): registerServiceAssign()">
                                 <mat-icon>save</mat-icon>
                                 Registrar
                             </button>
                         </div>
-                    </div>   
+                    </div>
                 </mat-card-content>
             </mat-card>
         </form>
