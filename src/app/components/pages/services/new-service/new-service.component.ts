@@ -16,9 +16,9 @@ import { PersonService } from 'src/app/services/person.service';
   styleUrls: ['./new-service.component.scss']
 })
 export class NewServiceComponent implements OnInit {
-  public originalFormData: any = null;      // snapshot form + comisiones
-  public originalExtras: any = null;        // snapshot indicadores + pagos
-  public originalBodyBase: any = null;      // body base original para diff
+  public originalFormData: any = null;
+  public originalExtras: any = null;
+  public originalBodyBase: any = null;
   public originalIdServiceProv: string | null = null;
 
   public columns: any[] = [
@@ -233,7 +233,7 @@ export class NewServiceComponent implements OnInit {
     const serviceRaw = this.serviceForm.getRawValue();
     const comissionRaw = this.comissionForm.getRawValue();
 
-    const bodyBase1 = {
+    const bodyBase = {
       idProvider: serviceRaw.service_prov,
       idClient: '00000100',
       idServiceProv: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
@@ -252,30 +252,11 @@ export class NewServiceComponent implements OnInit {
       indicators: this.indicatrs,
       additionalPaymentFields: this.dataPayment
     };
-    // USANDO NOMBRES REALES DE CAMPOS
-    const bodyBase = {
-      ID_PROVIDER: serviceRaw.service_prov,
-      ID_CLIENT: '00000100',
-      ID_SERVICE_PROV: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
-      SERVICE_NAME: serviceRaw.service_name,
-      USER_REG: this.userName.Username,
-      ID_TYPE_SERVICE: String(serviceRaw.service_type.master_idTypeService),
-      TYPE_SERVICE: serviceRaw.service_type.master_name,
-      BUSINESS: serviceRaw.service_type_business,
-      STATUS: serviceRaw.service_state,
-      ZONE: serviceRaw.service_zone ?? null,
-      TYPE_COMISSION: comissionRaw.comission_type,
-      COMISSION_FIXED: comissionRaw.comission_fixed,
-      COMISSION_CRITERION: comissionRaw.comission_criterion,
-      COMISSION_PCT: comissionRaw.comission_percentage,
-      INDICATORS: this.indicatrs,
-      ADDITIONAL_PAYMENT_FIELDS: this.dataPayment
-    };
 
     if (!this.idService) {
-      this.AddService({ ...bodyBase1, ...bodyBase });
+      this.AddService(bodyBase);
     } else {
-      this.updateService(bodyBase, serviceRaw, comissionRaw)
+      this.updateService(bodyBase, serviceRaw, comissionRaw);
     }
   }
 
@@ -295,11 +276,10 @@ export class NewServiceComponent implements OnInit {
     }
 
     const changedBody = this.getBodyDiff(bodyBase, this.originalBodyBase);
-    changedBody.USER_REG = this.userName.Username;
+    changedBody.userRegistration = this.userName.Username;
 
-    // LÓGICA PARA REMOVES CON NOMBRES REALES
     const removes = this.getCommissionRemoves(
-      this.originalBodyBase?.TYPE_COMISSION,
+      this.originalBodyBase?.typeComission,
       comissionRaw.comission_type
     );
 
@@ -326,27 +306,19 @@ export class NewServiceComponent implements OnInit {
     });
   }
 
-  // NUEVO MÉTODO PARA CAMPOS A ELIMINAR SEGÚN TIPO DE COMISIÓN
   private getCommissionRemoves(originalType: string, currentType: string): string {
     if (!originalType) return '';
 
     const removes: string[] = [];
 
-    // FIJO → PORCENTUAL: eliminar COMISSION_FIXED
     if (originalType === 'FIJO' && currentType === 'PORCENTUAL') {
-      removes.push('COMISSION_FIXED');
-    }
-    // PORCENTUAL → FIJO: eliminar COMISSION_PCT
-    else if (originalType === 'PORCENTUAL' && currentType === 'FIJO') {
-      removes.push('COMISSION_PCT');
-    }
-    // MULTIPLE → FIJO: eliminar COMISSION_CRITERION y COMISSION_PCT
-    else if (originalType === 'MULTIPLE' && currentType === 'FIJO') {
-      removes.push('COMISSION_CRITERION', 'COMISSION_PCT');
-    }
-    // MULTIPLE → PORCENTUAL: eliminar COMISSION_CRITERION y COMISSION_FIXED
-    else if (originalType === 'MULTIPLE' && currentType === 'PORCENTUAL') {
-      removes.push('COMISSION_CRITERION', 'COMISSION_FIXED');
+      removes.push('comissionFixed');
+    } else if (originalType === 'PORCENTUAL' && currentType === 'FIJO') {
+      removes.push('comissionPCT');
+    } else if (originalType === 'MULTIPLE' && currentType === 'FIJO') {
+      removes.push('comissionCriterion', 'comissionPCT');
+    } else if (originalType === 'MULTIPLE' && currentType === 'PORCENTUAL') {
+      removes.push('comissionCriterion', 'comissionFixed');
     }
 
     return removes.join(',');
@@ -362,7 +334,7 @@ export class NewServiceComponent implements OnInit {
     const diff: any = {};
 
     for (const key of Object.keys(current)) {
-      if (key === 'USER_REG') continue;
+      if (key === 'userRegistration') continue;
 
       const cur = current[key];
       const orig = original[key];
@@ -484,23 +456,22 @@ export class NewServiceComponent implements OnInit {
 
       this.service_indicators.setValue(this.indicatrs.filter(i => i.isActive).map(i => i.id));
 
-      // originalBodyBase CON NOMBRES REALES DE CAMPOS
       this.originalBodyBase = {
-        ID_PROVIDER: data.idProvider,
-        ID_CLIENT: '00000100',
-        ID_SERVICE_PROV: data.id_serviceProv,
-        SERVICE_NAME: data.name,
-        ID_TYPE_SERVICE: String(data.serviceType.id),
-        TYPE_SERVICE: data.serviceType.name,
-        BUSINESS: data.business,
-        STATUS: data.status,
-        ZONE: data.zone ?? null,
-        TYPE_COMISSION: data.typeComission,
-        COMISSION_FIXED: data.fixedcomission,
-        COMISSION_CRITERION: data.comissioncriterion,
-        COMISSION_PCT: data.pctcomission,
-        INDICATORS: JSON.parse(JSON.stringify(this.indicatrs)),
-        ADDITIONAL_PAYMENT_FIELDS: JSON.parse(JSON.stringify(this.dataPayment))
+        idProvider: data.idProvider,
+        idClient: '00000100',
+        idServiceProv: data.id_serviceProv,
+        serviceName: data.name,
+        idTypeService: String(data.serviceType.id),
+        typeService: data.serviceType.name,
+        business: data.business,
+        status: data.status,
+        zone: data.zone ?? null,
+        typeComission: data.typeComission,
+        comissionFixed: data.fixedcomission,
+        comissionCriterion: data.comissioncriterion,
+        comissionPCT: data.pctcomission,
+        indicators: JSON.parse(JSON.stringify(this.indicatrs)),
+        additionalPaymentFields: JSON.parse(JSON.stringify(this.dataPayment))
       };
     } catch (err) {
       console.error('ERROR: ', err);
