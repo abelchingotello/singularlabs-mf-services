@@ -303,11 +303,13 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
     const payload = {
       serviceName: this.configuredServiceForm.get('serviceName')?.value,
       businessCode: this.configuredServiceForm.get('businessCode')?.value,
-      webhookUrl: this.configuredServiceForm.get('webhookUrl')?.value,
+      webhookUrl: this.configuredServiceForm.get('webhookUrl')?.value || null,
       webhookEnabled: Number(this.configuredServiceForm.get('webhookEnabled')?.value ?? 0),
       skipPagos: Number(this.configuredServiceForm.get('skipPagos')?.value ?? 0),
       qrTtlMinutes: Number(this.configuredServiceForm.get('qrTtlMinutes')?.value || 0)
     };
+
+    console.log('[SFTP SERVICIOS REQUEST][UPDATE SERVICE]', { serviceId, payload });
 
     this.isSavingConfiguredService = true;
     this.spinner.spinnerOnOff();
@@ -319,9 +321,26 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('[SFTP SERVICIOS RESPONSE][UPDATE SERVICE]', response);
+
+          const updatedItem = {
+            ...(this.selectedQrConfiguredService || {}),
+            ...(response?.item || response?.data || response || {}),
+            serviceId,
+            serviceName: payload.serviceName,
+            businessCode: payload.businessCode,
+            webhookUrl: payload.webhookUrl,
+            webhookEnabled: payload.webhookEnabled,
+            skipPagos: payload.skipPagos,
+            qrTtlMinutes: payload.qrTtlMinutes
+          };
+
+          this.qrConfiguredServices = (this.qrConfiguredServices || []).map((item: any) =>
+            this.getQrConfiguredServiceId(item) === serviceId ? { ...item, ...updatedItem } : item
+          );
+          this.selectedQrConfiguredService = updatedItem;
+
           this.mytoastr.showSuccess('Servicio actualizado', payload.serviceName);
           this.configuredServiceDialogRef?.close();
-          this.loadServices();
         },
         error: (error) => {
           console.error('[SFTP SERVICIOS ERROR][UPDATE SERVICE]', error);
