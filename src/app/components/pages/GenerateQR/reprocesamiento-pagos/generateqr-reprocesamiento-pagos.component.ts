@@ -143,7 +143,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
       instructionId: ['', [Validators.pattern(/^\d*$/)]],
       serviceId: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
-      reference: ['', [Validators.pattern(/^\d*$/)]],
+      reference: [''],
       responsable: [''],
       dateFrom: [''],
       dateTo: [''],

@@ -182,7 +182,7 @@ export class GenerateQrReportsComponent implements OnInit {
       paymentTo: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
       servicio: [''],
-      referencia: ['', [Validators.pattern(/^\d*$/)]],
+      referencia: [''],
       titular: [''],
       expiredFrom: [''],
       expiredTo: [''],
@@ -687,7 +687,6 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
-
 
 
 
