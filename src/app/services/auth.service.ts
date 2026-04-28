@@ -3,21 +3,26 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import jwtDecode from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private url = `${environment.URL_API_GATEWAY}`;
+  private readonly url = `${environment.URL_API_GATEWAY}`;
   private userId: string;
   private user: any;
   private roles: any[];
 
+  private readonly permissionsSubject = new BehaviorSubject<any>({});
+  permissions$ = this.permissionsSubject.asObservable();
+  public permissions: any = {}; public allPermission: Map<string, any> = new Map();
+  private lastRolId: string
+
   constructor(
-    private httpClient: HttpClient,
-    private cookieService: CookieService
+    private readonly httpClient: HttpClient,
+    private readonly cookieService: CookieService
   ) { }
 
   //Verificar si el usuario esta logeado en api gateway
@@ -51,7 +56,7 @@ export class AuthService {
     const token = this.getToken();
     const decoded: any = jwtDecode(token);
     this.userId = decoded.sub
-    if(!this.userId) console.error('Identicadr de usuario no encontrado');
+    if (!this.userId) console.error('Identicadr de usuario no encontrado');
   }
 
   getUser() {
@@ -74,7 +79,7 @@ export class AuthService {
   updateRole(role: any) {
     this.cookieService.set('role', JSON.stringify(role), { expires: 7, path: '/' });
     const event = new CustomEvent('roleChanged', { detail: role });
-    window.dispatchEvent(event);
+    globalThis.dispatchEvent(event);
   }
 
   async hasPermission(permission: string): Promise<boolean> {
@@ -93,6 +98,40 @@ export class AuthService {
     }
   }
 
+
+  hasPermissionFromTag(tag) {
+    const permiso = this.permissions[tag]
+    return permiso === true
+  }
+
+  async getAllPermissions() {
+    let params = new HttpParams().set('group', '5');
+    const items = await firstValueFrom(this.httpClient.get<any>(`${this.url}/master/group`, { params: params }))
+    items.forEach((permiso: any) => {
+      if (permiso.SK) {
+        this.allPermission.set(permiso.SK, permiso);
+      }
+    });
+  }
+
+  async getPermissions() {
+    let { role_id } = this.getRole();
+    if (role_id === this.lastRolId) return;
+    await this.getAllPermissions()
+    role_id = role_id.split("#")[1]
+    const { items } = await firstValueFrom(this.httpClient.get<any>(`${this.url}/roles/${role_id}`));
+    let permissions = {}
+    items.map((item: any) => {
+      const permission = this.allPermission.get(item.process_permissionId);
+      if (item.process_permissionId != "PERMISO#0" && permission?.master_tag) {
+        permissions[permission.master_tag] = true
+      }
+    });
+
+    this.permissions = { ...permissions };
+    this.permissionsSubject.next(this.permissions);
+    this.lastRolId = role_id
+  }
   setCookie(name: string, value: string) {
     this.cookieService.set(name, value, { expires: 7, path: '/' });
   }
@@ -104,7 +143,7 @@ export class AuthService {
 
     // Verificar si el userId está presente
     if (!this.userId) {
-      return Promise.reject('No se encontró el ID del usuario');
+      throw new Error('No se encontró el ID del usuario');
     }
 
     try {
@@ -115,7 +154,7 @@ export class AuthService {
     } catch (err) {
       // Manejo de errores en la consulta HTTP
       console.error('Error al obtener datos del usuario:', err);
-      return Promise.reject(err);
+      throw new Error(err);
     }
   }
 

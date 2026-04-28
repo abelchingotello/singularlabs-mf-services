@@ -11,12 +11,11 @@ const routes: Routes = [
   { path: 'edit/:id', component: NewServiceComponent },
   { path: 'detail', component: DetailServiceComponent },
   { path: 'payment', component: PaymentServiceComponent },
-
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ServicesRoutingModule { 
-}
+
+export class ServicesRoutingModule { }

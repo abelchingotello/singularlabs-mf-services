@@ -10,8 +10,6 @@ import { DetailServiceComponent } from './detail-service/detail-service.componen
 import { PaymentServiceComponent } from './payment-service/payment-service.component';
 import { MatIconModule } from '@angular/material/icon';
 
-
-
 @NgModule({
   declarations: [
     NewServiceComponent,
@@ -29,4 +27,5 @@ import { MatIconModule } from '@angular/material/icon';
     FormsModule
   ]
 })
+
 export class ServicesModule { }

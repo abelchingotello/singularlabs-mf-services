@@ -5,8 +5,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { LibraryModule } from '../library/library.module';
 import { MatDialogModule } from '@angular/material/dialog';
 
-
-
 @NgModule({
   declarations: [],
   imports: [
@@ -17,5 +15,5 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatDialogModule
   ]
 })
-export class PagesModule { }
 
+export class PagesModule { }
