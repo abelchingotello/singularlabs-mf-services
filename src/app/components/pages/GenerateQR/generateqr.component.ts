@@ -29,6 +29,7 @@ export class GenerateQR implements OnInit {
     { name: 'ID QR', attribute: 'id_qr' },
     { name: 'Referencia', attribute: 'referencia' },
     { name: 'Servicio', attribute: 'empresa' },
+    { name: 'Creado por', attribute: 'generatedBy' },
     {
       name: 'Fecha creacion',
       attribute: 'qr_created_at',
@@ -698,6 +699,7 @@ export class GenerateQR implements OnInit {
         const normalizedItems = items.map((item: any) => ({
           ...item,
           referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.codigo_usuario,
+          generatedBy: item?.generatedBy ?? item?.generated_by ?? item?.frontendUsername ?? item?.frontend_username ?? '-',
           amount: this.normalizeAmount(item?.amount),
           estado_pago_label: this.formatEstadoPago(item?.estado_pago),
           estado_vigencia_label: this.formatVigencia(item?.estado_vigencia ?? item?.vigencia)

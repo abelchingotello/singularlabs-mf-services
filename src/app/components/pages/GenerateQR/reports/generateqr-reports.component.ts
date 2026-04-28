@@ -41,6 +41,7 @@ export class GenerateQrReportsComponent implements OnInit {
       }
     },
     { name: 'Servicio', attribute: 'servicio' },
+    { name: 'Creado por', attribute: 'generatedBy' },
     { name: 'Referencia', attribute: 'referencia' },
     { name: 'Descripcion', attribute: 'descripcion' },
     { name: 'Monto', attribute: 'monto' },
@@ -529,6 +530,7 @@ export class GenerateQrReportsComponent implements OnInit {
       hash_qr: item?.hash_qr ?? item?.hash ?? item?.qrHash,
       qr_created_at: item?.qr_created_at ?? item?.created_at ?? item?.createdAt ?? item?.fecha_generacion,
       servicio: item?.servicio ?? item?.service ?? item?.empresa ?? item?.service_name,
+      generatedBy: item?.generatedBy ?? item?.generated_by ?? item?.frontendUsername ?? item?.frontend_username ?? '-',
       referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.supply ?? item?.codigo_usuario,
       monto: this.normalizeAmount(item?.monto ?? item?.amount),
       titular: item?.titular ?? item?.cliente ?? item?.customer ?? item?.client_name,
@@ -687,7 +689,6 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
-
 
 
 
