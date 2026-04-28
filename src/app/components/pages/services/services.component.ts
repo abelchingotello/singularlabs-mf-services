@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { DialogServiceStatusComponent } from 'src/app/dialogs/dialog-service-status/dialog-service-status.component';
 import { ServicesService } from 'src/app/services/services.service';
 import { DynamicTableComponent } from '../../library/dynamic-table/dynamic-table.component';
 import { MasterService } from 'src/app/services/master.service';
@@ -11,7 +9,8 @@ import { SpinnerService } from 'src/app/services/spinner.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
-import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'uni-services',
@@ -30,33 +29,17 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     { 'name': 'Cliente', 'attribute': 'nameClient' },
+    { 'name': 'Estado', 'attribute': 'status', 'config': { 'styleClass': true } },
     {
-      'name': 'Estado', 'attribute': 'status', 'config': {
-        'styleClass': true
-      }
-    },
-    {
-      name: 'Acciones',
-      attribute: '',
-      config: {
-        type: 'buttonicons',
-        actions: [
-          {
-            hide: false,
-            bgClass: 'yellow',
-            toolTip: 'Editar Servicio',
-            icon: 'edit',
-            value: 'edit'
-          }
-        ]
+      'name': 'Acciones',
+      'attribute': '',
+      'config': {
+        'type': 'buttonicons',
+        restriccPermission: true,
+        actions: [{ hide: false, bgClass: 'yellow', toolTip: 'Editar Servicio', icon: 'edit', value: 'edit', permission: "services-updates-individual" }]
       }
     },
   ];
-  public options: any[] = [
-    { value: 'Servicio', id: '1' },
-    { value: 'Entidad-Servicio', id: '2' },
-    { value: 'Client-Servicio', id: '3' },
-  ]
 
   public pageSize: any = 5;
   public pageKey: any[];
@@ -65,24 +48,14 @@ export class ServicesComponent implements OnInit {
   public dataFilter: any = [];
   public dataService: any[];
   public functionDataCurrent: (pageSize: any) => any;
-  public disabledEditOption: any
-  public editOption: any;
-  public selectedIds: any;
   public stateMaster: any;
-  public idClient: any;
-  public idProvider: any;
-  public dataIdService: any;
-  public optionId: any
   public categoriesService: any[] = [];
   public filteredServices: ServiceItem[] = []; // Lista filtrada que se mostrará
   public listServicesSelected: ServiceItem[] = [];
-  public listServicesSelected1: ServiceItem[] = [];
-  public allItems1: ServiceItem[] = []; // Lista filtrada que se mostrará
   public allItems: any[] = [];
   public serviceFilter: string = '';
 
-  private pagUtils: PaginationUtils | undefined;
-  public page: number = -1; // Variable para la página actual
+  private readonly pagUtils: PaginationUtils | undefined;
   public count: number = null; // Variable para el total de elementos
   public listProviders: any;
   public selectedCategory: boolean = false;
@@ -91,29 +64,24 @@ export class ServicesComponent implements OnInit {
 
 
   constructor(
-    private router: Router,
-    private services: ServicesService,
-    private fb: FormBuilder,
-    private master: MasterService,
-    private person: PersonService,
-    private spinner: SpinnerService,
-    private mytoastr: MytoastrService,
-    private personService: PersonService
+    private readonly router: Router,
+    private readonly services: ServicesService,
+    private readonly fb: FormBuilder,
+    private readonly master: MasterService,
+    private readonly spinner: SpinnerService,
+    private readonly mytoastr: MytoastrService,
+    private readonly personService: PersonService,
+    public authService: AuthService,
   ) {
     this.pagUtils = new PaginationUtils();
   }
 
   ngOnInit(): void {
-    this.formService();//inicializa los inputs como vacios
-    this.dataMaster();//carga lista de estados
-    this.listData();//carga lista de tipos de servicios
-    // Suscribirse a cambios y convertir a mayúsculas
-    this.service_name?.valueChanges.subscribe(value => {
-      if (value) {
-        this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
-      }
-    });
-    this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
+    this.formService();
+    this.dataMaster();
+    this.listData();
+    this.service_name?.valueChanges.subscribe(value => { if (value) this.service_name?.setValue(value.toUpperCase(), { emitEvent: false }); });
+    this.functionDataCurrent = this.dataInitial.bind(this);
     this.functionDataCurrent(this.pageSize);
   }
 
@@ -125,7 +93,6 @@ export class ServicesComponent implements OnInit {
     const inputStatus = this.status.value?.master_name?.toUpperCase();
     const listIds = this.servicesId;
     this.spinner.spinnerOnOff();
-    // return
     console.log("pag key:");
     console.log(this.pageKey);
     this.services.getServices(input, inputStatus, inputType, null, this.count, null, pageSize, this.pageKey, undefined, inputId, provider, listIds).subscribe({
@@ -134,27 +101,11 @@ export class ServicesComponent implements OnInit {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
-        //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
-        //console.log(...data.data.Items);
-        this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
+        this.dataFilter = [...this.dataFilter, ...data.data.Items];
+        this.dataService = this.dataFilter.map(item => ({ ...item, serviceTypeName: item.serviceType?.name || '' }));
+        if (this.dataService.length == this.count) this.pageKey = null;
+        else this.pageKey = data.data.nextPageKey ?? null;
 
-        this.dataService = this.dataFilter.map(item => ({
-          ...item,
-          serviceTypeName: item.serviceType?.name || ''
-        }));
-        //console.log("this.dataFilter: "+this.dataFilter);
-        //console.log("this.dataService: "+this.dataService);
-        console.log("data.data.nextPageKey:");
-        console.log(data.data.nextPageKey);
-        console.log("this.count:");
-        console.log(this.count);
-        console.log("data.data.Count:");
-        console.log(data.data.Count);
-        if (this.dataService.length == this.count) {//se recuperaron todos los datos
-          this.pageKey = null;
-        } else {
-          this.pageKey = data.data.nextPageKey ?? null;
-        }
         this.count = data.data.Count ?? 0;
       },
       error: (err) => {
@@ -179,17 +130,11 @@ export class ServicesComponent implements OnInit {
     })
   }
 
-  addService() {
-    this.router.navigate(['service/add'])
-  }
+  addService() { this.router.navigate(['service/add']) }
 
-  updateService() {
-    this.router.navigate(['service/import', 'update']);
-  }
+  updateService() { this.router.navigate(['service/import', 'update']); }
 
-  createService() {
-    this.router.navigate(['service/import', 'create']);
-  }
+  createService() { this.router.navigate(['service/import', 'create']); }
 
   searchData() {
     if (!this.service_name.value && !this.status.value && !this.service_type.value && !this.service_id.value && !this.provider.value) {
@@ -211,27 +156,16 @@ export class ServicesComponent implements OnInit {
     this.clearData();
   }
 
-  clickButton(event) {
-    console.log("event", event)
-    const { value, element } = event
-    if (value == "edit") {
-      console.log("element: ", element)
-      this.editElement(element.id)
-    }
+  clickButton({ value, element }: { value: string, element: { id: string } }) {
+    if (value == "edit") this.editElement(element.id)
   }
 
-  editElement(id: any) {
-    this.router.navigate([`/service/edit/${id}`]);
-  }
+  editElement(id: string) { this.router.navigate([`/service/edit/${id}`]); }
 
   dataMaster() {
     this.master.getItemsMasterTable('1').subscribe({
-      next: (data) => {
-        this.stateMaster = data;
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      },
+      next: (data) => { this.stateMaster = data; },
+      error: (error) => { console.error('Error:', error); },
     });
   }
 
@@ -250,9 +184,7 @@ export class ServicesComponent implements OnInit {
         this.spinner.spinnerOnOff();
         console.error("Error loading master table data:", error);
       },
-      complete: () => {
-        this.spinner.spinnerOnOff();
-      },
+      complete: () => { this.spinner.spinnerOnOff(); },
     });
   }
 
@@ -268,7 +200,6 @@ export class ServicesComponent implements OnInit {
     this.clearData();
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
-    // this.functionDataCurrent(this.pageSize);
   }
 
   /************************************* METODOS DE BOTONES ***********************************/
@@ -284,17 +215,12 @@ export class ServicesComponent implements OnInit {
 
   /******************************** METODOS DE PAGINADO *************************************/
   onPageChange(event: PageEvent) {
-    console.log('onPageChange', event);
-    console.log('pageKey', this.pageKey);
-    console.log('pageSize', this.pageSize);
     this.pageSize = this.pagUtils?.updatePageSize(event.pageSize, this.pageSize);
     this.pagUtils?.onPageChange(event, this.pageSize, this.functionDataCurrent.bind(this), this.pageKey);
   }
 
   exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
-    console.log('exportDataViaAPI called with', fileType);
     this.spinner.spinnerOnOff();
-
     // Preparar los filtros para la exportación
     const exportFilters: Record<string, any> = {
       name: this.service_name.value?.toUpperCase() || undefined,
@@ -304,21 +230,14 @@ export class ServicesComponent implements OnInit {
     };
 
     // Eliminar propiedades undefined
-    Object.keys(exportFilters).forEach(key => {
-      if (exportFilters[key] === undefined) {
-        delete exportFilters[key];
-      }
-    });
+    Object.keys(exportFilters).forEach(key => { if (exportFilters[key] === undefined) delete exportFilters[key]; });
     const inbx = 'srv';
     const token = localStorage.getItem('fcmToken');
     this.services.exportServices(fileType, exportFilters, inbx, token).subscribe({
       next: (response) => {
         this.spinner.spinnerOnOff();
-        if (response.statusCode === 200) {
-          this.mytoastr.showWarning('', 'Procesando Archivo...')
-        } else {
-          this.mytoastr.showError('', 'Error al enviar la solicitud')
-        }
+        if (response.statusCode === 200) this.mytoastr.showWarning('', 'Procesando Archivo...')
+        else this.mytoastr.showError('', 'Error al enviar la solicitud')
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
@@ -329,35 +248,13 @@ export class ServicesComponent implements OnInit {
   }
 
   /******************************************** METODOS GET ****************************************/
-
-  get service_name() {
-    return this.serviceForm.get('service_name')
-  }
-
-  get service_type() {
-    return this.serviceForm?.get('service_type')
-  }
-
-  get status() {
-    return this.serviceForm.get('status')
-  }
-
-  get service_id() {
-    return this.serviceForm.get('service_id')
-  }
-
-  get provider() {
-    return this.serviceForm.get('provider')
-  }
-
-  get servicesNames(): string {
-    return this.listServicesSelected.map(s => s.name).join(', ');
-  }
-
-  get servicesId(): string {
-    return this.listServicesSelected.map(s => s.id).join(', ');
-  }
-
+  get service_name() { return this.serviceForm.get('service_name') }
+  get service_type() { return this.serviceForm?.get('service_type') }
+  get status() { return this.serviceForm.get('status') }
+  get service_id() { return this.serviceForm.get('service_id') }
+  get provider() { return this.serviceForm.get('provider') }
+  get servicesNames(): string { return this.listServicesSelected.map(s => s.name).join(', ') }
+  get servicesId(): string { return this.listServicesSelected.map(s => s.id).join(', ') }
 }
 
 interface ServiceItem {

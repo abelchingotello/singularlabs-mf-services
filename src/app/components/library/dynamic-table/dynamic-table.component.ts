@@ -1,25 +1,12 @@
-import {
-  Component,
-  Input,
-  Output,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-  EventEmitter,
-  ChangeDetectorRef,
-  ElementRef,
-  OnChanges,
-  SimpleChanges,
-  Inject,
-} from '@angular/core';
+import { Component, Input, Output, OnInit, AfterViewInit, ViewChild, EventEmitter, ChangeDetectorRef, ElementRef, OnChanges, SimpleChanges, Inject, OnDestroy, } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, formatDate } from '@angular/common';
-import { utils, writeFile, WorkBook } from 'xlsx';
+import { utils, WorkBook } from 'xlsx';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +20,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { IconTypeComponent } from './../icons_type/icons_type.component';
 
+import { AuthService } from 'src/app/services/auth.service';
+
+// Agregar propiedad para manejar la suscripción
 @Component({
   selector: 'uni-dynamic-table',
   templateUrl: './dynamic-table.component.html',
@@ -57,7 +47,7 @@ import { IconTypeComponent } from './../icons_type/icons_type.component';
     IconTypeComponent,
   ],
 })
-export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
+export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() columns: any[] = [];
   @Input() data: any[] = [];
   @Input() actionsOptions?: boolean;
@@ -75,6 +65,9 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() lengthTable: any;
   @Input() paginationinFrontend: any;
   @Input() shouldExport: boolean = false;
+  @Input() showExport: boolean = true;
+  @Input() pageSizeOptions: number[] = [5, 10, 20, 50];
+  @Input() currentPageIndex: number = 0;
 
   @Output() toggleChange = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<PageEvent>();
@@ -103,12 +96,19 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   public pageSize = 5;
   public paginatorLength: any;
   public dataCurrent: boolean;
-  public previousDataLength = 0;
+  public previousDataLength = 0;// 1. Agregar el import
+
+  // 2. Nuevas propiedades públicas (junto a las demás)
+  public action_permision: any = {};
+  public actions_visible: boolean = false;
+
+  private permissionsSub: Subscription;
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private http: HttpClient,
-    @Inject(MatPaginatorIntl) private paginatorIntl: MatPaginatorIntl
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly http: HttpClient,
+    private readonly authService: AuthService,
+    @Inject(MatPaginatorIntl) private readonly paginatorIntl: MatPaginatorIntl
   ) {
     this.paginatorIntl.itemsPerPageLabel = 'Elementos por página';
   }
@@ -117,9 +117,62 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
     this.updateColumnsFromConfig();
     this.dataSource = new MatTableDataSource(this.data);
     this.dataPrint = new MatTableDataSource(this.data);
-    this.selectedTab.toLowerCase();
+
+    // ✅ Suscribirse al observable en vez de llamar getPermissions()
+    // BehaviorSubject emite el valor actual inmediatamente + futuros cambios de rol
+    this.permissionsSub = this.authService.permissions$.subscribe(permissions => {
+      if (!permissions || Object.keys(permissions).length === 0) return;
+
+      const allPermissionFromRol: any = {};
+      this.actions_visible = false; // resetear en cada emisión
+
+      const columnAction = this.columns.find(
+        (column: any) =>
+          column.config?.type === 'buttonicons' &&
+          column.config?.actions?.length > 0
+      );
+
+      columnAction?.config?.actions.forEach((action: any) => {
+        allPermissionFromRol[action.permission] = this.authService.hasPermissionFromTag(action.permission);
+        if (allPermissionFromRol[action.permission]) {
+          this.actions_visible = true;
+        }
+      });
+
+      this.action_permision = { ...allPermissionFromRol };
+      this.updateColumnsFromConfig();
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
+  // Limpiar suscripción al destruir el componente
+  ngOnDestroy(): void {
+    this.permissionsSub?.unsubscribe();
+  }
+  // 5. Nuevos métodos (añadir al final de la clase)
+  async getPermissions(columns: any): Promise<void> {
+    await this.authService.getPermissions();
+    const allPermissionFromRol: any = {};
+
+    const columnAction = columns.find(
+      (column: any) =>
+        column.config?.type === 'buttonicons' &&
+        column.config?.actions?.length > 0
+    );
+
+    columnAction?.config?.actions.forEach((action: any) => {
+      allPermissionFromRol[action.permission] = this.hasPermission(action.permission);
+      if (allPermissionFromRol[action.permission]) {
+        this.actions_visible = true;
+      }
+    });
+
+    this.action_permision = { ...allPermissionFromRol };
+  }
+
+  hasPermission(tag: any): boolean {
+    return this.authService.hasPermissionFromTag(tag);
+  }
   ngAfterViewInit(): void {
     this.initTable();
   }
@@ -153,8 +206,9 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
 
   /** Recalcula displayedColumns y attributeNames respetando column.hide */
   private updateColumnsFromConfig(): void {
-    // Solo columnas visibles
-    const visibleColumns = this.columns?.filter(c => c.hide !== true) || [];
+    const visibleColumns = this.columns?.filter(
+      c => !c?.config?.restriccPermission || this.actions_visible  // ← agregar condición
+    ) || [];
     this.displayedColumns = visibleColumns.map(column => column.name);
     this.attributeNames = visibleColumns.map(column => column.attribute);
   }
@@ -248,13 +302,10 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   onPageChange(event: PageEvent) {
-    const from = event.pageIndex * event.pageSize;
-    const to = from + event.pageSize;
-
-    if (from < event.length) {
-      this.pageChange.emit(event);
-    }
+    // Always propagate paginator changes to parent (backend pagination).
+    this.pageChange.emit(event);
     this.pageSize = event.pageSize;
+    this.currentPageIndex = event.pageIndex;
   }
 
   onCellClick(value: any) {

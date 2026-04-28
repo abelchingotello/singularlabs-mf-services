@@ -2,7 +2,8 @@
   <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
     <uni-image-card title="Servicios"
       externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
-      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2 " (click)="addService()">
+      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2 " (click)="addService()"
+        *ngIf="authService.permissions?.['services-create-individual']">
         <mat-icon>add</mat-icon>
         <span class="custom-span-icon-responsive">Añadir</span>
       </button>
