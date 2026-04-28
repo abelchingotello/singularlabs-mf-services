@@ -1,5 +1,6 @@
 import { HttpBackend, HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
@@ -17,6 +18,7 @@ export class GenerateQrService {
   private reprocessQueueUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/queue`;
   private reprocessHistoryUrl = `${environment.URL_API_GENERATE_QR}/v1/reprocess/history`;
   private qrServicesUrl = `${environment.URL_API_GENERATE_QR}/v1/services`;
+  private qrServicesConfigUrl = `${environment.URL_API_GENERATE_QR}/v1/services-config`;
   private sftpProviderConfigsUrl = `${environment.URL_API_GENERATE_QR}/v1/sftp/provider-configs`;
   private serviceSftpProviderUrl = `${environment.URL_API_GENERATE_QR}/v1/service-sftp-provider`;
   private notificationEmailsUrl = `${environment.URL_API_GENERATE_QR}/v1/notification-emails`;
@@ -28,12 +30,17 @@ export class GenerateQrService {
     private httpClient: HttpClient,
     private authService: AuthService,
     private httpBackend: HttpBackend,
+    private cookieService: CookieService,
   ) {
     this.rawHttpClient = new HttpClient(this.httpBackend);
   }
 
   generateIndividual(payload: any): Observable<any> {
-    return this.httpClient.post<any>(this.url, payload);
+    const frontendUsername = String(this.cookieService.get('userName') || '').trim();
+    return this.httpClient.post<any>(this.url, {
+      ...payload,
+      frontendUsername
+    });
   }
 
   listIndividuals(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
@@ -142,7 +149,7 @@ export class GenerateQrService {
     const params = new HttpParams()
       .set('page', page)
       .set('pageSize', pageSize);
-    return this.httpClient.get<any>(this.qrServicesUrl, { params });
+    return this.httpClient.get<any>(this.qrServicesConfigUrl, { params });
   }
 
   registerConfiguredService(serviceName: string): Observable<any> {
@@ -292,7 +299,7 @@ export class GenerateQrService {
     if (responsable) {
       body.responsable = responsable;
     }
-    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/reprocess-next-attempt`, body);
+    return this.httpClient.post<any>(`${environment.URL_API_REPROCESS}/v1/reprocess-next-attempt`, body);
   }
 
   notificationHistory(idQr: string): Observable<any> {
@@ -357,6 +364,3 @@ export class GenerateQrService {
     return this.httpClient.get(`${this.URL1}`, { params });
   }
 }
-
-
-

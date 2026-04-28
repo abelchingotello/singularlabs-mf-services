@@ -183,7 +183,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
     });
 
     console.log('[SFTP SERVICIOS REQUEST][QR CONFIGURADOS]', {
-      endpoint: '/v1/services',
+      endpoint: '/v1/services-config',
       params: {
         page: this.qrServicePage,
         pageSize: this.qrServicePageSize
