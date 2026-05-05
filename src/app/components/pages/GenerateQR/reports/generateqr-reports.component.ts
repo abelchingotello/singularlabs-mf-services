@@ -532,7 +532,9 @@ export class GenerateQrReportsComponent implements OnInit {
       servicio: item?.servicio ?? item?.service ?? item?.empresa ?? item?.service_name,
       generatedBy: item?.generatedBy ?? item?.generated_by ?? item?.frontendUsername ?? item?.frontend_username ?? '-',
       referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.supply ?? item?.codigo_usuario,
-      monto: this.normalizeAmount(item?.monto ?? item?.amount),
+      monto: this.hasAmountValue(item?.monto)
+        ? this.formatAmountInSoles(item.monto)
+        : this.formatAmountInCents(item?.amount),
       titular: item?.titular ?? item?.cliente ?? item?.customer ?? item?.client_name,
       qr_expired_at: item?.qr_expired_at ?? item?.expired_at ?? item?.expiredAt ?? item?.fecha_vencimiento,
       descripcion: item?.descripcion ?? item?.description ?? item?.numero_recibo ?? item?.receipt_number ?? item?.recibo ?? '',
@@ -577,7 +579,11 @@ export class GenerateQrReportsComponent implements OnInit {
     return String(value).toLowerCase().replace(/\s+/g, '_');
   }
 
-  private normalizeAmount(value: any): string {
+  private hasAmountValue(value: any): boolean {
+    return value !== null && value !== undefined && value !== '';
+  }
+
+  private formatAmountInSoles(value: any): string {
     if (value === null || value === undefined || value === '') {
       return '-';
     }
@@ -585,20 +591,29 @@ export class GenerateQrReportsComponent implements OnInit {
     if (/pen/i.test(raw)) {
       return raw;
     }
-    const match = raw.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-    if (!match) {
-      return raw;
-    }
-    const intPart = match[1];
-    const decPart = match[2] ?? '';
-    let num = Number(raw);
-    if (decPart === '00' && intPart.length >= 3) {
-      num = Number(intPart) / 100;
-    }
+    const num = Number(raw.replace(',', '.'));
     if (Number.isNaN(num)) {
       return raw;
     }
     return `${num.toFixed(2)} PEN`;
+  }
+
+  private formatAmountInCents(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '-';
+    }
+    const raw = String(value).trim();
+    if (/pen/i.test(raw)) {
+      return raw;
+    }
+    if (raw.includes('.') || raw.includes(',')) {
+      return this.formatAmountInSoles(raw);
+    }
+    const num = Number(raw);
+    if (Number.isNaN(num)) {
+      return raw;
+    }
+    return `${(num / 100).toFixed(2)} PEN`;
   }
 
   private buildListFilters(): Record<string, any> {
@@ -689,7 +704,6 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
-
 
 
 
