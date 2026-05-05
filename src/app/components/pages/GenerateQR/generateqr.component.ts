@@ -700,7 +700,7 @@ export class GenerateQR implements OnInit {
           ...item,
           referencia: item?.referencia ?? item?.suministro ?? item?.reference ?? item?.codigo_usuario,
           generatedBy: item?.generatedBy ?? item?.generated_by ?? item?.frontendUsername ?? item?.frontend_username ?? '-',
-          amount: this.normalizeAmount(item?.amount),
+          amount: this.formatAmountInCents(item?.amount),
           estado_pago_label: this.formatEstadoPago(item?.estado_pago),
           estado_vigencia_label: this.formatVigencia(item?.estado_vigencia ?? item?.vigencia)
         }));
@@ -1134,9 +1134,9 @@ export class GenerateQR implements OnInit {
   get qrDisplayAmount(): string {
     const formAmount = this.qrForm?.get('amount')?.value;
     if (this.qrDialogMode === 'create' && formAmount) {
-      return this.normalizeAmount(formAmount);
+      return this.formatAmountInSoles(formAmount);
     }
-    return this.normalizeAmount(this.qrResult?.amount);
+    return this.formatAmountInCents(this.qrResult?.amount);
   }
 
   get qrDetailTitle(): string {
@@ -1339,7 +1339,7 @@ export class GenerateQR implements OnInit {
     }
   }
 
-  private normalizeAmount(value: any): string {
+  private formatAmountInSoles(value: any): string {
     if (value === null || value === undefined || value === '') {
       return '-';
     }
@@ -1347,20 +1347,29 @@ export class GenerateQR implements OnInit {
     if (/pen/i.test(raw)) {
       return raw;
     }
-    const match = raw.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-    if (!match) {
-      return raw;
-    }
-    const intPart = match[1];
-    const decPart = match[2] ?? '';
-    let num = Number(raw);
-    if (decPart === '00' && intPart.length >= 3) {
-      num = Number(intPart) / 100;
-    }
+    const num = Number(raw.replace(',', '.'));
     if (Number.isNaN(num)) {
       return raw;
     }
     return `${num.toFixed(2)} PEN`;
+  }
+
+  private formatAmountInCents(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '-';
+    }
+    const raw = String(value).trim();
+    if (/pen/i.test(raw)) {
+      return raw;
+    }
+    if (raw.includes('.') || raw.includes(',')) {
+      return this.formatAmountInSoles(raw);
+    }
+    const num = Number(raw);
+    if (Number.isNaN(num)) {
+      return raw;
+    }
+    return `${(num / 100).toFixed(2)} PEN`;
   }
 
   private buildQrFileName(): string {
