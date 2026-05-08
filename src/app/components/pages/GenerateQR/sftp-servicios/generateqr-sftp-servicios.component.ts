@@ -144,7 +144,10 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       webhookUrl: [''],
       webhookEnabled: [0],
       skipPagos: [0],
-      qrTtlMinutes: ['']
+      qrTtlMinutes: [''],
+      serviceOrigin: ['internal', Validators.required],
+      idServiceProv: [''],
+      maxQrAmount: ['']
     });
 
     this.notificationEmailFiltersForm = this.fb.group({
@@ -240,9 +243,6 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
   }
 
   selectLigopayService(service: any): void {
-    if (this.isServiceConfigured(service)) {
-      return;
-    }
     this.selectedLigopayService = service;
   }
 
@@ -278,7 +278,10 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       webhookUrl: this.selectedQrConfiguredService?.webhookUrl || this.selectedQrConfiguredService?.webhook_url || '',
       webhookEnabled: Number(this.selectedQrConfiguredService?.webhookEnabled ?? this.selectedQrConfiguredService?.webhook_enabled ?? 0),
       skipPagos: Number(this.selectedQrConfiguredService?.skipPagos ?? this.selectedQrConfiguredService?.skip_pagos ?? 0),
-      qrTtlMinutes: this.selectedQrConfiguredService?.qrTtlMinutes || this.selectedQrConfiguredService?.qr_ttl_minutes || ''
+      qrTtlMinutes: this.selectedQrConfiguredService?.qrTtlMinutes || this.selectedQrConfiguredService?.qr_ttl_minutes || '',
+      serviceOrigin: this.selectedQrConfiguredService?.serviceOrigin || this.selectedQrConfiguredService?.service_origin || 'internal',
+      idServiceProv: this.selectedQrConfiguredService?.idServiceProv || this.selectedQrConfiguredService?.id_service_prov || this.selectedQrConfiguredService?.id_serviceProv || '',
+      maxQrAmount: this.selectedQrConfiguredService?.maxQrAmount ?? this.selectedQrConfiguredService?.max_qr_amount ?? ''
     });
 
     this.configuredServiceDialogRef = this.dialog.open(this.configuredServiceDialog, {
@@ -300,13 +303,17 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       return;
     }
 
+    const maxQrAmountValue = this.configuredServiceForm.get('maxQrAmount')?.value;
     const payload = {
       serviceName: this.configuredServiceForm.get('serviceName')?.value,
       businessCode: this.configuredServiceForm.get('businessCode')?.value,
       webhookUrl: this.configuredServiceForm.get('webhookUrl')?.value || null,
       webhookEnabled: Number(this.configuredServiceForm.get('webhookEnabled')?.value ?? 0),
       skipPagos: Number(this.configuredServiceForm.get('skipPagos')?.value ?? 0),
-      qrTtlMinutes: Number(this.configuredServiceForm.get('qrTtlMinutes')?.value || 0)
+      qrTtlMinutes: Number(this.configuredServiceForm.get('qrTtlMinutes')?.value || 0),
+      serviceOrigin: this.configuredServiceForm.get('serviceOrigin')?.value,
+      idServiceProv: this.configuredServiceForm.get('idServiceProv')?.value || null,
+      maxQrAmount: maxQrAmountValue === '' || maxQrAmountValue === null || maxQrAmountValue === undefined ? null : Number(maxQrAmountValue)
     };
 
     console.log('[SFTP SERVICIOS REQUEST][UPDATE SERVICE]', { serviceId, payload });
@@ -331,7 +338,10 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
             webhookUrl: payload.webhookUrl,
             webhookEnabled: payload.webhookEnabled,
             skipPagos: payload.skipPagos,
-            qrTtlMinutes: payload.qrTtlMinutes
+            qrTtlMinutes: payload.qrTtlMinutes,
+            serviceOrigin: payload.serviceOrigin,
+            idServiceProv: payload.idServiceProv,
+            maxQrAmount: payload.maxQrAmount
           };
 
           this.qrConfiguredServices = (this.qrConfiguredServices || []).map((item: any) =>
@@ -355,6 +365,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
     }
 
     const serviceName = this.getLigopayServiceName(this.selectedLigopayService);
+    const isConfigured = this.isServiceConfigured(this.selectedLigopayService);
     if (!serviceName) {
       this.mytoastr.showWarning('Servicio invalido', 'No se pudo obtener el nombre del servicio');
       return;
@@ -373,13 +384,13 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('[SFTP SERVICIOS RESPONSE][REGISTER]', response);
-          this.mytoastr.showSuccess('Servicio registrado', serviceName);
+          this.mytoastr.showSuccess(isConfigured ? 'Servicio actualizado' : 'Servicio registrado', serviceName);
           this.selectedLigopayService = null;
           this.loadServices();
         },
         error: (error) => {
           console.error('[SFTP SERVICIOS ERROR][REGISTER]', error);
-          this.mytoastr.showError('No se pudo registrar el servicio', '');
+          this.mytoastr.showError(isConfigured ? 'No se pudo actualizar el servicio' : 'No se pudo registrar el servicio', '');
         }
       });
   }
