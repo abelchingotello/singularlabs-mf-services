@@ -30,6 +30,7 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
     { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
+    { 'name': 'Modalidad de Recaudo', 'attribute': 'collectorMode' },
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     {
       'name': 'Estado', 'attribute': 'status', 'config': {
@@ -204,6 +205,39 @@ export class ServicesComponent implements OnInit {
     );
   }
 
+  getCollectionMode(indicators) {
+    if (indicators) {
+      console.log("indicators: ", indicators)
+      const parsed = typeof indicators === "string" ? JSON.parse(indicators) : indicators;
+      console.log("Parsed: ", parsed)
+      let payBill = false;
+      let payOnline = false;
+
+      for (let i = 0, len = parsed.length; i < len; i++) {
+        const item = parsed[i];
+
+        if (item.id === "PAY_BILL") {
+          payBill = item.isActive;
+
+          // DATA ENTRY nunca necesita evaluar PAY_ONLINE
+          if (!payBill) return "DATA ENTRY";
+        } else if (item.id === "PAY_ONLINE") {
+          payOnline = item.isActive;
+        }
+
+        // ya tenemos ambos valores relevantes
+        if (payBill && payOnline) {
+          return "PAGO INTERCONECTADO";
+        }
+      }
+
+      return payBill
+        ? "BASE DE DATOS"
+        : "DATA ENTRY";
+    }
+    return ""
+  };
+
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputId = this.service_id.value?.toUpperCase();
@@ -227,7 +261,8 @@ export class ServicesComponent implements OnInit {
 
         this.dataService = this.dataFilter.map(item => ({
           ...item,
-          serviceTypeName: item.serviceType?.name || ''
+          serviceTypeName: item.serviceType?.name || '',
+          collectorMode: this.getCollectionMode(item.indicators),
         }));
         //console.log("this.dataFilter: "+this.dataFilter);
         //console.log("this.dataService: "+this.dataService);
