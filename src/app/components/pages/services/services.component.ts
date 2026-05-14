@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { DialogServiceStatusComponent } from 'src/app/dialogs/dialog-service-status/dialog-service-status.component';
 import { ServicesService } from 'src/app/services/services.service';
 import { DynamicTableComponent } from '../../library/dynamic-table/dynamic-table.component';
 import { MasterService } from 'src/app/services/master.service';
@@ -30,6 +29,7 @@ export class ServicesComponent implements OnInit {
     { 'name': 'Comision Fija', 'attribute': 'fixedcomission' },
     { 'name': 'Comision Porcentual', 'attribute': 'pctcomission' },
     { 'name': 'Tipo de servicio', 'attribute': 'serviceTypeName' },
+    { 'name': 'Modalidad de Recaudo', 'attribute': 'collectorMode' },
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     {
       'name': 'Estado', 'attribute': 'status', 'config': {
@@ -88,7 +88,7 @@ export class ServicesComponent implements OnInit {
   public allItems: any[] = [];
   public serviceFilter: string = '';
 
-  private pagUtils: PaginationUtils | undefined;
+  private readonly pagUtils: PaginationUtils | undefined;
   public page: number = -1; // Variable para la página actual
   public count: number = null; // Variable para el total de elementos
   public listProviders: any;
@@ -98,14 +98,14 @@ export class ServicesComponent implements OnInit {
 
 
   constructor(
-    private router: Router,
-    private services: ServicesService,
-    private fb: FormBuilder,
-    private master: MasterService,
-    private person: PersonService,
-    private spinner: SpinnerService,
-    private mytoastr: MytoastrService,
-    private personService: PersonService,
+    private readonly router: Router,
+    private readonly services: ServicesService,
+    private readonly fb: FormBuilder,
+    private readonly master: MasterService,
+    private readonly person: PersonService,
+    private readonly spinner: SpinnerService,
+    private readonly mytoastr: MytoastrService,
+    private readonly personService: PersonService,
     public dialog: MatDialog,
     public authService: AuthService,
   ) {
@@ -168,7 +168,6 @@ export class ServicesComponent implements OnInit {
     this.filteredServices = this.allItems1.filter(service =>
       service.name.toLowerCase().includes(value)
     );
-    this.spinner.spinnerOnOff
   }
 
   async cargarServicios(): Promise<void> {
@@ -204,6 +203,23 @@ export class ServicesComponent implements OnInit {
     );
   }
 
+  getCollectionMode(indicators) {
+    const parsed = typeof indicators === "string" ? JSON.parse(indicators) : indicators;
+    let payBill = false, payOnline = false;
+
+    for (let i = 0, len = parsed.length; i < len; i++) {
+      const item = parsed[i];
+
+      if (item.id === "PAY_BILL") {
+        payBill = item.isActive;
+        if (!payBill) return "DATA ENTRY";
+      } else if (item.id === "PAY_ONLINE") payOnline = item.isActive;
+
+      if (payBill && payOnline) return "PAGO INTERCONECTADO";
+    }
+    return payBill ? "BASE DE DATOS" : "DATA ENTRY";
+  };
+
   dataInitial(pageSize: any) {
     const input = this.service_name.value?.toUpperCase();
     const inputId = this.service_id.value?.toUpperCase();
@@ -221,16 +237,13 @@ export class ServicesComponent implements OnInit {
           this.mytoastr.showWarning(data.messages, '')
           return
         }
-        //this.dataService = [...this.dataService, ...data.data.Items]; // Acumula los datos en dataFilter
-        //console.log(...data.data.Items);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
 
         this.dataService = this.dataFilter.map(item => ({
           ...item,
-          serviceTypeName: item.serviceType?.name || ''
+          serviceTypeName: item.serviceType?.name || '',
+          collectorMode: item.indicators ? this.getCollectionMode(item.indicators) : '',
         }));
-        //console.log("this.dataFilter: "+this.dataFilter);
-        //console.log("this.dataService: "+this.dataService);
         console.log("data.data.nextPageKey:");
         console.log(data.data.nextPageKey);
         console.log("this.count:");
@@ -387,7 +400,6 @@ export class ServicesComponent implements OnInit {
     this.clearData();
     this.dynamic.clearSelection();
     this.dataInitial(this.pageSize);
-    // this.functionDataCurrent(this.pageSize);
   }
 
   /************************************* METODOS DE BOTONES ***********************************/
