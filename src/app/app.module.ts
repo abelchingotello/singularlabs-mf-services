@@ -16,11 +16,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogServiceConfigComponent } from './dialogs/dialog-service-config/dialog-service-config.component';
+import { DialogServiceAssignProviderStatusComponent } from './dialogs/dialog-service-assign-provider-status/dialog-service-assign-provider-status.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DialogServiceStatusComponent,
+    DialogServiceAssignProviderStatusComponent,
     DialogCommissionAssingServiceComponent,
     DialogServiceConfigComponent,
   ],

@@ -432,6 +432,7 @@ export class ServicesComponent implements OnInit {
       type: this.service_type.value?.toUpperCase() || undefined,
       status: this.status.value?.master_name?.toUpperCase() || undefined,
       service_id: this.service_id.value?.toUpperCase() || undefined,
+      provider: this.provider.value?.toUpperCase() || undefined,
     };
 
     // Eliminar propiedades undefined

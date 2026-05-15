@@ -29,7 +29,7 @@ export class PersonService {
     if (nameAlias) params = params.set('nameAlias', nameAlias);
 
     if (activeOnly) params = params.set('activeOnly', JSON.stringify(activeOnly));
-    
+
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
 
@@ -55,7 +55,7 @@ export class PersonService {
     return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
 
-  getPersonForStatusConciliation(typeEntity: string, nameAlias: string, count:number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
+  getPersonForStatusConciliation(typeEntity: string, nameAlias: string, count: number, limit?: any, pageKey?: any[]): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams()
     if (typeEntity) {
       params = params.set('typeEntity', typeEntity);
@@ -81,6 +81,12 @@ export class PersonService {
 
   patchStatePerson(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/person/entity/status`, data);
+  }
+
+  getPersonsPandR(): Observable<any> {
+    let params = new HttpParams();
+    params = params.set('type', 'recandprov');
+    return this.httpClient.get(`${this.url}/person/entity`, { params: params });
   }
   exportEntitys(
     format: 'xlsx' | 'csv',

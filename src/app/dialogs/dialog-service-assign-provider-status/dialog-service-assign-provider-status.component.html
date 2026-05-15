@@ -1,0 +1,44 @@
+<div class="bg-dialog p-3">
+    <h3 class="m-0 text-dialog">ACTUALIZACION DE ESTADO DE ASIGNACION POR PROVEEDOR - {{clientData?.nameAlias || ""}}
+    </h3>
+</div>
+
+<form [formGroup]="formEntity" class="p-3">
+
+    <h3>Datos Generales</h3>
+
+    <mat-form-field appearance="outline" class="col-md-4">
+        <mat-label>Cliente</mat-label>
+        <input formControlName="client" type="text" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-4">
+        <mat-label>Seleccionar Proveedor</mat-label>
+        <mat-select formControlName="provider" (selectionChange)="searchData()">
+            <mat-option [value]="">NINGUNO</mat-option>
+            <mat-option *ngFor="let provider of listProviders" [value]="provider?.servicePerson?.idPerson">
+                {{provider?.servicePerson?.nameAlias}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="col-md-4">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+            <mat-option *ngFor="let state of masterStatus" [value]="state?.master_name">{{state?.master_name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+</form>
+<uni-dynamic-table [columns]="columns" [data]="dataService" [pageKey]="pageKey" [hideHeaderOptions]="true"
+    (pageChange)="onPageChange($event)" [lengthTable]="count">
+</uni-dynamic-table>
+<div class="d-flex justify-content-end m-2">
+
+    <button mat-button class="btn btn-custom" cdkFocusInitial (click)="updateServicesFromProvider()">
+        <mat-icon>save</mat-icon>
+        Guardar
+    </button>
+</div>
