@@ -68,6 +68,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, 
   @Input() data: any[] = [];
   @Input() actionsOptions?: boolean;
   @Input() element_id?: string | string[] | 'ALL';
+
+  @Input() hideHeaderOptions: any;
   @Input() pageKey: any;
   @Input() refreshFunction!: () => void;
   @Input() alwaysShowHeaderOptions: boolean;

@@ -15,6 +15,7 @@ import { DialogCommissionAssingServiceComponent } from 'src/app/dialogs/dialog-c
 import { environment } from 'src/environments/environment'
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from 'src/app/services/auth.service';
+import { DialogServiceAssignProviderStatusComponent } from 'src/app/dialogs/dialog-service-assign-provider-status/dialog-service-assign-provider-status.component';
 
 @Component({
   selector: 'uni-assign',
@@ -116,7 +117,6 @@ export class AssignComponent implements OnInit {
         this.persons = person.data;
         this.categoriesService = categoryService;
         this.masterStatus = status;
-        console.log("estadooooooos: ", this.masterStatus)
       },
       error: (error) => {
         this.spinner.spinnerOnOff();
@@ -142,22 +142,12 @@ export class AssignComponent implements OnInit {
           return
         }
 
-        console.log("data.data.nextPageKey ver Items:");
-        //console.log(data.data.nextPageKey);
         this.dataFilter = [...this.dataFilter, ...data.data.Items]; // Acumula los datos en dataFilter
         this.dataService = this.dataFilter.map(item => ({
           ...item,
           serviceTypeName: item.serviceType?.name || ''
         }));
-        //this.pageKey = data.data.nextPageKey ?? null;
-        //this.count = data.data.Count ?? this.count;
 
-        //console.log("data.data.nextPageKey:");
-        //console.log(data.data.nextPageKey);
-        //console.log("this.count:");
-        //console.log(this.count);
-        //console.log("data.data.Count:");
-        // console.log(data.data.Count);
         if (this.dataService.length == this.count) {//se recuperaron todos los datos
           this.pageKey = null;
         } else {
@@ -177,7 +167,6 @@ export class AssignComponent implements OnInit {
   }
 
   openDialogType(data: any): void {
-    console.log("data: ", data)
     const typeCommission = data.fixedcomission && data.pctcomission ? "MULTIPLE" : data.fixedcomission ? "FIJO" : data.pctcomission ? "PORCENTUAL" : null;
     const dialogRef = this.dialog.open(DialogCommissionAssingServiceComponent, {
       width: '900px',
@@ -252,16 +241,28 @@ export class AssignComponent implements OnInit {
   }
 
   clickButton(event) {
-    console.log("event", event)
     const { value, element } = event
     if (value == "edit") {
-      console.log("element: ", element)
       this.openDialogType(element)
     }
   }
+  disableAssignmentByProvider() {
+    const dialogRef = this.dialog.open(DialogServiceAssignProviderStatusComponent, {
+      width: '900px',
+      data: {
+        id: this.client.value,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === "200") {
+        this.reload();
+      }
+    });
+
+  }
 
   exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
-    console.log('exportDataViaAPI called with', fileType);
     this.spinner.spinnerOnOff();
 
     // Preparar los filtros para la exportación

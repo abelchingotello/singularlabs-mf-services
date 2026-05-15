@@ -72,6 +72,13 @@
           <uni-dynamic-table [columns]="columns" [data]="dataService" [pageKey]="pageKey"
             [refreshFunction]="reload.bind(this)" (pageChange)="onPageChange($event)" [lengthTable]="count"
             [customExportFunction]="exportDataViaAPI.bind(this)" (clickButtonEvent)="clickButton($event)">
+            <div class="row">
+              <div class="col lg-6 d-flex justify-content-end align-items-end mr-3">
+                <button mat-flat-button matTooltip="Actualizar Asignacion por proveedor" matTooltipPosition="above" *ngIf="authService.permissions?.['services-assign-disable-assignment-by-provider'] && client.value" (click)="disableAssignmentByProvider()">
+                  <mat-icon>person</mat-icon> Actualizar por Proveedor
+                </button>
+              </div>
+            </div>
           </uni-dynamic-table>
         </div>
       </mat-card-content>

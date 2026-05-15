@@ -43,6 +43,10 @@ export class ServicesService {
     return this.httpClient.post<any>(`${this.url}/services/register/massive?import=${valueImport}`, data);
   }
 
+  updateAssingServicerFromProvider(body): Observable<any> {
+    return this.httpClient.post<any>(`${this.url}/services/assign/person`, body);
+  }
+
   getServices(name: string, status: string, type: string, category: string, count: number, idClient?: any, limit?: any, pageKey?: any[], getAssignAll?: boolean, id_service?: string, id_prov?: string, listIds?: any): Observable<ResponseDTO<PageInterface<ServiceTableInterface>>> {
     let params = new HttpParams();
     if (name) {
@@ -219,6 +223,10 @@ export class ServicesService {
 
     if (filters.client !== undefined) {
       params = params.set('idClient', filters.client);
+    }
+
+    if (filters.provider !== undefined) {
+      params = params.set('id_provider', filters.provider);
     }
 
     params = params.set('format', format);
