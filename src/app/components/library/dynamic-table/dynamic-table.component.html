@@ -1,19 +1,14 @@
 <div class="buttons row d-flex pt-2" *ngIf="!hideHeaderOptions">
     <div class="col-12 col-lg-7 d-flex justify-content-between align-items-center">
-        <div *ngIf="headerOptions || alwaysShowHeaderOptions;else showNgContent "
-            class="container-fluid d-flex flex-wrap align-items-center ps-4">
-            <div class="d-flex align-items-center me-auto me-md-0">
+        <div class="container-fluid d-flex flex-wrap align-items-center ps-4">
+            <div *ngIf="headerOptions || alwaysShowHeaderOptions" class="d-flex align-items-center me-auto me-md-0">
                 Seleccionados: {{ selectedIds?.length }}
             </div>
+        
             <div class="d-flex align-items-center justify-content-start flex-wrap">
                 <ng-content></ng-content>
             </div>
         </div>
-        <ng-template #showNgContent>
-            <div class="p-1">
-                <ng-content></ng-content>
-            </div>
-        </ng-template>
     </div>
     <div class="col-12 col-lg-5 d-flex justify-content-end">
         <div class="viewOptions d-flex align-items-center">
