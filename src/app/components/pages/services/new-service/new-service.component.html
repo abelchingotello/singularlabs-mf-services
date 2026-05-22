@@ -11,7 +11,6 @@
                 <mat-card style="
                         border-top-left-radius: 0rem !important; 
                         border-top-right-radius: 0rem !important;
-                        border-bottom-left-radius: 1.25rem !important;
                         border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 ">
@@ -20,80 +19,48 @@
                                     <mat-form-field appearance="outline" fxFlex="25%" class="col-md-3">
                                         <mat-label>Nombre de Servicio</mat-label>
                                         <input formControlName="service_name" type="text" matInput />
-                                        <!-- <mat-error *ngIf="typeDoc?.hasError('required') && typeDoc?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3 ">
                                         <mat-label>Proveedor</mat-label>
-                                        <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_prov">
                                             <mat-option *ngFor="let prov of typePro"
                                                 [value]="prov.servicePerson.idPerson">{{prov.servicePerson.nameAlias}}</mat-option>
                                         </mat-select>
-                                        <!-- <mat-error *ngIf="name?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="25%" class="col-md-3">
                                         <mat-label>Convenio</mat-label>
                                         <input formControlName="service_convenio" type="text" matInput />
-                                        <!-- <mat-error *ngIf="numDoc?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Tipo</mat-label>
-                                        <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_type">
                                             <mat-option *ngFor="let type of typeService"
                                                 [value]="type">{{type.master_name}}</mat-option>
                                         </mat-select>
-                                        <!-- <mat-error *ngIf="name?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Negocio</mat-label>
                                         <input formControlName="service_type_business" type="text" matInput
                                             placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="name?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
-
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Estado</mat-label>
-                                        <!-- <input formControlName="service_type" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_state">
                                             <mat-option *ngFor="let status of typeStatus"
                                                 [value]="status.master_name">{{status.master_name}}</mat-option>
                                         </mat-select>
-                                        <!-- <mat-error *ngIf="name?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{name?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Zona </mat-label>
-                                        <!-- <input formControlName="service_zone" type="text"  matInput placeholder="Ingresa nombre" > -->
                                         <mat-select formControlName="service_zone">
                                             <mat-option *ngFor="let zone of depart"
                                                 [value]="zone.master_department">{{zone.master_department}}</mat-option>
                                         </mat-select>
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" class="col-md-3">
@@ -106,10 +73,6 @@
                                         </mat-select>
                                     </mat-form-field>
                                 </form>
-                                <!-- <div class="btn-guardar button-container">
-                                        <button  routerLink="/service" class="btn btn-primary">CANCELAR</button>
-                                        <button  (click)="saveService()" class="btn btn-primary">GUARDAR</button>
-                                    </div> -->
                             </ng-container>
                         </div>
                     </mat-card-content>
@@ -123,7 +86,6 @@
                 <mat-card style="
                         border-top-left-radius: 0rem !important; 
                         border-top-right-radius: 0rem !important;
-                        border-bottom-left-radius: 1.25rem !important;
                         border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 row-container">
@@ -139,20 +101,35 @@
                                             <mat-option *ngFor="let comission of typeComission"
                                                 [value]="comission.master_name">{{comission.master_name}}</mat-option>
                                         </mat-select>
-                                        <!-- <mat-error *ngIf="numDoc?.hasError('required')">
-                        Este campo es requerido
-                    </mat-error> -->
-                                        <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
+
                                     <mat-form-field *ngIf="comissionFixed" appearance="outline" fxFlex="25%"
                                         class="col-md-3">
                                         <mat-label>Comisión fija</mat-label>
                                         <input formControlName="comission_fixed" type="number" min="0" step="0.01"
                                             matInput />
-                                        <!-- <mat-error *ngIf="numDoc?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
+                                    </mat-form-field>
+
+                                    <mat-form-field *ngIf="comissionRange" appearance="outline" fxFlex="25%"
+                                        class="col-md-3">
+                                        <mat-label>Comisión Menor al criterio</mat-label>
+                                        <input formControlName="comission_range_lower" type="number" min="0" step="0.01"
+                                            matInput />
+                                    </mat-form-field>
+
+                                    <mat-form-field *ngIf="comissionRange" appearance="outline" fxFlex="25%"
+                                        class="col-md-3">
+                                        <mat-label>Comisión Superior al criterio</mat-label>
+                                        <input formControlName="comission_range_upper" type="number" min="0" step="0.01"
+                                            matInput />
+                                    </mat-form-field>
+
+
+                                    <mat-form-field *ngIf="comissionPercentage" appearance="outline" fxFlex="25%"
+                                        class="col-md-3">
+                                        <mat-label>Comisión porcentual </mat-label>
+                                        <input formControlName="comission_percentage" type="number" min="0" step="0.01"
+                                            matInput />
                                     </mat-form-field>
 
                                     <mat-form-field *ngIf="comissionCriterio" appearance="outline" fxFlex="25%"
@@ -160,27 +137,9 @@
                                         <mat-label>Comisión de criterio</mat-label>
                                         <input formControlName="comission_criterion" type="number" min="0" step="0.01"
                                             matInput />
-                                        <!-- <mat-error *ngIf="numDoc?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
-                                    </mat-form-field>
-
-                                    <mat-form-field *ngIf="comissionPercentage" appearance="outline" fxFlex="25%"
-                                        class="col-md-3">
-                                        <mat-label>Comisión porcentual </mat-label>
-                                        <input formControlName="comission_percentage" type="number" min="0" step="0.01"
-                                            matInput />
-                                        <!-- <mat-error *ngIf="numDoc?.hasError('required')">
-                                            Este campo es requerido
-                                        </mat-error> -->
-                                        <!-- <mat-hint align="end">{{numDoc?.value?.length ?? 0}} / {{documentMaxLenght}}</mat-hint> -->
                                     </mat-form-field>
                                 </form>
                             </div>
-
-
-                            <!-- </div> -->
                         </div>
                     </mat-card-content>
                 </mat-card>
@@ -194,7 +153,6 @@
                 <mat-card style="
                         border-top-left-radius: 0rem !important; 
                         border-top-right-radius: 0rem !important;
-                        border-bottom-left-radius: 1.25rem !important;
                         border-bottom-left-radius: 1.25rem !important;">
                     <mat-card-content>
                         <div class="pt-3 pl-0 ">
@@ -204,49 +162,29 @@
                                         <mat-label>ID</mat-label>
                                         <input formControlName="paymentFields_id" type="text" matInput
                                             placeholder="Ingresa ID">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                            Este campo es requerido
-                                        </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Nombre</mat-label>
                                         <input formControlName="paymentFields_name" type="text" matInput
                                             placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                            Este campo es requerido
-                                        </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Tipo de campo</mat-label>
                                         <input formControlName="paymentFields_fieldType" type="text" matInput
                                             placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Máscara de campo</mat-label>
                                         <input formControlName="paymentFields_fieldMask" type="text" matInput
                                             placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
                                         <mat-label>Longitud máxima</mat-label>
                                         <input formControlName="paymentFields_max" type="text" matInput
                                             placeholder="Ingresa nombre">
-                                        <!-- <mat-error *ngIf="person_lastName?.hasError('required')">
-                                                Este campo es requerido
-                                            </mat-error> -->
-                                        <!-- <mat-hint align="end">{{person_lastName?.value?.length ?? 0}} / 150</mat-hint> -->
                                     </mat-form-field>
 
                                     <mat-checkbox formControlName="paymentFields_mandatory" class="col-md-3">
