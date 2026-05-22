@@ -115,17 +115,14 @@
         <h2 class="mt-4 ml-3 text-default">Reprocesos de pagos</h2>
         <form [formGroup]="queueForm" class="d-flex flex-wrap">
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Fecha inicio</mat-label>
-            <input matInput [matDatepicker]="queueStartPicker" formControlName="dateFrom" />
-            <mat-datepicker-toggle matSuffix [for]="queueStartPicker"></mat-datepicker-toggle>
-            <mat-datepicker #queueStartPicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Fecha fin</mat-label>
-            <input matInput [matDatepicker]="queueEndPicker" formControlName="dateTo" />
-            <mat-datepicker-toggle matSuffix [for]="queueEndPicker"></mat-datepicker-toggle>
-            <mat-datepicker #queueEndPicker></mat-datepicker>
+            <mat-label>Fecha notificado</mat-label>
+            <mat-date-range-input [rangePicker]="queueDatePicker">
+              <input matStartDate formControlName="dateFrom" placeholder="Inicio" />
+              <input matEndDate formControlName="dateTo" placeholder="Fin" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="queueDatePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #queueDatePicker></mat-date-range-picker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
