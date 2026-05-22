@@ -76,7 +76,7 @@ export class GenerateQrReprocesamientoPagosComponent implements OnInit {
     },
     { name: 'Responsable', attribute: 'responsable' },
     {
-      name: 'Creado',
+      name: 'Notificado',
       attribute: 'created_at',
       config: { formatDate: { format: 'dd/MM/yyyy HH:mm', locale: 'en-US' } }
     },

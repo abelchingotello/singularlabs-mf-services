@@ -12,31 +12,47 @@
         <h2 class="mt-4 ml-3 text-default">Datos de reporte</h2>
         <form [formGroup]="reportForm" class="d-flex flex-wrap">
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Fecha inicio</mat-label>
-            <input matInput [matDatepicker]="startPicker" formControlName="start" />
-            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-            <mat-datepicker #startPicker></mat-datepicker>
+            <mat-label>Fecha generacion</mat-label>
+            <mat-date-range-input [rangePicker]="createdAtPicker">
+              <input matStartDate formControlName="start" placeholder="Inicio" />
+              <input matEndDate formControlName="end" placeholder="Fin" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="createdAtPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #createdAtPicker></mat-date-range-picker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Fecha fin</mat-label>
-            <input matInput [matDatepicker]="endPicker" formControlName="end" />
-            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-label>Fecha pago</mat-label>
+            <mat-date-range-input [rangePicker]="paymentPicker">
+              <input matStartDate formControlName="paymentFrom" placeholder="Desde" />
+              <input matEndDate formControlName="paymentTo" placeholder="Hasta" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="paymentPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #paymentPicker></mat-date-range-picker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Pago desde</mat-label>
-            <input matInput [matDatepicker]="paymentFromPicker" formControlName="paymentFrom" />
-            <mat-datepicker-toggle matSuffix [for]="paymentFromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #paymentFromPicker></mat-datepicker>
+            <mat-label>Fecha notificacion</mat-label>
+            <mat-date-range-input [rangePicker]="notificationPicker">
+              <input matStartDate formControlName="notificationFrom" placeholder="Desde" />
+              <input matEndDate formControlName="notificationTo" placeholder="Hasta" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="notificationPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #notificationPicker></mat-date-range-picker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Pago hasta</mat-label>
-            <input matInput [matDatepicker]="paymentToPicker" formControlName="paymentTo" />
-            <mat-datepicker-toggle matSuffix [for]="paymentToPicker"></mat-datepicker-toggle>
-            <mat-datepicker #paymentToPicker></mat-datepicker>
+            <mat-label>Fecha vencimiento</mat-label>
+            <mat-date-range-input [rangePicker]="expirationPicker">
+              <input matStartDate formControlName="expiredFrom" placeholder="Desde" />
+              <input matEndDate formControlName="expiredTo" placeholder="Hasta" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="expirationPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #expirationPicker></mat-date-range-picker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -72,20 +88,6 @@
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Titular</mat-label>
             <input matInput formControlName="titular" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Vence desde</mat-label>
-            <input matInput [matDatepicker]="expFromPicker" formControlName="expiredFrom" />
-            <mat-datepicker-toggle matSuffix [for]="expFromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #expFromPicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="col-md-3">
-            <mat-label>Vence hasta</mat-label>
-            <input matInput [matDatepicker]="expToPicker" formControlName="expiredTo" />
-            <mat-datepicker-toggle matSuffix [for]="expToPicker"></mat-datepicker-toggle>
-            <mat-datepicker #expToPicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-md-3">
@@ -337,5 +339,3 @@
         </mat-card>
       </div>
     </ng-template>
-
-

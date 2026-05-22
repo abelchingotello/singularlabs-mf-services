@@ -88,6 +88,7 @@ export class NewServiceComponent implements OnInit {
   public owncomissionPercentage: boolean = true;
   public comissionFixed: boolean = true;
   public comissionCriterio: boolean = true;
+  public comissionRange: boolean = false;
   public comissionPercentage: boolean = true;
   public currentStep: number = 0;
   public steps: string[] = ['datos-servicio', 'datos-comisiones', 'datos-pagos'];
@@ -184,6 +185,8 @@ export class NewServiceComponent implements OnInit {
       comission_fixed: ['', Validators.required],
       comission_criterion: ['', Validators.required],
       comission_percentage: ['', Validators.required],
+      comission_range_lower: ['', Validators.required],
+      comission_range_upper: ['', Validators.required],
       comission_type: ['', Validators.required],
     });
 
@@ -247,6 +250,12 @@ export class NewServiceComponent implements OnInit {
       collectorName: '',
       typeComission: comissionRaw.comission_type,
       comissionFixed: comissionRaw.comission_fixed,
+      comissionRange: comissionRaw.comission_range_lower != null
+        ? JSON.stringify({
+          lower: comissionRaw.comission_range_lower,
+          upper: comissionRaw.comission_range_upper
+        })
+        : this.originalBodyBase?.comissionRange ?? null,
       comissionCriterion: comissionRaw.comission_criterion,
       comissionPCT: comissionRaw.comission_percentage,
       indicators: this.indicatrs,
@@ -307,21 +316,23 @@ export class NewServiceComponent implements OnInit {
   }
 
   private getCommissionRemoves(originalType: string, currentType: string): string {
-    if (!originalType) return '';
+    if (!originalType || originalType === currentType) return '';
 
-    const removes: string[] = [];
+    // Campos que usa cada tipo de comisión
+    const typeFields: Record<string, string[]> = {
+      'FIJO': ['comissionFixed'],
+      'PORCENTUAL': ['comissionPCT'],
+      'MULTIPLE': ['comissionFixed', 'comissionCriterion', 'comissionPCT'],
+      'RANGO': ['comissionCriterion', 'comissionRange'],
+    };
 
-    if (originalType === 'FIJO' && currentType === 'PORCENTUAL') {
-      removes.push('comissionFixed');
-    } else if (originalType === 'PORCENTUAL' && currentType === 'FIJO') {
-      removes.push('comissionPCT');
-    } else if (originalType === 'MULTIPLE' && currentType === 'FIJO') {
-      removes.push('comissionCriterion', 'comissionPCT');
-    } else if (originalType === 'MULTIPLE' && currentType === 'PORCENTUAL') {
-      removes.push('comissionCriterion', 'comissionFixed');
-    }
+    const originalFields = typeFields[originalType] ?? [];
+    const currentFields = typeFields[currentType] ?? [];
 
-    return removes.join(',');
+    // Solo se eliminan los campos que tenía el tipo anterior y el nuevo NO tiene
+    return originalFields
+      .filter(field => !currentFields.includes(field))
+      .join(',');
   }
 
   private hasDiff(current: any, original: any): boolean {
@@ -394,25 +405,52 @@ export class NewServiceComponent implements OnInit {
     if (this.comissionForm.get('comission_percentage')) {
       this.comissionForm.removeControl('comission_percentage');
     }
-
-    if (event.value === 'FIJO') {
-      this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
-      this.comissionPercentage = false;
-      this.comissionCriterio = false;
-      this.comissionFixed = true;
-    } else if (event.value === 'PORCENTUAL') {
-      this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
-      this.comissionFixed = false;
-      this.comissionCriterio = false;
-      this.comissionPercentage = true;
-    } else if (event.value === 'MULTIPLE') {
-      this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
-      this.comissionForm.addControl('comission_criterion', this.fb.control('', Validators.required));
-      this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
-      this.comissionCriterio = true;
-      this.comissionFixed = true;
-      this.comissionPercentage = true;
+    if (this.comissionForm.get('comission_range_lower')) {
+      this.comissionForm.removeControl('comission_range_lower');
     }
+    if (this.comissionForm.get('comission_range_upper')) {
+      this.comissionForm.removeControl('comission_range_upper');
+    }
+
+    switch (event.value) {
+      case 'FIJO':
+        this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
+        this.comissionPercentage = false;
+        this.comissionCriterio = false;
+        this.comissionFixed = true;
+        this.comissionRange = false;
+        break
+        ;
+      case 'PORCENTUAL':
+        this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
+        this.comissionFixed = false;
+        this.comissionCriterio = false;
+        this.comissionPercentage = true;
+        this.comissionRange = false;
+
+        break
+        ;
+      case 'MULTIPLE':
+        this.comissionForm.addControl('comission_fixed', this.fb.control('', Validators.required));
+        this.comissionForm.addControl('comission_criterion', this.fb.control('', Validators.required));
+        this.comissionForm.addControl('comission_percentage', this.fb.control('', Validators.required));
+        this.comissionCriterio = true;
+        this.comissionFixed = true;
+        this.comissionPercentage = true;
+        this.comissionRange = false;
+        break
+        ;
+      case 'RANGO':
+        this.comissionForm.addControl('comission_criterion', this.fb.control('', Validators.required));
+        this.comissionForm.addControl('comission_range_lower', this.fb.control('', Validators.required));
+        this.comissionForm.addControl('comission_range_upper', this.fb.control('', Validators.required));
+        this.comissionCriterio = true;
+        this.comissionPercentage = false;
+        this.comissionFixed = false;
+        this.comissionRange = true;
+        break;
+    };
+
   }
 
   private async getIdService(idService: string): Promise<void> {
@@ -453,6 +491,12 @@ export class NewServiceComponent implements OnInit {
       if (data.fixedcomission) this.comission_fixed.setValue(data.fixedcomission);
       if (data.pctcomission) this.pctcomission.setValue(data.pctcomission);
       if (data.comissioncriterion) this.comissioncriterion.setValue(data.comissioncriterion);
+      if (data.rangecomission) {
+        const { lower, upper } = JSON.parse(data.rangecomission)
+        this.comission_range_lower.setValue(lower);
+        this.comission_range_upper.setValue(upper);
+      }
+
 
       this.service_indicators.setValue(this.indicatrs.filter(i => i.isActive).map(i => i.id));
 
@@ -469,6 +513,7 @@ export class NewServiceComponent implements OnInit {
         typeComission: data.typeComission,
         comissionFixed: data.fixedcomission,
         comissionCriterion: data.comissioncriterion,
+        comissionRange: data.comissionrange,
         comissionPCT: data.pctcomission,
         indicators: JSON.parse(JSON.stringify(this.indicatrs)),
         additionalPaymentFields: JSON.parse(JSON.stringify(this.dataPayment))
@@ -579,4 +624,6 @@ export class NewServiceComponent implements OnInit {
   get comission_fixed() { return this.comissionForm.get('comission_fixed'); }
   get pctcomission() { return this.comissionForm.get('comission_percentage'); }
   get comissioncriterion() { return this.comissionForm.get('comission_criterion'); }
+  get comission_range_lower() { return this.comissionForm.get('comission_range_lower'); }
+  get comission_range_upper() { return this.comissionForm.get('comission_range_upper'); }
 }

@@ -181,6 +181,8 @@ export class GenerateQrReportsComponent implements OnInit {
       end: [''],
       paymentFrom: [''],
       paymentTo: [''],
+      notificationFrom: [''],
+      notificationTo: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
       servicio: [''],
       referencia: [''],
@@ -192,7 +194,8 @@ export class GenerateQrReportsComponent implements OnInit {
     }, { validators: [
       this.dateRangeValidator('start', 'end'),
       this.dateRangeValidator('expiredFrom', 'expiredTo'),
-      this.dateRangeValidator('paymentFrom', 'paymentTo')
+      this.dateRangeValidator('paymentFrom', 'paymentTo'),
+      this.dateRangeValidator('notificationFrom', 'notificationTo')
     ] });
   }
 
@@ -625,11 +628,15 @@ export class GenerateQrReportsComponent implements OnInit {
     const expiredTo = this.formatDateParam(this.reportForm?.get('expiredTo')?.value);
     const paymentFrom = this.formatDateParam(this.reportForm?.get('paymentFrom')?.value);
     const paymentTo = this.formatDateParam(this.reportForm?.get('paymentTo')?.value);
+    const notificationFrom = this.formatDateParam(this.reportForm?.get('notificationFrom')?.value);
+    const notificationTo = this.formatDateParam(this.reportForm?.get('notificationTo')?.value);
 
     if (start) filters['start'] = start;
     if (end) filters['end'] = end;
     if (paymentFrom) filters['paymentFrom'] = paymentFrom;
     if (paymentTo) filters['paymentTo'] = paymentTo;
+    if (notificationFrom) filters['notificationFrom'] = notificationFrom;
+    if (notificationTo) filters['notificationTo'] = notificationTo;
 
     const idQr = get('idQr');
     const servicio = get('servicio');
@@ -704,6 +711,5 @@ export class GenerateQrReportsComponent implements OnInit {
     return `${yyyy}-${MM}-${dd}`;
   }
 }
-
 
 
