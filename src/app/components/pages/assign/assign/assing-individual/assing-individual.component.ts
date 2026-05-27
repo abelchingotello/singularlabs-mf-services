@@ -105,7 +105,7 @@ export class AssingIndividualComponent implements OnInit {
     this.spinner.spinnerOnOff();
     forkJoin([
       this.masterService.getItemsMasterTable('15'), // tipoComission
-      this.personService.getPerson(this.isQrAssign ? 'USER LIGO PAY' : 'RECAUDADORA DE SERVICIOS', undefined, true),
+      this.personService.getPerson(this.isQrAssign ? 'USER QRCASH' : 'RECAUDADORA DE SERVICIOS', undefined, true),
       this.masterService.getItemsMasterTable('14') // CategoriaService
     ]).subscribe({
       next: (response) => {
@@ -324,7 +324,7 @@ export class AssingIndividualComponent implements OnInit {
   /****************************************** OTHER METHODS **********************************************/
   getRecaudador() {
     this.spinner.spinnerOnOff();
-    this.personService.getPerson(this.isQrAssign ? "USER LIGO PAY" : 'RECAUDADORA DE SERVICIOS', undefined, true).subscribe({
+    this.personService.getPerson(this.isQrAssign ? "USER QRCASH" : 'RECAUDADORA DE SERVICIOS', undefined, true).subscribe({
       next: (response) => {
         this.data = this.convertData(response.data)
       },
