@@ -11,7 +11,8 @@
                     <div class="d-flex flex-wrap">
                         <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Categoria de Servicio</mat-label>
-                            <mat-select formControlName="categoryService">
+                            <mat-select formControlName="categoryService" (selectionChange)="searchBtn()">
+                                <mat-option value="">TODOS</mat-option>
                                 <mat-option *ngFor="let category of categoriesService"
                                     [value]="category">{{category.master_name}}</mat-option>
                             </mat-select>
@@ -19,7 +20,8 @@
 
                         <mat-form-field appearance="outline" class="col-md-3">
                             <mat-label>Nombre de Servicio</mat-label>
-                            <input formControlName="service" matInput type="text" />
+                            <input formControlName="service" matInput type="text" (input)="onServiceInput($event)"
+                                (keydown.enter)="$event.preventDefault(); searchBtn()" />
                         </mat-form-field>
                     </div>
 
@@ -62,26 +64,45 @@
                         <ng-container *ngIf="!isQrAssign">
                             <mat-form-field appearance="outline" class="col-md-3">
                                 <mat-label>Tipo Comisión</mat-label>
-                                <mat-select formControlName="comission">
+                                <mat-select formControlName="comission"
+                                    (selectionChange)="selectionComissionProv($event)">
                                     <mat-option *ngFor="let type of typeComission" [value]="type.master_name">{{
                                         type.master_name }}</mat-option>
                                 </mat-select>
                             </mat-form-field>
 
-                            <mat-form-field appearance="outline" *ngIf="isComisionFixed()" class="col-md-3">
+                            <mat-form-field *ngIf="comissionFixed" appearance="outline" fxFlex="25%" class="col-md-3">
                                 <mat-label>Comisión Fija</mat-label>
-                                <input formControlName="fixed" (blur)="validComissionFixed()" matInput type="number"
+                                <input formControlName="fixed" (input)="validComission($event, 'fixed')" matInput type="number"
                                     min="0" step="0.01" />
                             </mat-form-field>
 
-                            <mat-form-field appearance="outline" *ngIf="isComisionPorcent()">
-                                <mat-label>Comisión Porcentual</mat-label>
-                                <input formControlName="porcent" matInput type="number" min="0" step="0.01" />
+                            <mat-form-field *ngIf="comissionRange" appearance="outline" fxFlex="25%" class="col-md-3">
+                                <mat-label>Comisión Menor al criterio</mat-label>
+                                <input formControlName="range_lower" (input)="validComission($event, 'range_lower')" type="number"
+                                    min="0" step="0.01" matInput />
                             </mat-form-field>
 
-                            <mat-form-field appearance="outline" *ngIf="isComisionMultiple()">
-                                <mat-label>Comisión Múltiple</mat-label>
+                            <mat-form-field *ngIf="comissionRange" appearance="outline" fxFlex="25%" class="col-md-3">
+                                <mat-label>Comisión Superior al criterio</mat-label>
+                                <input formControlName="range_upper" (input)="validComission($event, 'range_upper')" type="number"
+                                    min="0" step="0.01" matInput />
+                            </mat-form-field>
+
+
+                            <mat-form-field *ngIf="comissionPercentage" appearance="outline" fxFlex="25%"
+                                class="col-md-3">
+                                <mat-label>Comisión Porcentual</mat-label>
+                                <input formControlName="porcent" (input)="validComission($event, 'porcent')" matInput
+                                    type="number" min="0" step="0.01" />
+
+                            </mat-form-field>
+
+                            <mat-form-field *ngIf="comissionCriterio" appearance="outline" fxFlex="25%"
+                                class="col-md-3">
+                                <mat-label>Criterio de Comisión</mat-label>
                                 <input formControlName="multiple" matInput type="number" min="0" step="0.01" />
+
                             </mat-form-field>
                         </ng-container>
                     </div>

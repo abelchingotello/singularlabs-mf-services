@@ -47,12 +47,14 @@ export class AssingIndividualComponent implements OnInit {
   public count: number = null; // Variable para el total de elementos
   public pageSize: any = 5;
   public pageKey: any[];
-  private pagUtils: PaginationUtils = new PaginationUtils();
+  private readonly pagUtils: PaginationUtils = new PaginationUtils();
   public functionDataCurrent: (pageSize: any) => any;
   @ViewChild(DynamicTableComponent) dynamicTable!: DynamicTableComponent;
   public columnsTableService: any[] = [
     { 'name': 'NUM', 'attribute': 'index' },
     { 'name': 'Nombre', 'attribute': 'name' },
+    { 'name': 'Tipo Comisión', 'attribute': 'typeComission' },
+
     { 'name': 'Proveedor', 'attribute': 'nameProvider' },
     {
       'name': 'Estado', 'attribute': 'status', 'config': {
@@ -68,15 +70,20 @@ export class AssingIndividualComponent implements OnInit {
 
   public isQrAssign = false
 
+  public comissionFixed = false
+  public comissionRange = false
+  public comissionPercentage = false
+  public comissionCriterio = false
+
   constructor(
-    private serviceServ: ServicesService,
-    private masterService: MasterService,
-    private personService: PersonService,
-    private fb: FormBuilder,
-    private router: Router,
-    private spinner: SpinnerService,
-    private mytoastr: MytoastrService,
-    private cookies: CookieService
+    private readonly serviceServ: ServicesService,
+    private readonly masterService: MasterService,
+    private readonly personService: PersonService,
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly spinner: SpinnerService,
+    private readonly mytoastr: MytoastrService,
+    private readonly cookies: CookieService
   ) { }
 
   /****************************************** METODOS INICIALES **********************************************/
@@ -94,10 +101,12 @@ export class AssingIndividualComponent implements OnInit {
       categoryService: [''],
       service: [''],
       entity: [''],
-      comission: ['FIJO', Validators.required],
+      comission: ['', Validators.required],
       fixed: [''],
       porcent: [''],
       multiple: [''],
+      range_lower: [''],
+      range_upper: [''],
     });
   }
 
@@ -124,6 +133,64 @@ export class AssingIndividualComponent implements OnInit {
     });
   }
 
+
+  selectionComissionProv(event: any) {
+    if (this.formAssign.get('fixed')) {
+      this.formAssign.removeControl('fixed');
+    }
+    if (this.formAssign.get('multiple')) {
+      this.formAssign.removeControl('multiple');
+    }
+    if (this.formAssign.get('porcent')) {
+      this.formAssign.removeControl('porcent');
+    }
+    if (this.formAssign.get('range_lower')) {
+      this.formAssign.removeControl('range_lower');
+    }
+    if (this.formAssign.get('range_upper')) {
+      this.formAssign.removeControl('range_upper');
+    }
+
+    switch (event.value) {
+      case 'FIJO':
+        this.formAssign.addControl('fixed', this.fb.control('', Validators.required));
+        this.comissionPercentage = false;
+        this.comissionCriterio = false;
+        this.comissionFixed = true;
+        this.comissionRange = false;
+        break
+        ;
+      case 'PORCENTUAL':
+        this.formAssign.addControl('porcent', this.fb.control('', Validators.required));
+        this.comissionFixed = false;
+        this.comissionCriterio = false;
+        this.comissionPercentage = true;
+        this.comissionRange = false;
+
+        break
+        ;
+      case 'MULTIPLE':
+        this.formAssign.addControl('fixed', this.fb.control('', Validators.required));
+        this.formAssign.addControl('multiple', this.fb.control('', Validators.required));
+        this.formAssign.addControl('porcent', this.fb.control('', Validators.required));
+        this.comissionCriterio = true;
+        this.comissionFixed = true;
+        this.comissionPercentage = true;
+        this.comissionRange = false;
+        break
+        ;
+      case 'RANGO':
+        this.formAssign.addControl('multiple', this.fb.control('', Validators.required));
+        this.formAssign.addControl('range_lower', this.fb.control('', Validators.required));
+        this.formAssign.addControl('range_upper', this.fb.control('', Validators.required));
+        this.comissionCriterio = true;
+        this.comissionPercentage = false;
+        this.comissionFixed = false;
+        this.comissionRange = true;
+        break;
+    };
+
+  }
 
   /******************************************** METODOS PARA LOS BOTONES ******************************************/
 
@@ -209,6 +276,11 @@ export class AssingIndividualComponent implements OnInit {
     })
   }
 
+  onServiceInput(event: any) {
+    const inputValue = event.target.value.toUpperCase();
+    this.service.setValue(inputValue);
+  }
+
   clearFormAndData() {
     this.count = null;
     this.pageKey = undefined;
@@ -251,18 +323,43 @@ export class AssingIndividualComponent implements OnInit {
       status: this.dataServiceSelected.status,
       zone: 'MULTIDEPARTAMENTAL',
       collectorName: "",//vacio cuando son clientes // somos proveedores
-      ownFixedComission: this.fixed.value ?? 0, //numeber
-      ownCriterionComission: this.multiple ?? 0, //number
-      ownPCTComission: this.porcent ?? 0, //number
-      ownComissionType: this.comission.value,
       indicators: this.dataServiceSelected.indicators,
       additionalPaymentFields: this.dataServiceSelected.additional,
-      comissionFixed: this.dataServiceSelected.fixedcomission, //number
-      comissionPCT: this.dataServiceSelected.pctcomission, //number
+      ...this.getComission(),
     }))
     this.registerServiceRequest(dataRegister)
   }
 
+  getComission() {
+    switch (this.comission.value) {
+      case 'FIJO':
+        return {
+          ownFixedComission: this.fixed.value ?? 0, //numeber
+          ownComissionType: this.comission.value,
+        }
+      case 'PORCENTUAL':
+        return {
+          ownPCTComission: this.porcent.value ?? 0, //number
+          ownComissionType: this.comission.value,
+        }
+      case 'MULTIPLE':
+        return {
+          ownFixedComission: this.fixed.value ?? 0, //numeber
+          ownCriterionComission: this.multiple.value ?? 0, //number
+          ownPCTComission: this.porcent.value ?? 0, //number
+          ownComissionType: this.comission.value,
+        }
+      case 'RANGO':
+        return {
+          ownCriterionComission: this.multiple.value ?? 0, //number
+          ownComissionType: this.comission.value,
+          ownComissionRange: this.range_lower.value && this.range_upper.value ? JSON.stringify({ lower: this.range_lower.value, upper: this.range_upper.value }) : '', //string
+        }
+    }
+    return {
+
+    }
+  }
 
   onCancel() {
     this.router.navigate(['../assign']);
@@ -285,12 +382,79 @@ export class AssingIndividualComponent implements OnInit {
     }
   }
 
-  validComissionFixed(): void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
-    if (this.dataServiceSelected?.fixedcomission && this.fixed.value) {
-      if (Number(this.fixed.value) > this.dataServiceSelected.fixedcomission) {
-        this.mytoastr.showWarning('La comisión fija debe ser menor que la comisión fija del servicio: ', this.dataServiceSelected.fixedcomission.toString());
-        this.fixed.setValue('');
-      }
+  validComission(event: any, controlName: string): void {//Validamos que la comisión fija de la asignación, sea menor a la comisión fija del servicio
+    console.log("validComission ", this.dataServiceSelected)
+    if (!this.dataServiceSelected) {
+      this.mytoastr.showWarning('Selecciona un servicio', '');
+      this.fixed?.setValue('');
+      this.range_lower?.setValue('');
+      this.range_upper?.setValue('');
+      this.porcent?.setValue('');
+      this.multiple?.setValue('');
+      return;
+    }
+    switch (controlName) {
+      case 'fixed':
+        if (this.fixed.value < 0) {
+          this.fixed.setValue('');
+        }
+        if (this.dataServiceSelected && this.dataServiceSelected.fixedcomission != null && this.fixed.value > this.dataServiceSelected.fixedcomission) {
+          this.fixed.setValue('');
+          this.mytoastr.showWarning('La comisión fija no puede ser mayor a la comisión fija del servicio', '');
+        }
+
+        if (this.dataServiceSelected.rangecomission) {
+          const { lower } = JSON.parse(this.dataServiceSelected.rangecomission);
+          if (this.fixed.value > lower) {
+            this.fixed.setValue('');
+            this.mytoastr.showWarning('La comisión fija está fuera del rango permitido', '');
+          }
+        }
+        break;
+      case 'range_lower':
+        if (this.range_lower.value < 0) {
+          this.range_lower.setValue('');
+        }
+        if (this.dataServiceSelected.fixedcomission != null && this.range_lower.value > this.dataServiceSelected.fixedcomission) {
+          this.range_lower.setValue('');
+          this.mytoastr.showWarning('La comisión menor al criterio no puede ser mayor a la comisión fija del servicio', '');
+        }
+        if (this.dataServiceSelected.rangecomission) {
+          const { lower } = JSON.parse(this.dataServiceSelected.rangecomission);
+          if (this.range_lower.value > lower) {
+            this.range_lower.setValue('');
+            this.mytoastr.showWarning('La comisión menor al criterio está fuera del rango permitido', '');
+          }
+        }
+        break;
+      case 'range_upper':
+        if (this.range_upper.value < 0) {
+          this.range_upper.setValue('');
+        }
+        if (this.dataServiceSelected.fixedcomission != null && this.range_upper.value > this.dataServiceSelected.fixedcomission) {
+          this.range_upper.setValue('');
+          this.mytoastr.showWarning('La comisión mayor al criterio no puede ser mayor a la comisión fija del servicio', '');
+          return;
+        }
+        if (this.dataServiceSelected.rangecomission) {
+          const { upper } = JSON.parse(this.dataServiceSelected.rangecomission);
+          if (this.range_upper.value > upper) {
+            this.range_upper.setValue('');
+            this.mytoastr.showWarning('La comisión mayor al criterio está fuera del rango permitido', '');
+          }
+        }
+        break;
+      case 'porcent':
+        if (this.porcent.value < 0) {
+          this.porcent.setValue('');
+        }
+        if (this.dataServiceSelected && this.dataServiceSelected.pctcomission != null && this.porcent.value > this.dataServiceSelected.pctcomission) {
+          this.porcent.setValue('');
+          this.mytoastr.showWarning('La comisión porcentual no puede ser mayor a la comisión porcentual del servicio', '');
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -302,6 +466,7 @@ export class AssingIndividualComponent implements OnInit {
 
   handleSelectedIds(selectedIds: string[]) {
     this.dataServiceSelectedIds = selectedIds; // Asignar los IDs seleccionados a dataServiceSelectedIds
+    console.log("DATA SERVICES SELECTED IDS: ", this.dataServiceSelectedIds)
   }
 
   selectedHandle(event: any) {
@@ -310,6 +475,7 @@ export class AssingIndividualComponent implements OnInit {
         this.dataServiceSelected = null;
       }
       this.dataServiceSelected = event[0];
+      console.log("this.dataServiceSelected ", this.dataServiceSelected)
     } else {
       this.dataServiceSelected = null;
     }
@@ -406,12 +572,10 @@ export class AssingIndividualComponent implements OnInit {
   get service() { return this.formAssign.get('service') };
   get entity() { return this.formAssign.get('entity') };
   get fixed() { return this.formAssign.get('fixed') };
+  get range_lower() { return this.formAssign.get('range_lower') };
+  get range_upper() { return this.formAssign.get('range_upper') };
   get comission() { return this.formAssign.get('comission') };
-  get multiple() { return this.formAssign.get('multiple').value };
-  get porcent() { return this.formAssign.get('porcent').value };
-
-  isComisionFixed(): boolean { return this.comission.value === 'FIJO'; }
-  isComisionMultiple(): boolean { return this.comission.value === 'MULTIPLE'; }
-  isComisionPorcent(): boolean { return this.comission.value === 'PORCENTUAL'; }
+  get multiple() { return this.formAssign.get('multiple') };
+  get porcent() { return this.formAssign.get('porcent') };
 
 }
