@@ -489,3 +489,39 @@ mat-card-actions {
 ::ng-deep .mat-card-subtitle{
   margin-bottom: 0px !important;
 }
+
+.upload-area {
+    border: 2px dashed #c5c5c5;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.upload-area:hover {
+    border-color: #3f51b5;
+    background: #f5f7ff;
+}
+
+.upload-area.drag-active {
+    border-color: #3f51b5;
+    background: #e8edff;
+    transform: scale(1.01);
+}
+
+.upload-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+}

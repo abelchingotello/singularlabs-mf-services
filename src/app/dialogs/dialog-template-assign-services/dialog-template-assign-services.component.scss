@@ -1,0 +1,235 @@
+/* CONTENEDOR PRINCIPAL */
+:host {
+    display: block;
+    color: #1f2937;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+.bg-custom {
+    background-color: #003d64;
+    color: #fff !important;
+}
+
+.bg-dialog h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+/* TEXTO GENERAL */
+p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+/* TÍTULOS DE SECCIÓN */
+h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #003d64;
+}
+
+h4 mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+/* TABLA */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 14px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    background: #fff;
+}
+
+thead {
+    background: #003d64;
+    color: #fff;
+}
+
+thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+tbody tr {
+    border-bottom: 1px solid #edf2f7;
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #f8fbff;
+}
+
+tbody td {
+    padding: 14px 16px;
+    font-size: 13px;
+    vertical-align: middle;
+    color: #374151;
+}
+
+/* ICONOS TABLA */
+tbody td mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+tbody td mat-icon[color="primary"],
+tbody td .mat-icon {
+    vertical-align: middle;
+}
+
+tbody tr td:last-child {
+    text-align: center;
+}
+
+/* CODE */
+code {
+    background: #eef4ff;
+    color: #003d64;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #d6e4ff;
+    word-break: break-word;
+}
+
+/* LISTAS */
+ul {
+    margin-top: 8px;
+    margin-bottom: 18px;
+    padding-left: 22px;
+}
+
+ul li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+/* ALERTA */
+p mat-icon {
+    vertical-align: middle;
+    margin-right: 6px;
+    color: #f59e0b;
+}
+
+/* BOTONES */
+.btn-default2,
+.btn-default3,
+.btn-custom {
+    border-radius: 10px !important;
+    font-weight: 600;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px;
+    padding: 10px 18px !important;
+    transition: all 0.25s ease;
+    min-height: 42px;
+}
+
+/* BOTÓN SECUNDARIO */
+.btn-default2 {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.btn-default2:hover {
+    background: #e5e7eb !important;
+    transform: translateY(-1px);
+}
+
+/* BOTÓN PRINCIPAL */
+.btn-default3,
+.btn-custom {
+    background: linear-gradient(135deg, #003d64 0%, #005b96 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(0, 61, 100, 0.25);
+}
+
+.btn-default3:hover,
+.btn-custom:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 61, 100, 0.35);
+}
+
+/* ICONOS BOTONES */
+button mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* FOOTER DIALOG */
+mat-dialog-actions {
+    padding-top: 20px;
+    margin-top: 10px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+        width: 100%;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody tr {
+        margin-bottom: 16px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+    tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #003d64;
+        text-align: left;
+        margin-right: 12px;
+    }
+
+    .bg-dialog h3 {
+        font-size: 1rem;
+    }
+}

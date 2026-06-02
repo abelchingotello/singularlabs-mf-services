@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { forkJoin } from 'rxjs';
+import { DialogTemplateAssignServiceComponent } from 'src/app/dialogs/dialog-template-assign-services/dialog-template-assign-services.component';
 import { MasterService } from 'src/app/services/master.service';
 import { MytoastrService } from 'src/app/services/mytoastr';
 import { PersonService } from 'src/app/services/person.service';
@@ -21,6 +23,7 @@ export class AssingMassiveComponent implements OnInit {
   public disableEntities = false;
 
   public persons: any[] = [];
+  public isDragOver: boolean = false;
 
   // propiedades para la carga de un archivo excel
   public showExcelUpload: boolean = false;
@@ -37,7 +40,9 @@ export class AssingMassiveComponent implements OnInit {
     private router: Router,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
-    private cookies: CookieService
+    private cookies: CookieService,
+    private dialog: MatDialog,
+
   ) { }
 
   /****************************************** METODOS INICIALES **********************************************/
@@ -51,7 +56,7 @@ export class AssingMassiveComponent implements OnInit {
   listData() {
     this.spinner.spinnerOnOff();
     forkJoin([
-      this.personService.getPerson('RECAUDADORA DE SERVICIOS',undefined,true)
+      this.personService.getPerson('RECAUDADORA DE SERVICIOS', undefined, true)
     ]).subscribe({
       next: (response) => {
         const [person] = response;
@@ -80,7 +85,7 @@ export class AssingMassiveComponent implements OnInit {
   }
 
   // Método para procesar el archivo Excel
-  async   processExcelFile() {
+  async processExcelFile() {
     if (!this.selectedFile) {
       this.mytoastr.showWarning('Error', 'Por favor seleccione un archivo');
       return;
@@ -229,8 +234,9 @@ export class AssingMassiveComponent implements OnInit {
       codProveedor: item.codProveedor,
       status: item.status,
       ownComissionType: item.ownComissionType,
-      ownFixedComission: item.ownFixedComission,
-      ownPCTComission: item.ownPCTComission,
+      ownComission: item.ownComission,
+      ownComission2: item.ownComission2,
+      ownCriterionComission: item.ownCriterionComission,
       zone: item.zone
     }));
   }
@@ -238,23 +244,24 @@ export class AssingMassiveComponent implements OnInit {
   // Método para convertir datos de Excel al formato de asignación
   convertExcelToAssignmentFormat(excelData: any[]): any[] {
     const idProvider = "00000100"; // ID fijo del proveedor
-    const REQUIRED_COLUMNS = [  "CÓDIGO DE SERVICIO",  "NOMBRE DE SERVICIO",  "CODIGO DE SERVICIO DEL PROVEEDOR",  "CODIGO DEL PROVEEDOR",  
-      "ESTADO", "TIPO DE COMISION", "VALOR DE COMISION"
+    const REQUIRED_COLUMNS = ["CÓDIGO DE SERVICIO", "NOMBRE DE SERVICIO", "CODIGO DE SERVICIO DEL PROVEEDOR", "CODIGO DEL PROVEEDOR",
+      "ESTADO", "TIPO DE COMISION", "VALOR DE COMISION PRINCIPAL"
     ];
 
-      // Validar que haya datos
-      if (!excelData || excelData.length === 0) {
-        this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
-        return [];
-      }
+    // Validar que haya datos
+    if (!excelData || excelData.length === 0) {
+      this.mytoastr.showWarning('Error', 'El archivo Excel está vacío.');
+      return [];
+    }
 
-      // Validar que todas las columnas requeridas estén presentes
-      const headers = Object.keys(excelData[0]);
-      const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
-      if (missingColumns.length > 0) {
-        this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
-        return [];
-      }
+    // Validar que todas las columnas requeridas estén presentes
+    const headers = Object.keys(excelData[0]);
+    const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
+    if (missingColumns.length > 0) {
+      this.mytoastr.showWarning('Error', `Faltan las siguientes columnas requeridas: ${missingColumns.join(", ")}`);
+      return [];
+    }
+
     return excelData.map(row => {
       const jsonObj = {
         idProvider: idProvider,
@@ -269,13 +276,19 @@ export class AssingMassiveComponent implements OnInit {
         ownFixedComission: "",
         ownCriterionComission: "",
         ownPCTComission: "",
+        ownComissionRange: "",
+        ownComission: row["VALOR DE COMISION PRINCIPAL"] || "",
+        ownComission2: row["VALOR DE COMISION SECUNDARIA"] || "",
+        comissionRange: "",
         ownComissionType: "",
         comissionFixed: "",
         comissionPCT: "",
       };
 
       const tipoComision = row["TIPO DE COMISION"] || "";
-      const valorComision = row["VALOR DE COMISION"] || "";
+      const valorComision = row["VALOR DE COMISION PRINCIPAL"] || "";
+      const valorComision2 = row["VALOR DE COMISION SECUNDARIA"] || "";
+      const valorCriterio = row["CRITERIO DE COMISION"] || "";
 
       // Lógica de comisiones del script original
       if (tipoComision === "Comisión fija") {
@@ -289,6 +302,21 @@ export class AssingMassiveComponent implements OnInit {
         jsonObj.comissionPCT = valorComision;
       } else if (tipoComision === "Comisión Múltiple") {
         jsonObj.ownComissionType = "MULTIPLE";
+        jsonObj.ownPCTComission = valorComision2;
+        jsonObj.comissionPCT = valorComision2;
+
+        jsonObj.comissionFixed = valorComision;
+        jsonObj.ownFixedComission = valorComision;
+
+        jsonObj.ownCriterionComission = valorCriterio;
+      } else if (tipoComision === "Comisión fija segun monto") {
+        jsonObj.ownComissionType = "RANGO";
+
+        const comisionRange = JSON.stringify({ upper: Number.parseFloat(valorComision2), lower: Number.parseFloat(valorComision) });
+        jsonObj.comissionRange = comisionRange;
+        jsonObj.ownComissionRange = comisionRange;
+
+        jsonObj.ownCriterionComission = valorCriterio;
       }
 
       return jsonObj;
@@ -296,5 +324,50 @@ export class AssingMassiveComponent implements OnInit {
   }
 
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
 
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      const validExtensions = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+      ];
+
+      if (validExtensions.includes(file.type)) {
+        this.selectedFile = file;
+      } else {
+        console.error('Archivo inválido');
+      }
+    }
+  }
+  downloadTemplate() {
+    const dialogRef = this.dialog.open(DialogTemplateAssignServiceComponent
+      , {
+        width: '900px',
+        maxHeight: '80vh'
+      });
+
+    dialogRef.afterClosed().subscribe(result => {
+
+    });
+  }
 }
