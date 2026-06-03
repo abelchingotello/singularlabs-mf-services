@@ -17,6 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogServiceConfigComponent } from './dialogs/dialog-service-config/dialog-service-config.component';
 import { DialogServiceAssignProviderStatusComponent } from './dialogs/dialog-service-assign-provider-status/dialog-service-assign-provider-status.component';
+import { DialogTemplateAssignServiceComponent } from './dialogs/dialog-template-assign-services/dialog-template-assign-services.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { DialogServiceAssignProviderStatusComponent } from './dialogs/dialog-ser
     DialogServiceAssignProviderStatusComponent,
     DialogCommissionAssingServiceComponent,
     DialogServiceConfigComponent,
+    DialogTemplateAssignServiceComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,127 @@
+<div class="bg-dialog mb-3 p-3">
+    <h3 class="m-0" style="color: #fff !important;">PLANTILLA PARA ASIGNACIÓN MASIVA DE SERVICIOS</h3>
+</div>
+<div class="p-3">
+
+    <p>
+        Para realizar una carga masiva de asignaciones, descargue y complete la plantilla Excel
+        respetando el formato de las columnas indicadas a continuación.
+    </p>
+
+    <h4>
+        <mat-icon>table_chart</mat-icon>
+        Columnas requeridas
+    </h4>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Columna</th>
+                <th>Descripción</th>
+                <th>Requerido</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>CÓDIGO DE SERVICIO</code></td>
+                <td>Identificador único del servicio</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>NOMBRE DE SERVICIO</code></td>
+                <td>Nombre descriptivo del servicio</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>CODIGO DE SERVICIO DEL PROVEEDOR</code></td>
+                <td>Código del servicio asignado por el proveedor</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>CODIGO DEL PROVEEDOR</code></td>
+                <td>Código identificador del proveedor</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>ESTADO</code></td>
+                <td>Estado del servicio (ej: ACTIVO / INACTIVO)</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>TIPO DE COMISION</code></td>
+                <td>Tipo de comisión aplicada (ver sección inferior)</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>VALOR DE COMISION PRINCIPAL</code></td>
+                <td>Valor numérico de la comisión principal</td>
+                <td><mat-icon>check_circle</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>VALOR DE COMISION SECUNDARIA</code></td>
+                <td>Valor numérico de la comisión secundaria (según tipo)</td>
+                <td><mat-icon>remove_circle_outline</mat-icon></td>
+            </tr>
+            <tr>
+                <td><code>CRITERIO DE COMISION</code></td>
+                <td>Criterio aplicado para comisiones múltiples o por rango</td>
+                <td><mat-icon>remove_circle_outline</mat-icon></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>
+        <mat-icon>monetization_on</mat-icon>
+        ¿Cómo llenar las comisiones?
+    </h4>
+
+    <p>
+        El campo <strong>TIPO DE COMISION</strong> determina qué otros campos deben completarse.
+        Use exactamente los valores indicados a continuación:
+    </p>
+
+    <p><strong>Comisión fija</strong> — valor exacto: <code>Comisión fija</code></p>
+    <ul>
+        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo (ej: <code>0.6</code>)</li>
+        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> no requerido</li>
+        <li><strong>CRITERIO DE COMISION:</strong> no requerido</li>
+    </ul>
+
+    <p><strong>Comisión porcentual</strong> — valor exacto: <code>Comisión porcentual sobre el monto</code></p>
+    <ul>
+        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> porcentaje (ej: <code>0.001</code>)</li>
+        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> no requerido</li>
+        <li><strong>CRITERIO DE COMISION:</strong> no requerido</li>
+    </ul>
+
+    <p><strong>Comisión Múltiple</strong> — valor exacto: <code>Comisión Múltiple</code></p>
+    <ul>
+        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo (ej: <code>0.6</code>)</li>
+        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> porcentaje (ej: <code>0.001</code>)</li>
+        <li><strong>CRITERIO DE COMISION:</strong> criterio de aplicación (ej: <code>100</code>)</li>
+    </ul>
+
+    <p><strong>Comisión fija según monto</strong> — valor exacto: <code>Comisión fija segun monto</code></p>
+    <ul>
+        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo inferior del rango (ej: <code>1.3</code>)</li>
+        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> monto fijo superior del rango (ej: <code>1.7</code>)</li>
+        <li><strong>CRITERIO DE COMISION:</strong> criterio de aplicación (ej: <code>30</code>)</li>
+    </ul>
+
+    <p>
+        <mat-icon>warning</mat-icon>
+        Los nombres de las columnas deben coincidir <strong>exactamente</strong> con los indicados
+        (mayúsculas, tildes y espacios). De lo contrario el archivo será rechazado.
+    </p>
+
+    <mat-dialog-actions align="end">
+        <button mat-button class="btn btn-default2" (click)="onNoClick()">
+            <mat-icon>close</mat-icon>
+            Cerrar
+        </button>
+        <button mat-button class="btn btn-default3" (click)="download()">
+            <mat-icon>download</mat-icon>
+            Descargar Plantilla
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -15,5 +15,7 @@ export interface ServiceTableInterface {//Interface para el servicio de obtener 
     id_serviceProv: string;
     fixedcomission: number;//fixedcomission
     pctcomission: number;//pctcomission
-
+    typeComission: string;
+    rangecomission: string;
+    comissionCriterion: number;
 }
