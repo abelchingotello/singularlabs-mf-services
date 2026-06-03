@@ -77,7 +77,7 @@ export class ImportServicesComponent implements OnInit {
   }
 
   confirmIdClient() {
-    if (!this.requiredIdClient.trim()) {
+    if (!this.requiredIdClient?.trim()) {
       this.mytoastr.showWarning('Error', 'Debe ingresar un ID Cliente válido');
       return;
     }
