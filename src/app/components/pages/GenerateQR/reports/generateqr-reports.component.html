@@ -155,7 +155,7 @@
         <div class="reports-table-wrap">
           <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr"
             [refreshFunction]="searchData.bind(this)" [currentPageIndex]="page - 1" [pageSizeOptions]="[5, 10, 20, 50]" (pageChange)="onPageChange($event)" [lengthTable]="count"
-            (clickButtonEvent)="clickButton($event)" [showExport]="false">
+            (clickButtonEvent)="clickButton($event)"  [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="true" >
           </uni-dynamic-table>
         </div>
       </mat-card-content>
