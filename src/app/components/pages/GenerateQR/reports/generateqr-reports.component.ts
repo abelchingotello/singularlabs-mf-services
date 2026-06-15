@@ -76,7 +76,7 @@ export class GenerateQrReportsComponent implements OnInit {
             value: 'view_detail'
           },
           {
-            hide: false,
+            hide: this.route.snapshot.data?.['reportMode'] === 'external' ,
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
