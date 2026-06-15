@@ -67,23 +67,24 @@ export class GenerateQrReportsComponent implements OnInit {
       attribute: '',
       config: {
         type: 'buttonicons',
+        restriccPermission: true,
         actions: [
           {
-            hide: false,
+            permission: "qr-view-detail",
             bgClass: 'gray',
             toolTip: 'Ver detalles',
             icon: 'visibility',
             value: 'view_detail'
           },
           {
-            hide: false,
+            permission: "qr-mark-returned",
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
             value: 'mark_returned'
           },
           {
-            hide: false,
+            permission: "qr-cancel",
             bgClass: 'red',
             toolTip: 'Anular QR',
             icon: 'cancel',
