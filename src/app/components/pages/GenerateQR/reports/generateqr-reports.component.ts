@@ -67,7 +67,6 @@ export class GenerateQrReportsComponent implements OnInit {
       attribute: '',
       config: {
         type: 'buttonicons',
-        restriccPermission: true,
         actions: [
           {
             hide: false,
@@ -77,7 +76,7 @@ export class GenerateQrReportsComponent implements OnInit {
             value: 'view_detail'
           },
           {
-            permission: "qr-mark-returned",
+            hide: false,
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
