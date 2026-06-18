@@ -1062,6 +1062,7 @@ export class GenerateQR implements OnInit {
     if (exportFilters['empresa'] && !exportFilters['servicio']) {
       exportFilters['servicio'] = exportFilters['empresa'];
     }
+    exportFilters['export'] = true;
 
     const inbx = 'generate_qr';
     const token = localStorage.getItem('fcmToken');

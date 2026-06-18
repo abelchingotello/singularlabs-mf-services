@@ -730,6 +730,7 @@ export class GenerateQrReportsComponent implements OnInit {
     if (exportFilters['empresa'] && !exportFilters['servicio']) {
       exportFilters['servicio'] = exportFilters['empresa'];
     }
+    exportFilters['export'] = true;
 
     const token = localStorage.getItem('fcmToken');
     const inbx = this.reportMode === 'external' ? 'generate_pago_external_qr' : 'generate_pago_qr';
