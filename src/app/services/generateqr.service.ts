@@ -344,7 +344,8 @@ export class GenerateQrService {
     format: 'xlsx' | 'csv',
     filters: Record<string, any>,
     bandeja: string,
-    token: any
+    token: any,
+    idClient?: string
   ): Observable<any> {
     let params = new HttpParams();
 
@@ -360,6 +361,9 @@ export class GenerateQrService {
     params = params.set('format', format);
     params = params.set('inbx', bandeja);
     params = params.set('token', token);
+    if (idClient !== undefined && idClient !== null) {
+      params = params.set('idClient', idClient);
+    }
 
     return this.httpClient.get(`${this.URL1}`, { params });
   }

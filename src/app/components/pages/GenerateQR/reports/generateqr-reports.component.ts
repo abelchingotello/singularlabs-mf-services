@@ -67,23 +67,24 @@ export class GenerateQrReportsComponent implements OnInit {
       attribute: '',
       config: {
         type: 'buttonicons',
+        restriccPermission: true,
         actions: [
           {
-            hide: false,
+            permission: "qr-view-detail",
             bgClass: 'gray',
             toolTip: 'Ver detalles',
             icon: 'visibility',
             value: 'view_detail'
           },
           {
-            hide: false,
+            permission: "qr-mark-returned",
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
             value: 'mark_returned'
           },
           {
-            hide: false,
+            permission: "qr-cancel",
             bgClass: 'red',
             toolTip: 'Anular QR',
             icon: 'cancel',
@@ -710,6 +711,47 @@ export class GenerateQrReportsComponent implements OnInit {
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${MM}-${dd}`;
   }
+  
+  exportDataViaAPI(fileType: 'xlsx' | 'csv'): void {
+    console.log('exportDataViaAPI called with', fileType);
+    this.spinner.spinnerOnOff();
+
+    const exportFilters: Record<string, any> = Object.keys(this.listFilters || {}).length
+      ? { ...this.listFilters }
+      : this.buildListFilters();
+
+    // alias keys for backend compatibility
+    if (exportFilters['estado'] && !exportFilters['estadoPago']) {
+      exportFilters['estadoPago'] = exportFilters['estado'];
+    }
+    if (exportFilters['estado_vigencia'] && !exportFilters['vigencia']) {
+      exportFilters['vigencia'] = exportFilters['estado_vigencia'];
+    }
+    if (exportFilters['empresa'] && !exportFilters['servicio']) {
+      exportFilters['servicio'] = exportFilters['empresa'];
+    }
+    exportFilters['export'] = true;
+
+    const token = localStorage.getItem('fcmToken');
+    const inbx = this.reportMode === 'external' ? 'generate_pago_external_qr' : 'generate_pago_qr';
+
+    this.generateQrService.exportServices(fileType, exportFilters, inbx, token, this.personId).subscribe({
+      next: (response) => {
+        this.spinner.spinnerOnOff();
+        if (response.statusCode === 200) {
+          this.mytoastr.showWarning('', 'Procesando Archivo...')
+        } else {
+          this.mytoastr.showError('', 'Error al enviar la solicitud')
+        }
+      },
+      error: (error) => {
+        this.spinner.spinnerOnOff();
+        console.error('Error durante la exportación:', error);
+        this.mytoastr.showError('Error durante la exportación', '');
+      }
+    });
+  }
 }
+
 
 

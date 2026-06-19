@@ -1019,6 +1019,13 @@ export class GenerateQR implements OnInit {
     this.listFilters = {};
     this.selectedCategory = false;
     this.listServicesSelected = [];
+    this.cargarServicios();
+    // Suscribirse a cambios y convertir a mayusculas
+    this.service_name?.valueChanges.subscribe(value => {
+      if (value) {
+        this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
+      }
+    });
     this.dataInitial(this.pageSize);
   }
 
@@ -1055,6 +1062,7 @@ export class GenerateQR implements OnInit {
     if (exportFilters['empresa'] && !exportFilters['servicio']) {
       exportFilters['servicio'] = exportFilters['empresa'];
     }
+    exportFilters['export'] = true;
 
     const inbx = 'generate_qr';
     const token = localStorage.getItem('fcmToken');
