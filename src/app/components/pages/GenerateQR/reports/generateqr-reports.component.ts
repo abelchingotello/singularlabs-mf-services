@@ -77,19 +77,19 @@ export class GenerateQrReportsComponent implements OnInit {
             value: 'view_detail'
           },
           {
+            permission: "qr-cancel",
+            bgClass: 'red',
+            toolTip: 'Anular QR',
+            icon: 'cancel',
+            value: 'cancel_qr'
+          },
+          {
             permission: "qr-mark-returned",
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
             value: 'mark_returned'
           },
-          {
-            permission: "qr-cancel",
-            bgClass: 'red',
-            toolTip: 'Anular QR',
-            icon: 'cancel',
-            value: 'cancel_qr'
-          }
         ]
       }
     }
@@ -113,6 +113,7 @@ export class GenerateQrReportsComponent implements OnInit {
   private detailDialogRef?: MatDialogRef<any>;
   private historyDialogRef?: MatDialogRef<any>;
   private markReturnedDialogRef?: MatDialogRef<any>;
+  private markReturnedBlockedDialogRef?: MatDialogRef<any>;
   private cancelDialogRef?: MatDialogRef<any>;
   private cancelBlockedDialogRef?: MatDialogRef<any>;
   public notificationHistory: any = null;
@@ -128,6 +129,11 @@ export class GenerateQrReportsComponent implements OnInit {
   public filterServiceSelected: ServiceItem | null = null;
   private readonly personId: string;
   private reportMode: 'internal' | 'external' = 'internal';
+  public headSubTitleAnulado: string = '';
+  public contentSubTitleAnulado: string = '';
+  public headSubTitleReturned: string = '';
+  public contentSubTitleReturned: string = '';
+  
 
   get showNotificationHistoryAction(): boolean {
     return this.reportMode !== 'external';
@@ -154,6 +160,7 @@ export class GenerateQrReportsComponent implements OnInit {
   @ViewChild('markReturnedDialog') markReturnedDialog!: TemplateRef<any>;
   @ViewChild('cancelDialog') cancelDialog!: TemplateRef<any>;
   @ViewChild('cancelBlockedDialog') cancelBlockedDialog!: TemplateRef<any>;
+  @ViewChild('markReturnedBlockedDialog') markReturnedBlockedDialog!: TemplateRef<any>;
 
   constructor(
     private fb: FormBuilder,
@@ -367,19 +374,31 @@ export class GenerateQrReportsComponent implements OnInit {
     this.cancelRow = row;
     const estadoPago = String(row?.estado_pago_text || '').toLowerCase();
     const estadoPagoRaw = row?.estado_pago_raw;
+    const estadoVigencia = String(row?.estado_vigencia || '').toLowerCase();
     if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
+      this.headSubTitleAnulado = "El QR esta en estado pagado."
+      this.contentSubTitleAnulado = "Para anular un QR pagado primero debes marcarlo como devuelto."
       this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
         width: '480px',
         maxWidth: '95vw',
         panelClass: 'qr-dialog'
       });
-      return;
+    }else if( estadoVigencia === "anulado" ){
+      this.headSubTitleAnulado = "El QR ya se encuentra en estado anulado."
+      this.contentSubTitleAnulado = "No es necesario realizar ninguna acción adicional."
+      this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    }else{
+      this.cancelDialogRef = this.dialog.open(this.cancelDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
     }
-    this.cancelDialogRef = this.dialog.open(this.cancelDialog, {
-      width: '480px',
-      maxWidth: '95vw',
-      panelClass: 'qr-dialog'
-    });
+    return;
   }
 
   confirmCancel() {
@@ -394,8 +413,9 @@ export class GenerateQrReportsComponent implements OnInit {
       }))
       .subscribe({
         next: () => {
-          this.mytoastr.showSuccess('QR anulado', '');
+          this.mytoastr.showSuccess('QR anulado correctamente', '');
           this.cancelDialogRef?.close();
+          this.dataFilter = [];
           this.loadReports();
         },
         error: (err) => {
@@ -424,33 +444,64 @@ export class GenerateQrReportsComponent implements OnInit {
   }
 
   private openMarkReturnedDialog(row: any) {
-    this.pendingReturnRow = row;
-    this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
-      width: '480px',
-      maxWidth: '95vw',
-      panelClass: 'qr-dialog'
-    });
+    console.log('row devolver', row)
+    this.pendingReturnRow = String(row?.qr_id || row?.id || '');
+    if (!this.pendingReturnRow) {
+      this.mytoastr.showWarning('ID QR no disponible', '');
+      return;
+    }
+    
+    const estadoPago = String(row?.estado_pago_text || '').toLowerCase();
+    const estadoPagoRaw = row?.estado_pago_raw;
+    
+    if (estadoPago === 'devuelto' || estadoPagoRaw === 4 || estadoPagoRaw === '4') {
+      this.headSubTitleReturned = "El QR ya se encuentra en estado devuelto."
+      this.contentSubTitleReturned = "No es necesario realizar ninguna acción adicional."
+      this.markReturnedBlockedDialogRef = this.dialog.open(this.markReturnedBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    }else{
+      this.headSubTitleReturned = "Solo se puede actualizar cuando el estado es pagado, notificado no pagado o fallido."
+      this.contentSubTitleReturned = `La devolución debe gestionarse por el proceso correspondiente. ¿Deseas marcar como devuelto el QR ${this.pendingReturnRow}?`
+      this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
+        width: '480px',
+        maxWidth: '95vw',
+        panelClass: 'qr-dialog'
+      });
+    }
+    return;
   }
 
   confirmMarkReturned() {
-    const idQr = this.pendingReturnRow?.qr_id;
+    const idQr = this.pendingReturnRow;
     if (!idQr || this.isMarkingReturned) {
       return;
     }
     this.isMarkingReturned = true;
+    this.spinner.spinnerOnOff();
     const responsable = this.getResponsable();
     this.generateQrService.markReturned([String(idQr)], responsable)
       .pipe(finalize(() => {
         this.isMarkingReturned = false;
       }))
       .subscribe({
-        next: () => {
-          this.mytoastr.showWarning('Estado actualizado', '');
+        next: (rspta) => {
+          if ( rspta.dbUpdated === 1 ) {
+            this.mytoastr.showSuccess('QR devuelto correctamente', '');
+            this.spinner.spinnerOnOff();
+            this.dataFilter = []
+            this.loadReports();
+          }else{
+            this.mytoastr.showWarning('Error.', rspta.note);
+            this.spinner.spinnerOnOff();
+          }
           this.markReturnedDialogRef?.close();
-          this.loadReports();
         },
         error: (err) => {
           console.error(err);
+          this.spinner.spinnerOnOff();
           this.mytoastr.showError('Error al actualizar estado', '');
         }
       });
