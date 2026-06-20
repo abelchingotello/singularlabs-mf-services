@@ -286,34 +286,11 @@
       </div>
       <div class="qr-dialog-content">
         <mat-card class="qr-dialog-card">
-          <p>¿Seguro que deseas anular el QR <strong>{{ cancelRow?.qr_id || '-' }}</strong>?</p>
+          <p>¿Deseas anular el QR <strong>{{ cancelRow?.qr_id || '-' }}</strong>?</p>
           <div class="qr-dialog-actions">
             <button mat-button mat-dialog-close [disabled]="isCancelling">Cancelar</button>
             <button mat-raised-button color="warn" (click)="confirmCancel()" [disabled]="isCancelling">
               {{ isCancelling ? 'Anulando...' : 'Anular' }}
-            </button>
-          </div>
-        </mat-card>
-      </div>
-    </ng-template>
-
-    <ng-template #markReturnedDialog>
-      <div class="qr-dialog-header">
-        <div class="qr-dialog-icon">
-          <mat-icon>undo</mat-icon>
-        </div>
-        <div>
-          <div class="qr-dialog-title">Marcar devuelto</div>
-          <div class="qr-dialog-subtitle">Solo se puede actualizar cuando el estado es pagado y el estado anulado es vigente.</div>
-        </div>
-      </div>
-      <div class="qr-dialog-content">
-        <mat-card class="qr-dialog-card">
-          <p>¿Seguro que deseas marcar como devuelto el QR <strong>{{ pendingReturnRow?.qr_id || '-' }}</strong>?</p>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close [disabled]="isMarkingReturned">Cancelar</button>
-            <button mat-raised-button color="accent" (click)="confirmMarkReturned()" [disabled]="isMarkingReturned">
-              {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
             </button>
           </div>
         </mat-card>
@@ -327,15 +304,58 @@
         </div>
         <div>
           <div class="qr-dialog-title">No se puede anular</div>
-          <div class="qr-dialog-subtitle">El QR esta en estado pagado.</div>
+          <div class="qr-dialog-subtitle" >{{ headSubTitleAnulado }}</div>
         </div>
       </div>
       <div class="qr-dialog-content">
         <mat-card class="qr-dialog-card">
-          <p>Para anular un QR pagado primero debes marcarlo como <strong>devuelto</strong>.</p>
+          <p>{{ contentSubTitleAnulado }}</p>
           <div class="qr-dialog-actions">
             <button mat-button mat-dialog-close>Entendido</button>
           </div>
         </mat-card>
       </div>
     </ng-template>
+    
+    <ng-template #markReturnedDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>undo</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Marcar devuelto</div>
+          <div class="qr-result">{{ headSubTitleReturned }}</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>{{ contentSubTitleReturned }}</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close [disabled]="isMarkingReturned">Cancelar</button>
+            <button mat-raised-button color="accent" (click)="confirmMarkReturned()" [disabled]="isMarkingReturned">
+              {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+    
+  <ng-template #markReturnedBlockedDialog>
+    <div class="qr-dialog-header">
+      <div class="qr-dialog-icon">
+        <mat-icon>report_problem</mat-icon>
+      </div>
+      <div>
+        <div class="qr-dialog-title">No se puede devolver</div>
+        <div class="qr-dialog-subtitle">{{ headSubTitleReturned }}</div>
+      </div>
+    </div>
+    <div class="qr-dialog-content">
+      <mat-card class="qr-dialog-card">
+        <div class="qr-result">{{ contentSubTitleReturned }}</div>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Entendido</button>
+          </div>
+      </mat-card>
+    </div>
+  </ng-template>

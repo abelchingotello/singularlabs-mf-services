@@ -144,6 +144,7 @@ export class GenerateQR implements OnInit {
   public qrResult: any = null;
   public qrImageSrc: string = '';
   public pendingCancelId: string | null = null;
+  public pendingReturnRow: string | null = null;
   public massiveResult: any = null;
   public sftpItems: string[] = [];
   public massiveServiceFilter: string = '';
@@ -155,12 +156,18 @@ export class GenerateQR implements OnInit {
   private cancelDialogRef?: MatDialogRef<any>;
   private cancelBlockedDialogRef?: MatDialogRef<any>;
   private markReturnedDialogRef?: MatDialogRef<any>;
+  private markReturnedBlockedDialogRef?: MatDialogRef<any>;
   private qrMassiveDialogRef?: MatDialogRef<any>;
   public qrDialogMode: 'create' | 'view' = 'create';
   public isGeneratingQr: boolean = false;
   public isGeneratingMassive: boolean = false;
   public isCancellingQr: boolean = false;
   public isMarkingReturned: boolean = false;
+  public headSubTitleAnulado: string = '';
+  public contentSubTitleAnulado: string = '';
+  public headSubTitleReturned: string = '';
+  public contentSubTitleReturned: string = '';
+  
 
   private pagUtils: PaginationUtils | undefined;
   public page: number = 1; // Variable para la página actual
@@ -175,6 +182,7 @@ export class GenerateQR implements OnInit {
   @ViewChild('cancelBlockedDialog') cancelBlockedDialog!: TemplateRef<any>;
   @ViewChild('markReturnedDialog') markReturnedDialog!: TemplateRef<any>;
   @ViewChild('generateQrMassiveDialog') generateQrMassiveDialog!: TemplateRef<any>;
+  @ViewChild('markReturnedBlockedDialog') markReturnedBlockedDialog!: TemplateRef<any>;
 
 
   constructor(
@@ -278,9 +286,6 @@ export class GenerateQR implements OnInit {
     return this.filterServiceSelected?.name || '';
   }
 
-
-
-
   openCancelQrDialog(element: any) {
     this.pendingCancelId = String(element?.id_qr || element?.id || '');
     if (!this.pendingCancelId) {
@@ -289,19 +294,31 @@ export class GenerateQR implements OnInit {
     }
     const estadoPago = String(element?.estado_pago_label || '').toLowerCase();
     const estadoPagoRaw = element?.estado_pago;
+    const estadoVigencia = String(element?.estado_vigencia || '').toLowerCase();
     if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
+      this.headSubTitleAnulado = "El QR esta en estado pagado."
+      this.contentSubTitleAnulado = "Para anular un QR pagado primero debes marcarlo como devuelto."
+      this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
+        width: '480px',
+        maxWidth: '95vw',
+        panelClass: 'qr-dialog'
+      });
+    }else if( estadoVigencia === "anulado" ){
+      this.headSubTitleAnulado = "El QR ya se encuentra en estado anulado."
+      this.contentSubTitleAnulado = "No es necesario realizar ninguna acción adicional."
       this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
         width: '420px',
         maxWidth: '92vw',
         panelClass: 'qr-dialog'
       });
-      return;
+    }else{
+      this.cancelDialogRef = this.dialog.open(this.cancelQrDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
     }
-    this.cancelDialogRef = this.dialog.open(this.cancelQrDialog, {
-      width: '420px',
-      maxWidth: '92vw',
-      panelClass: 'qr-dialog'
-    });
+      return;
   }
 
   confirmCancelQr() {
@@ -318,7 +335,7 @@ export class GenerateQR implements OnInit {
     ).subscribe({
       next: (response) => {
         this.spinner.spinnerOnOff();
-        this.mytoastr.showWarning('QR anulado', '');
+        this.mytoastr.showSuccess('QR anulado correctamente', '');
         if (this.cancelDialogRef) {
           this.cancelDialogRef.close();
         }
@@ -333,37 +350,60 @@ export class GenerateQR implements OnInit {
   }
 
   openMarkReturnedDialog(element: any) {
-    this.pendingCancelId = String(element?.id_qr || element?.id || '');
-    if (!this.pendingCancelId) {
+    this.pendingReturnRow = String(element?.id_qr || element?.id || '');
+    if (!this.pendingReturnRow) {
       this.mytoastr.showWarning('ID QR no disponible', '');
       return;
     }
-    this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
-      width: '460px',
-      maxWidth: '92vw',
-      panelClass: 'qr-dialog'
-    });
+    
+    const estadoPago = String(element?.estado_pago_label || '').toLowerCase();
+    const estadoPagoRaw = element?.estado_pago;
+    
+    if (estadoPago === 'devuelto' || estadoPagoRaw === 4 || estadoPagoRaw === '4') {
+      this.headSubTitleReturned = "El QR ya se encuentra en estado devuelto."
+      this.contentSubTitleReturned = "No es necesario realizar ninguna acción adicional."
+      this.markReturnedBlockedDialogRef = this.dialog.open(this.markReturnedBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    }else{
+      this.headSubTitleReturned = "Solo se puede actualizar cuando el estado es pagado, notificado no pagado o fallido."
+      this.contentSubTitleReturned = `La devolución debe gestionarse por el proceso correspondiente. ¿Deseas marcar como devuelto el QR ${this.pendingReturnRow}?`
+      this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
+        width: '480px',
+        maxWidth: '95vw',
+        panelClass: 'qr-dialog'
+      });
+    }
+      return;
+    
   }
 
   confirmMarkReturned() {
-    if (!this.pendingCancelId || this.isMarkingReturned) {
+    if (!this.pendingReturnRow || this.isMarkingReturned) {
       return;
     }
     this.isMarkingReturned = true;
     this.spinner.spinnerOnOff();
     const responsable = this.getResponsable();
-    this.generateQrService.markReturned([this.pendingCancelId], responsable).pipe(
+    this.generateQrService.markReturned([this.pendingReturnRow], responsable).pipe(
       finalize(() => {
         this.isMarkingReturned = false;
       })
     ).subscribe({
-      next: () => {
-        this.spinner.spinnerOnOff();
-        this.mytoastr.showWarning('Estado actualizado', '');
+      next: (rspta) => {
+        if ( rspta.dbUpdated === 1 ) {
+          this.mytoastr.showSuccess('QR devuelto correctamente', '');
+          this.spinner.spinnerOnOff();
+          this.reload();
+        }else{
+          this.mytoastr.showWarning('Error.', rspta.note);
+          this.spinner.spinnerOnOff();
+        }
         if (this.markReturnedDialogRef) {
           this.markReturnedDialogRef.close();
         }
-        this.reload();
       },
       error: (err) => {
         console.error(err);
