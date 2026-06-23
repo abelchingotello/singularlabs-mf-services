@@ -90,6 +90,13 @@ export class GenerateQrReportsComponent implements OnInit {
             icon: 'undo',
             value: 'mark_returned'
           },
+          {
+            permission: "qr-re-notify",
+            bgClass: 'teal',//teal
+            toolTip: 'Re notificar',
+            icon: 'content_paste_go',
+            value: 're_notify'
+          },
         ]
       }
     }
@@ -114,12 +121,15 @@ export class GenerateQrReportsComponent implements OnInit {
   private historyDialogRef?: MatDialogRef<any>;
   private markReturnedDialogRef?: MatDialogRef<any>;
   private markReturnedBlockedDialogRef?: MatDialogRef<any>;
+  private reNotifyDialogRef?: MatDialogRef<any>;
+  private reNotifyBlockedDialogRef?: MatDialogRef<any>;
   private cancelDialogRef?: MatDialogRef<any>;
   private cancelBlockedDialogRef?: MatDialogRef<any>;
   public notificationHistory: any = null;
   public notificationItems: any[] = [];
   public isLoadingHistory: boolean = false;
   public isMarkingReturned: boolean = false;
+  public isReNotified: boolean = false;
   public pendingReturnRow: any = null;
   public isCancelling: boolean = false;
   public cancelRow: any = null;
@@ -130,6 +140,8 @@ export class GenerateQrReportsComponent implements OnInit {
   private readonly personId: string;
   private reportMode: 'internal' | 'external' = 'internal';
   public headSubTitleAnulado: string = '';
+  public headSubTitleReNotify: string = '';
+  public contentSubTitleReNotify: string = '';
   public contentSubTitleAnulado: string = '';
   public headSubTitleReturned: string = '';
   public contentSubTitleReturned: string = '';
@@ -158,6 +170,8 @@ export class GenerateQrReportsComponent implements OnInit {
   @ViewChild('detailDialog') detailDialog!: TemplateRef<any>;
   @ViewChild('notificationHistoryDialog') notificationHistoryDialog!: TemplateRef<any>;
   @ViewChild('markReturnedDialog') markReturnedDialog!: TemplateRef<any>;
+  @ViewChild('reNotifyDialog') reNotifyDialog!: TemplateRef<any>;
+  @ViewChild('reNotifyBlockedDialog') reNotifyBlockedDialog!: TemplateRef<any>;
   @ViewChild('cancelDialog') cancelDialog!: TemplateRef<any>;
   @ViewChild('cancelBlockedDialog') cancelBlockedDialog!: TemplateRef<any>;
   @ViewChild('markReturnedBlockedDialog') markReturnedBlockedDialog!: TemplateRef<any>;
@@ -246,6 +260,9 @@ export class GenerateQrReportsComponent implements OnInit {
     }
     if (value === 'mark_returned') {
       this.openMarkReturnedDialog(element);
+    }
+    if (value === 're_notify') {
+      this.openReNotifyDialog(element);
     }
   }
 
@@ -376,15 +393,15 @@ export class GenerateQrReportsComponent implements OnInit {
     const estadoPagoRaw = row?.estado_pago_raw;
     const estadoVigencia = String(row?.estado_vigencia || '').toLowerCase();
     if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
-      this.headSubTitleAnulado = "El QR esta en estado pagado."
-      this.contentSubTitleAnulado = "Para anular un QR pagado primero debes marcarlo como devuelto."
+      this.headSubTitleAnulado = "El QR se encuentra en estado de pago pagado."
+      this.contentSubTitleAnulado = "Para anular un QR en estado pagado, primero debes marcarlo como devuelto."
       this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
         width: '480px',
         maxWidth: '95vw',
         panelClass: 'qr-dialog'
       });
     }else if( estadoVigencia === "anulado" ){
-      this.headSubTitleAnulado = "El QR ya se encuentra en estado anulado."
+      this.headSubTitleAnulado = "El QR ya se encuentra en estado de vigencia anulado."
       this.contentSubTitleAnulado = "No es necesario realizar ninguna acción adicional."
       this.cancelBlockedDialogRef = this.dialog.open(this.cancelBlockedDialog, {
         width: '420px',
@@ -455,16 +472,24 @@ export class GenerateQrReportsComponent implements OnInit {
     const estadoPagoRaw = row?.estado_pago_raw;
     
     if (estadoPago === 'devuelto' || estadoPagoRaw === 4 || estadoPagoRaw === '4') {
-      this.headSubTitleReturned = "El QR ya se encuentra en estado devuelto."
+      this.headSubTitleReturned = "El QR ya se encuentra en estado de pago devuelto."
       this.contentSubTitleReturned = "No es necesario realizar ninguna acción adicional."
       this.markReturnedBlockedDialogRef = this.dialog.open(this.markReturnedBlockedDialog, {
         width: '420px',
         maxWidth: '92vw',
         panelClass: 'qr-dialog'
       });
-    }else{
-      this.headSubTitleReturned = "Solo se puede actualizar cuando el estado es pagado, notificado no pagado o fallido."
-      this.contentSubTitleReturned = `La devolución debe gestionarse por el proceso correspondiente. ¿Deseas marcar como devuelto el QR ${this.pendingReturnRow}?`
+    }else if (estadoPago === 'pendiente' || estadoPagoRaw === 0 || estadoPagoRaw === '0') {
+      this.headSubTitleReturned = "Solo es posible marcar como devuelto un QR en estado pagado, notificado no pagado o fallido."
+      this.contentSubTitleReturned = "El estado de pago actual del QR es pendiente."
+      this.markReturnedBlockedDialogRef = this.dialog.open(this.markReturnedBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    } else{
+      this.headSubTitleReturned = "Esta acción solo actualizará el estado del QR en el sistema."
+      this.contentSubTitleReturned = `La devolución del pago debe gestionarse por el proceso correspondiente. ¿Deseas marcar como devuelto el QR ${this.pendingReturnRow}?`
       this.markReturnedDialogRef = this.dialog.open(this.markReturnedDialog, {
         width: '480px',
         maxWidth: '95vw',
@@ -507,6 +532,73 @@ export class GenerateQrReportsComponent implements OnInit {
       });
   }
 
+
+  private openReNotifyDialog(row: any) {
+    console.log('row a renotificar', row)
+    this.pendingReturnRow = String(row?.qr_id || row?.id || '');
+    if (!this.pendingReturnRow) {
+      this.mytoastr.showWarning('ID QR no disponible', '');
+      return;
+    }
+    
+    const estadoPago = String(row?.estado_pago_text || '').toLowerCase();
+    const estadoPagoRaw = row?.estado_pago_raw;
+    
+    if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
+      this.headSubTitleReNotify = "Se enviará nuevamente la notificación de pago al cliente externo."
+      this.contentSubTitleReNotify = `¿Deseas renotificar el QR ${this.pendingReturnRow}?`
+      this.reNotifyDialogRef = this.dialog.open(this.reNotifyDialog, {
+        width: '480px',
+        maxWidth: '95vw',
+        panelClass: 'qr-dialog'
+      });
+    }else{
+      this.headSubTitleReNotify = "Solo es posible re notificar un QR en estado pagado."
+      this.contentSubTitleReNotify = `El estado de pago actual del QR es ${estadoPago}`
+      this.reNotifyBlockedDialogRef = this.dialog.open(this.reNotifyBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    }
+    return;
+  }
+  
+  confirmReNotify() {
+    const idQr = this.pendingReturnRow;
+    if (!idQr || this.isReNotified) {
+      return;
+    }
+    this.isReNotified = true;
+    this.spinner.spinnerOnOff();
+    const responsable = this.getResponsable();
+    
+    const request$ = this.reportMode === 'external'
+      ? this.generateQrService.reNotifyByExternalUser(String(idQr), responsable)
+      : this.generateQrService.reNotifyByInternalUser(String(idQr), responsable);
+
+    request$.pipe(
+      finalize(() => this.isReNotified = false)
+    ).subscribe({
+      next: (rspta) => {
+        if ( rspta.status === "ok" ) {
+          this.mytoastr.showSuccess('QR re procesada correctamente', '');
+          this.spinner.spinnerOnOff();
+          //this.dataFilter = []
+          //this.loadReports();
+        }else{
+          this.mytoastr.showWarning('Error.', rspta.note);
+          this.spinner.spinnerOnOff();
+        }
+        this.reNotifyDialogRef?.close();
+      },
+      error: (err) => {
+        console.error(err);
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showError('Error al reprocesar', '');
+      }
+    });
+  }
   downloadDetailQrImage() {
     if (!this.detailQrImage) {
       return;
@@ -540,7 +632,7 @@ export class GenerateQrReportsComponent implements OnInit {
       return;
     }
     const request$ = this.reportMode === 'external'
-      ? this.generateQrService.listExternalReports(page, this.pageSize, this.listFilters, this.personId)
+      ? this.generateQrService.listExternalReports(page, this.pageSize, this.listFilters)
       : this.generateQrService.listReports(page, this.pageSize, this.listFilters);
 
     request$.pipe(
@@ -786,7 +878,7 @@ export class GenerateQrReportsComponent implements OnInit {
     const token = localStorage.getItem('fcmToken');
     const inbx = this.reportMode === 'external' ? 'generate_pago_external_qr' : 'generate_pago_qr';
 
-    this.generateQrService.exportServices(fileType, exportFilters, inbx, token, this.personId).subscribe({
+    this.generateQrService.exportServices(fileType, exportFilters, inbx, token).subscribe({
       next: (response) => {
         this.spinner.spinnerOnOff();
         if (response.statusCode === 200) {

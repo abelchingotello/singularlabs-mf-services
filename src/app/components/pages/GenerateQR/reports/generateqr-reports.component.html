@@ -346,13 +346,56 @@
         <mat-icon>report_problem</mat-icon>
       </div>
       <div>
-        <div class="qr-dialog-title">No se puede devolver</div>
+        <div class="qr-dialog-title">No se puede marcar como devuelto</div>
         <div class="qr-dialog-subtitle">{{ headSubTitleReturned }}</div>
       </div>
     </div>
     <div class="qr-dialog-content">
       <mat-card class="qr-dialog-card">
         <div class="qr-result">{{ contentSubTitleReturned }}</div>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Entendido</button>
+          </div>
+      </mat-card>
+    </div>
+  </ng-template>
+
+    <ng-template #reNotifyDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>content_paste_go</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Re notificar pago al cliente externo</div>
+          <div class="qr-result">{{ headSubTitleReNotify }}</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>{{ contentSubTitleReNotify }}</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close [disabled]="isReNotified">Cancelar</button>
+            <button mat-raised-button color="accent" (click)="confirmReNotify()" [disabled]="isReNotified">
+              {{ isReNotified ? 'Re notificando...' : 'Re notificar' }}
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+    
+  <ng-template #reNotifyBlockedDialog>
+    <div class="qr-dialog-header">
+      <div class="qr-dialog-icon">
+        <mat-icon>report_problem</mat-icon>
+      </div>
+      <div>
+        <div class="qr-dialog-title">No se puede re notificar el pago</div>
+        <div class="qr-dialog-subtitle">{{ headSubTitleReNotify }}</div>
+      </div>
+    </div>
+    <div class="qr-dialog-content">
+      <mat-card class="qr-dialog-card">
+        <div class="qr-result">{{ contentSubTitleReNotify }}</div>
           <div class="qr-dialog-actions">
             <button mat-button mat-dialog-close>Entendido</button>
           </div>

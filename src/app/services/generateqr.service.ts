@@ -94,6 +94,31 @@ export class GenerateQrService {
     }
     return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/qr/mark-returned`, body);
   }
+  reNotifyByExternalUser(idQr: string, responsable?: string): Observable<any> {
+    const token = this.authService.getToken();
+    console.log('token de external',token)
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    headers = headers.set('X-Skip-GenerateQr-Auth', 'true')
+
+    if (environment.URL_API_GENERATE_QR_API_KEY) {
+      headers = headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY);
+    }
+    const body: any = { idQr };
+    if (responsable) {
+      body.responsable = responsable;
+    }
+    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/external/qr/payment-webhook/replay`, body, { headers});
+  }
+  reNotifyByInternalUser(idQr: string, responsable?: string): Observable<any> {
+    const body: any = { idQr };
+    if (responsable) {
+      body.responsable = responsable;
+    }
+    return this.httpClient.post<any>(`${environment.URL_API_GENERATE_QR}/v1/qr/payment-webhook/replay`, body);
+  }
 
   listReports(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
     let params = new HttpParams();
@@ -114,8 +139,9 @@ export class GenerateQrService {
     return this.httpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/reports/qr`, { params });
   }
 
-  listExternalReports(page?: number, pageSize?: number, filters?: Record<string, any>, idClient?: string): Observable<any> {
+  listExternalReports(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
     const token = this.authService.getToken();
+    console.log('ytoken de listar reportes para user externo',token)
     let headers = new HttpHeaders();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
@@ -131,9 +157,6 @@ export class GenerateQrService {
     if (pageSize !== undefined) {
       params = params.set('pageSize', pageSize);
     }
-    if (idClient) {
-      params = params.set('idClient', idClient);
-    }
     if (filters) {
       Object.keys(filters).forEach(key => {
         const value = filters[key];
@@ -142,7 +165,7 @@ export class GenerateQrService {
         }
       });
     }
-    return this.rawHttpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/reports/qr-external-services`, { params, headers });
+    return this.rawHttpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/external/reports/qr-services`, { params, headers });
   }
 
   listConfiguredServices(page: number = 1, pageSize: number = 50): Observable<any> {
@@ -344,8 +367,7 @@ export class GenerateQrService {
     format: 'xlsx' | 'csv',
     filters: Record<string, any>,
     bandeja: string,
-    token: any,
-    idClient?: string
+    token: any
   ): Observable<any> {
     let params = new HttpParams();
 
@@ -361,9 +383,6 @@ export class GenerateQrService {
     params = params.set('format', format);
     params = params.set('inbx', bandeja);
     params = params.set('token', token);
-    if (idClient !== undefined && idClient !== null) {
-      params = params.set('idClient', idClient);
-    }
 
     return this.httpClient.get(`${this.URL1}`, { params });
   }
