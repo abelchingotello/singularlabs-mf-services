@@ -96,7 +96,7 @@ export class GenerateQrService {
   }
   reNotifyByExternalUser(idQr: string, responsable?: string): Observable<any> {
     const token = this.authService.getToken();
-    console.log('token de external',token)
+    
     let headers = new HttpHeaders();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
