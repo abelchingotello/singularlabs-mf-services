@@ -508,7 +508,8 @@
 
       <mat-form-field appearance="outline" class="configured-service-form-grid__full">
         <mat-label>Monto maximo QR</mat-label>
-        <input matInput formControlName="maxQrAmount" type="number" step="0.01" min="0" />
+        <input matInput formControlName="maxQrAmount" type="number" step="0.01" min="0" 
+        (input)="formatAmountInput($event, 'maxQrAmount')" (blur)="formatAmountBlur('maxQrAmount')"/>
       </mat-form-field>
     </form>
 

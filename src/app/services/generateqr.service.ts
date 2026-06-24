@@ -24,6 +24,8 @@ export class GenerateQrService {
   private notificationEmailsUrl = `${environment.URL_API_GENERATE_QR}/v1/notification-emails`;
   private URL1 = `${environment.URL_API_GATEWAY}/export`;
 
+  private urlGenerateByUserExternal = `${environment.URL_API_GENERATE_QR}/v1/external/qr/individual`;
+
   private rawHttpClient: HttpClient;
 
   constructor(
@@ -42,6 +44,24 @@ export class GenerateQrService {
       frontendUsername
     });
   }
+
+  generateIndividualByExternalUser(payload: any): Observable<any> {
+    const token = this.authService.getToken();
+    
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (environment.URL_API_GENERATE_QR_API_KEY) {
+      headers = headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY);
+    }
+
+    headers = headers.set('X-Skip-GenerateQr-Auth', 'true')
+
+    return this.httpClient.post<any>(this.urlGenerateByUserExternal, payload, {headers});
+  }
+
 
   listIndividuals(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
     let params = new HttpParams();
@@ -101,11 +121,13 @@ export class GenerateQrService {
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    headers = headers.set('X-Skip-GenerateQr-Auth', 'true')
 
     if (environment.URL_API_GENERATE_QR_API_KEY) {
       headers = headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY);
     }
+
+    headers = headers.set('X-Skip-GenerateQr-Auth', 'true')
+
     const body: any = { idQr };
     if (responsable) {
       body.responsable = responsable;
@@ -141,14 +163,16 @@ export class GenerateQrService {
 
   listExternalReports(page?: number, pageSize?: number, filters?: Record<string, any>): Observable<any> {
     const token = this.authService.getToken();
-    console.log('ytoken de listar reportes para user externo',token)
     let headers = new HttpHeaders();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
+    
     if (environment.URL_API_GENERATE_QR_API_KEY) {
       headers = headers.set('x-api-key', environment.URL_API_GENERATE_QR_API_KEY);
     }
+
+    headers = headers.set('X-Skip-GenerateQr-Auth', 'true')
 
     let params = new HttpParams();
     if (page !== undefined) {
@@ -165,7 +189,7 @@ export class GenerateQrService {
         }
       });
     }
-    return this.rawHttpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/external/reports/qr-services`, { params, headers });
+    return this.httpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/external/reports/qr-services`, { params, headers });
   }
 
   listConfiguredServices(page: number = 1, pageSize: number = 50): Observable<any> {

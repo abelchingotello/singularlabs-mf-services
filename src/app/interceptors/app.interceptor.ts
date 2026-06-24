@@ -28,7 +28,6 @@ export class AppInterceptor implements HttpInterceptor {
     const isGenerateQrProtectedApi = isGenerateQrApi || isReprocessApi;
     const isGenerateQrLogin = isGenerateQrApi && request.url.includes('/v1/auth/login');
     const skipGenerateQrAuth = request.headers.has('X-Skip-GenerateQr-Auth') || isGenerateQrLogin;
-
     let intReq = request;
 
     if (intReq.headers.has('X-Skip-GenerateQr-Auth')) {

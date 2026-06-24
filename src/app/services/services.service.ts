@@ -100,20 +100,13 @@ export class ServicesService {
     return this.httpClient.get<any>(`${this.url}/services`, { params });
   }
   getExternalServicesForIdClient(idclient: string, count: number = 0, limit: number = 200): Observable<any> {
-    const token = this.authService.getToken();
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    headers = headers.set('x-api-key', '36IZghAT9e4TtIbjPh6cy4T49cGaigwL6CVWudmm');
-
     const params = new HttpParams()
       .set('count', count)
       .set('limit', limit)
       .set('format', 'true')
       .set('idclient', idclient);
 
-    return this.rawHttpClient.get<any>(`${this.url}/services`, { params, headers });
+    return this.httpClient.get<any>(`${this.url}/services`, { params });
   }
 
 

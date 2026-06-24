@@ -147,7 +147,7 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       qrTtlMinutes: [''],
       serviceOrigin: ['internal', Validators.required],
       idServiceProv: [''],
-      maxQrAmount: ['']
+      maxQrAmount: ['',[ Validators.pattern(/^\d+(\.\d{2})$/), ]]
     });
 
     this.notificationEmailFiltersForm = this.fb.group({
@@ -291,6 +291,56 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
     });
   }
 
+
+  formatAmountInput(event: Event, controlName: string) {
+    const input = event.target as HTMLInputElement;
+    let digits = (input.value || '').replace(/\D/g, '');
+
+    if (!digits) {
+      input.value = '';
+      this.configuredServiceForm.get(controlName)?.setValue('', { emitEvent: false });
+      return;
+    }
+
+    let intPart = digits.length > 2 ? digits.slice(0, -2) : '0';
+    const decPart = digits.length > 1 ? digits.slice(-2) : `0${digits}`;
+
+    intPart = intPart.replace(/^0+(?=\d)/, '');
+
+    if (intPart === '') {
+      intPart = '0';
+    }
+
+    const MAX_INTEGER_DIGITS = 6;
+
+    if (intPart.length > MAX_INTEGER_DIGITS) {
+      intPart = intPart.slice(0, MAX_INTEGER_DIGITS);
+    }
+
+    const value = `${intPart}.${decPart}`;
+
+    input.value = value;
+
+    this.configuredServiceForm.get(controlName)
+      ?.setValue(value, { emitEvent: false });
+  }
+  
+  formatAmountBlur(controlName: string) {
+    const value = this.configuredServiceForm.get(controlName)?.value;
+
+    if (!value) {
+      return;
+    }
+
+    const num = Number(value);
+
+    if (!Number.isNaN(num)) {
+      this.configuredServiceForm
+        .get(controlName)
+        ?.setValue(num.toFixed(2), { emitEvent: false });
+    }
+  }
+
   saveConfiguredService(): void {
     if (!this.selectedQrConfiguredService || this.configuredServiceForm.invalid || this.isSavingConfiguredService) {
       this.configuredServiceForm.markAllAsTouched();
@@ -303,7 +353,9 @@ export class GenerateQrSftpServiciosComponent implements OnInit {
       return;
     }
 
-    const maxQrAmountValue = this.configuredServiceForm.get('maxQrAmount')?.value;
+    let maxQrAmountValue = this.configuredServiceForm.get('maxQrAmount')?.value;
+    console.log('maxQrAmountValue before update',maxQrAmountValue)
+    maxQrAmountValue = maxQrAmountValue * 100
     const payload = {
       serviceName: this.configuredServiceForm.get('serviceName')?.value,
       businessCode: this.configuredServiceForm.get('businessCode')?.value,

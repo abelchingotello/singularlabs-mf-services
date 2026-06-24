@@ -300,6 +300,13 @@
   color: #6b7280;
 }
 
+.qr-dialog-content-generated {
+  padding: 0 24px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
 .qr-dialog-content {
   padding: 8px 24px 20px;
   max-height: 75vh;
@@ -313,11 +320,112 @@
   border: 1px solid #eef2f7;
 }
 
+.qr-dialog-card-generated {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 12px 16px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.qr-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.qr-result-center {
+  align-items: center;
+  text-align: center;
+}
+
+.qr-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.qr-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.qr-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.qr-meta-item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+
+.qr-result-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.qr-result-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.qr-result-image {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.qr-result-image img {
+  max-width: 260px;
+  width: 100%;
+  height: auto;
+}
+/*
 .qr-dialog-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
   padding-top: 12px;
+}
+*/
+.qr-dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 8px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.qr-dialog-actions button {
+  min-width: 110px;
+}
+.qr-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .report-detail {
@@ -395,6 +503,14 @@
   }
 }
 
+@media (max-width: 768px) {
+  .qr-form {
+    grid-template-columns: 1fr;
+  }
+  .qr-dialog-content {
+    max-height: 75vh;
+  }
+}
 
 @media (max-width: 600px) {
   .qr-dialog-content {
