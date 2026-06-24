@@ -1514,7 +1514,7 @@ export class GenerateQR implements OnInit {
     const estadoPagoRaw = row?.estado_pago_raw;
     
     if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
-      this.headSubTitleReNotify = "Se enviará nuevamente la notificación de pago al cliente externo."
+      this.headSubTitleReNotify = "Se enviará nuevamente la notificación de pago al webhook del cliente."
       this.contentSubTitleReNotify = `¿Deseas renotificar el QR ${this.pendingReturnRow}?`
       this.reNotifyDialogRef = this.dialog.open(this.reNotifyDialog, {
         width: '480px',
