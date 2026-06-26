@@ -17,6 +17,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import * as QRCode from 'qrcode';
 import jwtDecode from 'jwt-decode';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'uni-services',
@@ -65,28 +66,36 @@ export class GenerateQR implements OnInit {
       attribute: '',
       config: {
         type: 'buttonicons',
+        restriccPermission: true,
         actions: [
           {
-            hide: false,
+            permission: "qr-view",
             bgClass: 'gray',
             toolTip: 'Ver QR',
             icon: 'visibility',
             value: 'view_qr'
           },
           {
-            hide: false,
+            permission: "qr-cancel",
             bgClass: 'red',
             toolTip: 'Anular QR',
             icon: 'cancel',
             value: 'cancel_qr'
           },
           {
-            hide: false,
+            permission: "qr-mark-returned",
             bgClass: 'yellow',
             toolTip: 'Marcar devuelto',
             icon: 'undo',
             value: 'mark_returned'
-          }
+          },
+          {
+            permission: "qr-re-notify",
+            bgClass: 'teal',
+            toolTip: 'Re notificar',
+            icon: 'content_paste_go',
+            value: 're_notify'
+          },
         ]
       }
     },
@@ -157,23 +166,29 @@ export class GenerateQR implements OnInit {
   private cancelBlockedDialogRef?: MatDialogRef<any>;
   private markReturnedDialogRef?: MatDialogRef<any>;
   private markReturnedBlockedDialogRef?: MatDialogRef<any>;
+  private reNotifyDialogRef?: MatDialogRef<any>;
+  private reNotifyBlockedDialogRef?: MatDialogRef<any>;
   private qrMassiveDialogRef?: MatDialogRef<any>;
   public qrDialogMode: 'create' | 'view' = 'create';
   public isGeneratingQr: boolean = false;
   public isGeneratingMassive: boolean = false;
   public isCancellingQr: boolean = false;
   public isMarkingReturned: boolean = false;
+  public isReNotified: boolean = false;
   public headSubTitleAnulado: string = '';
   public contentSubTitleAnulado: string = '';
   public headSubTitleReturned: string = '';
   public contentSubTitleReturned: string = '';
-  
+  public headSubTitleReNotify: string = '';
+  public contentSubTitleReNotify: string = '';  
 
   private pagUtils: PaginationUtils | undefined;
   public page: number = 1; // Variable para la página actual
   public count: number = null; // Variable para el total de elementos
   public listProviders: any;
   public selectedCategory: boolean = false;
+  public canGenerateQRIndividual: boolean = false;
+  public canGenerateQRMassive: boolean = false;
 
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
   @ViewChild('generateQrDialog') generateQrDialog!: TemplateRef<any>;
@@ -183,6 +198,8 @@ export class GenerateQR implements OnInit {
   @ViewChild('markReturnedDialog') markReturnedDialog!: TemplateRef<any>;
   @ViewChild('generateQrMassiveDialog') generateQrMassiveDialog!: TemplateRef<any>;
   @ViewChild('markReturnedBlockedDialog') markReturnedBlockedDialog!: TemplateRef<any>;
+  @ViewChild('reNotifyDialog') reNotifyDialog!: TemplateRef<any>;
+  @ViewChild('reNotifyBlockedDialog') reNotifyBlockedDialog!: TemplateRef<any>;
 
 
   constructor(
@@ -197,11 +214,17 @@ export class GenerateQR implements OnInit {
     private generateQrService: GenerateQrService,
     private authService: AuthService,
     public dialog: MatDialog,
+    private route: ActivatedRoute,
   ) {
     this.pagUtils = new PaginationUtils();
   }
 
   ngOnInit(): void {
+    this.authService.permissions$.subscribe(permissions => {
+      this.canGenerateQRIndividual = !!permissions['qr-generate-individual'];
+      this.canGenerateQRMassive = !!permissions['qr-generate-massive'];
+    });
+
     this.minDate.setHours(0, 0, 0, 0);
     this.minDate.setDate(this.minDate.getDate() + 1);
     this.formService();//inicializa los inputs como vacios
@@ -215,6 +238,12 @@ export class GenerateQR implements OnInit {
     this.service_name?.valueChanges.subscribe(value => {
       if (value) {
         this.service_name?.setValue(value.toUpperCase(), { emitEvent: false });
+      }
+    });
+    // Suscribirse a cambios y convertir a mayusculas titular
+    this.qrForm.get('titular')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.qrForm.get('titular')?.setValue(value.toUpperCase(), { emitEvent: false });
       }
     });
     this.functionDataCurrent = this.dataInitial.bind(this); //replica la funcion
@@ -524,27 +553,31 @@ export class GenerateQR implements OnInit {
     console.log('GenerateQR payload:', payload);
     this.isGeneratingQr = true;
     this.spinner.spinnerOnOff();
-    this.generateQrService.generateIndividual(payload).subscribe({
-      next: (response) => {
-        this.spinner.spinnerOnOff();
+    let request$ = this.generateQrService.generateIndividual(payload);
+
+    request$.pipe(
+      finalize(() => this.spinner.spinnerOnOff())
+    ).subscribe({
+      next: (data) => {
         this.isGeneratingQr = false;
-        if (response?.logError || response?.excelError) {
-          const msg = response?.logError || response?.excelError || 'Error al generar QR';
+        if (data?.logError || data?.excelError) {
+          const msg = data?.logError || data?.excelError || 'Error al generar QR';
           this.mytoastr.showError(msg, '');
           return;
         }
-        this.qrResult = response;
-        this.qrImageSrc = response?.imageBase64
-          ? `data:image/png;base64,${response.imageBase64}`
+        this.qrResult = data;
+        this.qrImageSrc = data?.imageBase64
+          ? `data:image/png;base64,${data.imageBase64}`
           : '';
         if (this.qrDialogRef) {
           this.qrDialogRef.close();
         }
+        
+        this.reload();
         this.openQrResultDialog('create');
       },
       error: (err) => {
         console.error(err);
-        this.spinner.spinnerOnOff();
         this.isGeneratingQr = false;
         this.mytoastr.showError('Error al generar QR', '');
       }
@@ -659,7 +692,6 @@ export class GenerateQR implements OnInit {
     this.filteredServices = this.allItems1.filter(service =>
       service.name.toLowerCase().includes(value)
     );
-    this.spinner.spinnerOnOff
   }
 
   async cargarServicios(): Promise<void> {
@@ -777,6 +809,7 @@ export class GenerateQR implements OnInit {
       empresa: [''],
       jobId: [''],
       idQr: ['', [Validators.pattern(/^\d*$/)]],
+      generatedBy: [''],
       service_name: [''],
       idService: [''],
       service_type: [''],
@@ -971,6 +1004,8 @@ export class GenerateQR implements OnInit {
       this.openCancelQrDialog(element)
     } else if (value == "mark_returned") {
       this.openMarkReturnedDialog(element)
+    } else if (value === 're_notify') {
+      this.openReNotifyDialog(element);
     }
   }
 
@@ -1271,6 +1306,7 @@ export class GenerateQR implements OnInit {
     const empresa = String(this.serviceForm?.get('empresa')?.value || '').trim();
     const jobId = String(this.serviceForm?.get('jobId')?.value || '').trim();
     const idQr = String(this.serviceForm?.get('idQr')?.value || '').trim();
+    const generatedBy = String(this.serviceForm?.get('generatedBy')?.value || '').trim();
     const filters: Record<string, any> = {};
     if (start) {
       filters['start'] = start;
@@ -1302,6 +1338,9 @@ export class GenerateQR implements OnInit {
     }
     if (idQr) {
       filters['idQr'] = idQr;
+    }
+    if (generatedBy) {
+      filters['generatedBy'] = generatedBy;
     }
     return filters;
   }
@@ -1460,6 +1499,71 @@ export class GenerateQR implements OnInit {
     return QRCode.toDataURL(hash, {
       width: 220,
       margin: 1
+    });
+  }
+
+  private openReNotifyDialog(row: any) {
+    console.log('row a renotificar', row)
+    this.pendingReturnRow = String(row?.id_qr || row?.id || '');
+    if (!this.pendingReturnRow) {
+      this.mytoastr.showWarning('ID QR no disponible', '');
+      return;
+    }
+    
+    const estadoPago = String(row?.estado_pago_text || '').toLowerCase();
+    const estadoPagoRaw = row?.estado_pago_raw;
+    
+    if (estadoPago === 'pagado' || estadoPagoRaw === 1 || estadoPagoRaw === '1') {
+      this.headSubTitleReNotify = "Se enviará nuevamente la notificación de pago al webhook del cliente."
+      this.contentSubTitleReNotify = `¿Deseas renotificar el QR ${this.pendingReturnRow}?`
+      this.reNotifyDialogRef = this.dialog.open(this.reNotifyDialog, {
+        width: '480px',
+        maxWidth: '95vw',
+        panelClass: 'qr-dialog'
+      });
+    }else{
+      this.headSubTitleReNotify = "Solo es posible re notificar un pago de QR en estado pagado."
+      this.contentSubTitleReNotify = `El estado de pago actual del QR es ${estadoPago}`
+      this.reNotifyBlockedDialogRef = this.dialog.open(this.reNotifyBlockedDialog, {
+        width: '420px',
+        maxWidth: '92vw',
+        panelClass: 'qr-dialog'
+      });
+    }
+    return;
+  }
+  
+  confirmReNotify() {
+    const idQr = this.pendingReturnRow;
+    if (!idQr || this.isReNotified) {
+      return;
+    }
+    this.isReNotified = true;
+    this.spinner.spinnerOnOff();
+    const responsable = this.getResponsable();
+    
+    const request$ = this.generateQrService.reNotifyByInternalUser(String(idQr), responsable);
+
+    request$.pipe(
+      finalize(() => this.isReNotified = false)
+    ).subscribe({
+      next: (rspta) => {
+        if ( rspta.status === "ok" ) {
+          this.mytoastr.showSuccess('QR re procesada correctamente', '');
+          this.spinner.spinnerOnOff();
+          //this.dataFilter = []
+          //this.loadReports();
+        }else{
+          this.mytoastr.showWarning('Error.', rspta.note);
+          this.spinner.spinnerOnOff();
+        }
+        this.reNotifyDialogRef?.close();
+      },
+      error: (err) => {
+        console.error(err);
+        this.spinner.spinnerOnOff();
+        this.mytoastr.showError('Error al reprocesar', '');
+      }
     });
   }
 

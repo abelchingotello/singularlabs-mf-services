@@ -3,7 +3,13 @@
     <uni-image-card title="Reporte Pagos y QRs generados"
       externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png" size="10%">
       <div class="row">
-        <div class="col d-flex justify-content-end align-items-end"></div>
+        <div class="col  d-flex justify-content-end align-items-end ">
+          <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2"
+            (click)="openGenerateQrDialog()" *ngIf="canGenerateQRIndividual">
+            <mat-icon>qr_code</mat-icon>
+            Generar QR
+          </button>
+        </div>
       </div>
     </uni-image-card>
 
@@ -104,6 +110,15 @@
             </mat-select>
           </mat-form-field>
 
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Job ID</mat-label>
+            <input matInput formControlName="jobId" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Generado por</mat-label>
+            <input matInput formControlName="generatedBy" />
+          </mat-form-field>
         </form>
 
         <div class="row">
@@ -161,6 +176,142 @@
       </mat-card-content>
     </mat-card> 
 
+    
+    <ng-template #generateQrDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Generar QR</div>
+          <div class="qr-dialog-subtitle">Complete los campos para generar un QR</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <form [formGroup]="qrForm" class="qr-form">
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Servicio</mat-label>
+              <mat-select formControlName="idService" (selectionChange)="onQrServiceChange($event)">
+                <mat-option disabled class="search-option">
+                  <input matInput placeholder="Buscar servicio..." [(ngModel)]="qrServiceFilter"
+                    [ngModelOptions]="{standalone: true}" (ngModelChange)="filterQrServices()"
+                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"
+                    (keydown.enter)="$event.stopPropagation()" />
+                </mat-option>
+
+                <mat-option disabled>
+                  <input matInput placeholder="Servicio seleccionado..." [value]="qrServiceName" />
+                </mat-option>
+
+                <mat-option *ngFor="let service of qrFilteredServices" [value]="service.id">
+                  {{ service.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Referencia</mat-label>
+              <input matInput formControlName="referencia" maxlength="10" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Titular del servicio</mat-label>
+              <input matInput formControlName="titular" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Monto</mat-label>
+              <input matInput formControlName="amount" inputmode="numeric" placeholder="500.00"
+                (input)="onAmountInput($event)" (blur)="onAmountBlur()" />
+              <mat-error *ngIf="qrForm.get('amount').hasError('required')">
+                Monto requerido
+              </mat-error>
+              <mat-error
+                *ngIf="qrForm.get('amount').hasError('pattern') || qrForm.get('amount').hasError('invalidAmount')">
+                Monto inválido
+              </mat-error>
+              <mat-error *ngIf="qrForm.get('amount').hasError('maxAmount')">
+                Monto máximo 500.00
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>N de recibo</mat-label>
+              <input matInput formControlName="receipt_number" inputmode="numeric"
+                (input)="onNumericInput($event, 20)" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Fecha vencimiento</mat-label>
+              <input matInput [matDatepicker]="duePicker" [min]="minDate" formControlName="due_date_date" />
+              <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+              <mat-datepicker #duePicker></mat-datepicker>
+              <mat-error *ngIf="qrForm.get('due_date_date').hasError('required')">
+                Fecha requerida
+              </mat-error>
+              <mat-error *ngIf="qrForm.get('due_date').hasError('notFuture')">
+                Debe ser mayor a la fecha actual
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="qr-field">
+              <mat-label>Hora</mat-label>
+              <input matInput type="time" formControlName="due_date_time" />
+              <mat-error *ngIf="qrForm.get('due_date_time').hasError('required')">
+                Hora requerida
+              </mat-error>
+            </mat-form-field>
+          </form>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Cancelar</button>
+            <button mat-raised-button color="primary" [disabled]="qrForm.invalid || isGeneratingQr"
+              (click)="generateQr()">Generar</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
+    <ng-template #generateQrResultDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>qr_code_2</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">{{ qrDialogMode === 'view' ? 'Detalle QR' : 'QR generado' }}</div>
+          <div class="qr-dialog-subtitle">
+            {{ qrDialogMode === 'view' ? 'Vista previa del QR' : 'Revisa los datos y descarga la imagen' }}
+          </div>
+        </div>
+      </div>
+      <div class="qr-dialog-content-generated">
+        <mat-card class="qr-dialog-card-generated">
+          <div class="qr-result qr-result-center">
+            <div class="qr-title">{{ qrDetailTitle }}</div>
+            <div class="qr-amount">{{ qrDisplayAmount }}</div>
+            <div class="qr-meta">
+              <div class="qr-meta-item">Vence: {{ qrExpiredAtDisplay }}</div>
+              <div class="qr-meta-item">
+                Estado: <span class="status-pill" [ngClass]="qrEstadoPagoLabel !== '-' ? qrEstadoPagoLabel : null">
+                  {{ qrEstadoPagoLabel }}
+                </span>
+              </div>
+            </div>
+            <div class="qr-result-image" *ngIf="qrImageSrc">
+              <img [src]="qrImageSrc" alt="QR" />
+            </div>
+          </div>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close (click)="backToForm()">
+              {{ qrDialogMode === 'view' ? 'Cerrar' : 'Regresar' }}
+            </button>
+            <button mat-raised-button color="primary" (click)="downloadQrImage()">Descargar PNG</button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+
     <ng-template #detailDialog>
       <div class="qr-dialog-header">
         <div class="qr-dialog-icon">
@@ -189,6 +340,7 @@
               <div class="detail-row"><span>Fecha generacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.qr_created_at) }}</span></div>
               <div class="detail-row"><span>Servicio:</span><span>{{ selectedRow?.servicio || '-' }}</span></div>
               <div class="detail-row"><span>Creado por:</span><span>{{ selectedRow?.generatedBy || selectedRow?.generated_by || '-' }}</span></div>
+              <div class="detail-row"><span>Job Id:</span><span>{{ selectedRow?.job_id || '-' }}</span></div>
               <div class="detail-row"><span>Referencia:</span><span>{{ selectedRow?.referencia || selectedRow?.suministro || '-' }}</span></div>
               <div class="detail-row"><span>Monto:</span><span>{{ selectedRow?.monto || '-' }}</span></div>
               <div class="detail-row"><span>Titular:</span><span>{{ selectedRow?.titular || '-' }}</span></div>
@@ -346,13 +498,56 @@
         <mat-icon>report_problem</mat-icon>
       </div>
       <div>
-        <div class="qr-dialog-title">No se puede devolver</div>
+        <div class="qr-dialog-title">No se puede marcar como devuelto</div>
         <div class="qr-dialog-subtitle">{{ headSubTitleReturned }}</div>
       </div>
     </div>
     <div class="qr-dialog-content">
       <mat-card class="qr-dialog-card">
         <div class="qr-result">{{ contentSubTitleReturned }}</div>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close>Entendido</button>
+          </div>
+      </mat-card>
+    </div>
+  </ng-template>
+
+    <ng-template #reNotifyDialog>
+      <div class="qr-dialog-header">
+        <div class="qr-dialog-icon">
+          <mat-icon>content_paste_go</mat-icon>
+        </div>
+        <div>
+          <div class="qr-dialog-title">Re notificar pago al webhook del cliente</div>
+          <div class="qr-result">{{ headSubTitleReNotify }}</div>
+        </div>
+      </div>
+      <div class="qr-dialog-content">
+        <mat-card class="qr-dialog-card">
+          <p>{{ contentSubTitleReNotify }}</p>
+          <div class="qr-dialog-actions">
+            <button mat-button mat-dialog-close [disabled]="isReNotified">Cancelar</button>
+            <button mat-raised-button color="accent" (click)="confirmReNotify()" [disabled]="isReNotified">
+              {{ isReNotified ? 'Re notificando...' : 'Re notificar' }}
+            </button>
+          </div>
+        </mat-card>
+      </div>
+    </ng-template>
+    
+  <ng-template #reNotifyBlockedDialog>
+    <div class="qr-dialog-header">
+      <div class="qr-dialog-icon">
+        <mat-icon>report_problem</mat-icon>
+      </div>
+      <div>
+        <div class="qr-dialog-title">No se puede re notificar el pago al webhook del cliente</div>
+        <div class="qr-dialog-subtitle">{{ headSubTitleReNotify }}</div>
+      </div>
+    </div>
+    <div class="qr-dialog-content">
+      <mat-card class="qr-dialog-card">
+        <div class="qr-result">{{ contentSubTitleReNotify }}</div>
           <div class="qr-dialog-actions">
             <button mat-button mat-dialog-close>Entendido</button>
           </div>
