@@ -10,6 +10,25 @@ import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { PersonService } from 'src/app/services/person.service';
 
+/**
+ * Catálogo de tipos de dato "amigables" para el área operativa.
+ *
+ * El mapeo a valores técnicos (fieldTypeId / fieldMask),6
+ * Ahí se confirma que:
+ *   - fieldMask SIEMPRE es 'D' para campos de referencia estándar
+ *     (independiente del tipo de dato).
+ *   - 'N' se usa como id de tipo cuando el dato es NUMERICO.
+ *   - Cualquier otro valor se trata como ALFANUMERICO.
+ *
+ */
+export interface PaymentFieldDataType {
+  key: string;          // valor interno del <mat-select>
+  label: string;         // texto amigable que ve el área operativa
+  fieldTypeId: string;   // código técnico que espera el backend ('A', 'N')
+  fieldTypeName: string; // nombre técnico completo
+  fieldMask: string;     // máscara técnica asociada
+}
+
 @Component({
   selector: 'uni-new-service',
   templateUrl: './new-service.component.html',
@@ -21,10 +40,17 @@ export class NewServiceComponent implements OnInit {
   public originalBodyBase: any = null;
   public originalIdServiceProv: string | null = null;
 
+  // Catálogo de tipos de dato amigables para "Datos Pagos-Adicionales".
+  // Solo ALFANUMERICO y NUMERICO están confirmados contra el importador.
+  public dataTypeCatalog: PaymentFieldDataType[] = [
+    { key: 'ALFANUMERICO', label: 'Alfanumérico (letras y números)', fieldTypeId: 'A', fieldTypeName: 'ALFANUMERICO', fieldMask: 'D' },
+    { key: 'NUMERICO', label: 'Numérico (solo números)', fieldTypeId: 'N', fieldTypeName: 'NUMERICO', fieldMask: 'D' },
+  ];
+
   public columns: any[] = [
     { name: 'ID', attribute: 'id' },
     { name: 'Nombre', attribute: 'name' },
-    { name: 'Máscara de campo', attribute: 'fieldMask' },
+    { name: 'Tipo de dato', attribute: 'dataTypeLabel' },
     { name: 'Longitud', attribute: 'maximumLength' },
     { name: 'Obligatorio', attribute: 'isMandatory' },
     { name: 'Editable', attribute: 'isEditable' },
@@ -61,6 +87,8 @@ export class NewServiceComponent implements OnInit {
     { id: 'PAY_CHECK_EXTERNAL', name: 'PAGO CON CHEQUE OTRO BANCO', isActive: false },
     { id: 'PAY_MULTIPLE_PAYMENTS', name: 'ACTUALIZACION MASIVA DE DEUDAS', isActive: false },
   ];
+
+  public modalidadRecaudo: any[] = [];
 
   public serviceForm!: FormGroup;
   public comissionForm!: FormGroup;
@@ -99,18 +127,22 @@ export class NewServiceComponent implements OnInit {
   public isMandatory: boolean = false;
   public isEdit: boolean = false;
 
+  // Evita que la automatización de indicadores pise los valores ya guardados
+  // mientras se está cargando un servicio existente para edición.
+  private loadingExistingService: boolean = false;
+
   @ViewChild(DynamicTableComponent) dynamic!: DynamicTableComponent;
 
   constructor(
-    private router: Router,
-    private fb: FormBuilder,
+    private readonly router: Router,
+    private readonly fb: FormBuilder,
     private readonly activeRouter: ActivatedRoute,
-    private mytoastr: MytoastrService,
-    private service: ServicesService,
-    private masterService: MasterService,
-    private spinner: SpinnerService,
-    private authService: AuthService,
-    private personService: PersonService,
+    private readonly mytoastr: MytoastrService,
+    private readonly service: ServicesService,
+    private readonly masterService: MasterService,
+    private readonly spinner: SpinnerService,
+    private readonly authService: AuthService,
+    private readonly personService: PersonService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -148,8 +180,41 @@ export class NewServiceComponent implements OnInit {
     });
   }
 
+  /**
+   * Reglas de negocio (tomadas de import-services.component.ts ->
+   * generateIndicators, y confirmadas por el ticket):
+   *   - DATA ENTRY            -> Base de Datos: NO, Interconectado: NO
+   *   - BASE DE DATOS (BATCH) -> Base de Datos: SI, Interconectado: NO
+   *   - INTERCONECTADO        -> Base de Datos: SI, Interconectado: SI
+   *
+   * Si el Tipo de Servicio no coincide con ninguna de estas modalidades
+   * conocidas, no se fuerza nada y el área operativa decide manualmente
+   * (evita "adivinar" reglas no confirmadas).
+   */
+  public applyIndicatorRulesByServiceType(event) {
+    const activeIndicators = event.value
+
+    let baseDatos: boolean;
+    let interconectado: boolean;
+
+    if (activeIndicators.includes('PAY_BILL')) {
+      baseDatos = true;
+    }
+    if (activeIndicators.includes('PAY_ONLINE')) {
+      interconectado = true;
+    }
+    this.indicatrs.forEach(indicator => {
+      if (indicator.id === 'PAY_BILL') indicator.isActive = baseDatos;
+      if (indicator.id === 'PAY_ONLINE') indicator.isActive = interconectado;
+    });
+
+    this.service_indicators?.setValue(
+      this.indicatrs.filter(i => i.isActive).map(i => i.id)
+    );
+  }
+
   private async listData(): Promise<void> {
-    const [personData, depart, typeService, typeClient, typeStatus, typeComission] =
+    const [personData, depart, typeService, typeClient, typeStatus, typeComission, modalidadRecaudo] =
       await firstValueFrom(
         forkJoin([
           this.personService.getPerson('PROVEEDOR', null, true),
@@ -158,6 +223,7 @@ export class NewServiceComponent implements OnInit {
           this.masterService.getItemsMasterTable('11'),
           this.masterService.getItemsMasterTable('1'),
           this.masterService.getItemsMasterTable('15'),
+          this.masterService.getItemsMasterTable('18'),
         ])
       );
 
@@ -167,6 +233,7 @@ export class NewServiceComponent implements OnInit {
     this.typeClient = typeClient.sort((a, b) => a.master_order - b.master_order);
     this.typeStatus = typeStatus.sort((a, b) => a.master_order - b.master_order);
     this.typeComission = typeComission.sort((a, b) => a.master_order - b.master_order);
+    this.modalidadRecaudo = modalidadRecaudo.sort((a, b) => a.master_order - b.master_order);
   }
 
   initializeFormGroup() {
@@ -179,6 +246,7 @@ export class NewServiceComponent implements OnInit {
       service_state: ['', Validators.required],
       service_zone: [''],
       service_indicators: [[]],
+      service_collection_type: ['', Validators.required]
     });
 
     this.comissionForm = this.fb.group({
@@ -193,8 +261,7 @@ export class NewServiceComponent implements OnInit {
     this.paymentFieldsForm = this.fb.group({
       paymentFields_id: ['', Validators.required],
       paymentFields_name: ['', Validators.required],
-      paymentFields_fieldType: ['', Validators.required],
-      paymentFields_fieldMask: ['', Validators.required],
+      paymentFields_dataType: ['', Validators.required],
       paymentFields_max: ['', Validators.required],
       paymentFields_mandatory: this.isMandatory,
       paymentFields_edit: this.isEdit,
@@ -259,7 +326,7 @@ export class NewServiceComponent implements OnInit {
       comissionCriterion: comissionRaw.comission_criterion,
       comissionPCT: comissionRaw.comission_percentage,
       indicators: this.indicatrs,
-      additionalPaymentFields: this.dataPayment
+      additionalPaymentFields: this.buildAdditionalPaymentFieldsPayload()
     };
 
     if (!this.idService) {
@@ -267,6 +334,17 @@ export class NewServiceComponent implements OnInit {
     } else {
       this.updateService(bodyBase, serviceRaw, comissionRaw);
     }
+  }
+
+  /**
+   * Arma el arreglo de additionalPaymentFields exactamente con la misma
+   * forma que ya espera el backend (id, name, fieldType{id,name}, fieldMask,
+   * maximumLength, isMandatory, isEditable). Las propiedades dataTypeKey /
+   * dataTypeLabel son solo para uso interno del frontend (mostrar el tipo
+   * amigable en la tabla) y NO se envían al backend.
+   */
+  private buildAdditionalPaymentFieldsPayload(): any[] {
+    return this.dataPayment.map(({ dataTypeKey, dataTypeLabel, ...backendField }) => backendField);
   }
 
   updateService(bodyBase: any, serviceRaw: any, comissionRaw: any) {
@@ -453,7 +531,24 @@ export class NewServiceComponent implements OnInit {
 
   }
 
+  /**
+   * A partir del fieldType.id que viene del backend, ubica la entrada
+   * correspondiente en dataTypeCatalog para poder mostrar el label amigable
+   * en la tabla al editar un servicio existente.
+   */
+  private mapExistingPaymentFields(fields: any[]): any[] {
+    return (fields || []).map(f => {
+      const match = this.dataTypeCatalog.find(t => t.fieldTypeId === f.fieldType?.id);
+      return {
+        ...f,
+        dataTypeKey: match ? match.key : null,
+        dataTypeLabel: match ? match.label : (f.fieldType?.name ?? f.fieldMask)
+      };
+    });
+  }
+
   private async getIdService(idService: string): Promise<void> {
+    this.loadingExistingService = true;
     try {
       const response: any = await firstValueFrom(this.service.getIdServices(idService));
       const data = response.data;
@@ -478,10 +573,29 @@ export class NewServiceComponent implements OnInit {
       this.service_type_business.setValue(data.business);
       this.service_type_business.disable();
 
-      this.dataPayment = data['additional-payment-fields'] || [];
+      this.dataPayment = this.mapExistingPaymentFields(data['additional-payment-fields']);
       this.register = [...this.dataPayment];
 
       this.indicatrs = data.indicators;
+
+      const baseDatos = data.indicators.some(
+        i => i.id === 'PAY_BILL' && i.isActive
+      );
+
+      const interconectado = data.indicators.some(
+        i => i.id === 'PAY_ONLINE' && i.isActive
+      );
+
+      let modalidad = '';
+
+      if (baseDatos) {
+        modalidad = 'PAY_BILL';
+      } else if (interconectado) {
+        modalidad += ', PAY_ONLINE';
+      }
+
+      this.service_collection_type?.setValue(modalidad);
+
       this.idProviderService = data.idProvider;
       this.fixcomisionService = data.fixedcomission;
 
@@ -521,6 +635,7 @@ export class NewServiceComponent implements OnInit {
     } catch (err) {
       console.error('ERROR: ', err);
     } finally {
+      this.loadingExistingService = false;
       this.spinner.spinnerOnOff();
     }
   }
@@ -531,17 +646,31 @@ export class NewServiceComponent implements OnInit {
       return;
     }
 
+    const selectedType = this.dataTypeCatalog.find(
+      t => t.key === this.paymentFieldsForm.value.paymentFields_dataType
+    );
+
+    if (!selectedType) {
+      this.mytoastr.showWarning('Seleccione un tipo de dato válido', '');
+      return;
+    }
+
     const data = {
       id: this.paymentFieldsForm.value.paymentFields_id,
       name: this.paymentFieldsForm.value.paymentFields_name,
       fieldType: {
-        id: this.paymentFieldsForm.value.paymentFields_fieldType.charAt(0),
-        name: this.paymentFieldsForm.value.paymentFields_fieldType
+        id: selectedType.fieldTypeId,
+        name: selectedType.fieldTypeName
       },
-      fieldMask: this.paymentFieldsForm.value.paymentFields_fieldMask,
+      fieldMask: selectedType.fieldMask,
       maximumLength: this.paymentFieldsForm.value.paymentFields_max,
       isMandatory: this.paymentFieldsForm.value.paymentFields_mandatory || this.isMandatory,
-      isEditable: this.paymentFieldsForm.value.paymentFields_edit || this.isEdit
+      isEditable: this.paymentFieldsForm.value.paymentFields_edit || this.isEdit,
+      // Solo para uso interno del frontend (mostrar el tipo amigable en la
+      // tabla). Se excluyen del payload antes de enviarlo al backend, ver
+      // buildAdditionalPaymentFieldsPayload().
+      dataTypeKey: selectedType.key,
+      dataTypeLabel: selectedType.label
     };
 
     this.register.push(data);
@@ -555,6 +684,7 @@ export class NewServiceComponent implements OnInit {
       indicator.isActive = selectedIds.includes(indicator.id);
     });
   }
+
 
   onNext() {
     this.onNextAdd();
@@ -618,6 +748,8 @@ export class NewServiceComponent implements OnInit {
   get service_zone() { return this.serviceForm.get('service_zone'); }
   get service_type_business() { return this.serviceForm.get('service_type_business'); }
   get service_indicators() { return this.serviceForm.get('service_indicators'); }
+  get service_collection_type() { return this.serviceForm.get('service_collection_type'); }
+  get paymentFields_dataType() { return this.paymentFieldsForm.get('paymentFields_dataType'); }
 
   get type_Comission() { return this.comissionForm.get('comission_type'); }
 
