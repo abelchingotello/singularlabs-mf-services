@@ -34,14 +34,14 @@ jobs:
     - name: Build project with the correct environment configuration
       run: npm run build-desa:single-spa:singularlabs-mf-services
 
-    - name: DEBUG - Ver token OIDC real
-      run: |
-        echo "Solicitando token OIDC..."
-        JWT=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-          "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
+    # - name: DEBUG - Ver token OIDC real
+    #   run: |
+    #     echo "Solicitando token OIDC..."
+    #     JWT=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+    #       "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
         
-        echo "Payload del token (decodificado):"
-        echo "$JWT" | cut -d "." -f2 | base64 -d 2>/dev/null | jq .
+    #     echo "Payload del token (decodificado):"
+    #     echo "$JWT" | cut -d "." -f2 | base64 -d 2>/dev/null | jq .
 
     - name: Connect to AWS
       uses: aws-actions/configure-aws-credentials@v2
