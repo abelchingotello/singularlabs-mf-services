@@ -192,6 +192,29 @@ export class GenerateQrService {
     return this.httpClient.get<any>(`${environment.URL_API_GENERATE_QR}/v1/external/reports/qr-services`, { params, headers });
   }
 
+  getQrSummaryByService(
+    paymentFrom: string,
+    paymentTo: string,
+    page: number = 1,
+    pageSize: number = 6,
+    serviceId?: string
+  ): Observable<QrSummaryByServiceResponse> {
+    let params = new HttpParams()
+      .set('paymentFrom', paymentFrom)
+      .set('paymentTo', paymentTo)
+      .set('page', page)
+      .set('pageSize', pageSize);
+
+    if (serviceId) {
+      params = params.set('serviceId', serviceId);
+    }
+
+    return this.httpClient.get<QrSummaryByServiceResponse>(
+      `${environment.URL_API_GENERATE_QR}/v1/reports/qr-summary-by-service`,
+      { params }
+    );
+  }
+
   listConfiguredServices(page: number = 1, pageSize: number = 50): Observable<any> {
     const params = new HttpParams()
       .set('page', page)
@@ -410,4 +433,23 @@ export class GenerateQrService {
 
     return this.httpClient.get(`${this.URL1}`, { params });
   }
+}
+
+export interface QrSummaryByServiceItem {
+  serviceId: string;
+  serviceName: string;
+  generated: number;
+  paid: number;
+  pending: number;
+  expired: number;
+  cancelled: number;
+  totalAmount: number;
+  collectedAmount: number;
+}
+
+export interface QrSummaryByServiceResponse {
+  page: number;
+  pageSize: number;
+  total: number;
+  items: QrSummaryByServiceItem[];
 }

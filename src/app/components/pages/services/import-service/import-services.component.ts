@@ -105,30 +105,6 @@ export class ImportServicesComponent implements OnInit {
     }
   }
 
-  //Metodo para generar comisiones
-  generateCommissions() {
-    const commissionType = Math.floor(Math.random() * 3) + 1;
-    let commissionFixed: number | null = null;
-    let commissionPct: number | null = null;
-    let commissionCriterion: number | null = null;
-
-    switch (commissionType) {
-      case 1:
-        commissionFixed = +(Math.random() * (0.6 - 0.3) + 0.3).toFixed(6);
-        break;
-      case 2:
-        commissionPct = +(Math.random() * (0.07 - 0.03) + 0.03).toFixed(6);
-        break;
-      case 3:
-        commissionFixed = +(Math.random() * (0.6 - 0.3) + 0.3).toFixed(6);
-        commissionPct = +(Math.random() * (0.07 - 0.03) + 0.03).toFixed(6);
-        commissionCriterion = [300, 400, 500][Math.floor(Math.random() * 3)];
-        break;
-    }
-
-    return { type: commissionType, fixed: commissionFixed, pct: commissionPct, criterion: commissionCriterion };
-  }
-
   //Metodo para generar los ADDITIONAL_PAYMENT
   generateAdditionalPayment(value: any): any[] {
     const data: any[] = [];
@@ -252,7 +228,6 @@ export class ImportServicesComponent implements OnInit {
         comissionPct = value['Comisión  a pagar B2CASH  sin IGV'];
       }
 
-      // const commissions = this.generateCommissions();
       // const comissionType = ['FIJO', 'PORCENTUAL', 'MULTIPLE'][commissions.type - 1];
 
       const serviceObject: any = {

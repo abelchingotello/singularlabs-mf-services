@@ -63,11 +63,22 @@
                                         </mat-select>
                                     </mat-form-field>
 
+                                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
+                                        <mat-label>Modalidad de Recaudo </mat-label>
+                                        <mat-select formControlName="service_collection_type"
+                                            (selectionChange)="applyIndicatorRulesByServiceType($event)">
+                                            <mat-option *ngFor="let modalidad of modalidadRecaudo"
+                                                [value]="modalidad.master_value">{{modalidad.master_name}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
                                     <mat-form-field appearance="outline" class="col-md-3">
                                         <mat-label>Indicadores</mat-label>
                                         <mat-select formControlName="service_indicators"
                                             (selectionChange)="selectIndicat($event)" multiple>
-                                            <mat-option *ngFor="let indicator of indicatrs" [value]="indicator.id">
+                                            <mat-option *ngFor="let indicator of indicatrs" [value]="indicator.id"
+                                                [disabled]="indicator.id === 'PAY_BILL' || indicator.id === 'PAY_ONLINE'">
+
                                                 {{ indicator.name }}
                                             </mat-option>
                                         </mat-select>
@@ -170,21 +181,17 @@
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
-                                        <mat-label>Tipo de campo</mat-label>
-                                        <input formControlName="paymentFields_fieldType" type="text" matInput
-                                            placeholder="Ingresa nombre">
+                                        <mat-label>Tipo de dato</mat-label>
+                                        <mat-select formControlName="paymentFields_dataType">
+                                            <mat-option *ngFor="let type of dataTypeCatalog" [value]="type.key">
+                                                {{ type.label }}
+                                            </mat-option>
+                                        </mat-select>
                                     </mat-form-field>
 
                                     <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
-                                        <mat-label>Máscara de campo</mat-label>
-                                        <input formControlName="paymentFields_fieldMask" type="text" matInput
-                                            placeholder="Ingresa nombre">
-                                    </mat-form-field>
-
-                                    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-3">
-                                        <mat-label>Longitud máxima</mat-label>
-                                        <input formControlName="paymentFields_max" type="text" matInput
-                                            placeholder="Ingresa nombre">
+                                        <mat-label>Longitud</mat-label>
+                                        <input formControlName="paymentFields_max" type="number" min="1" matInput>
                                     </mat-form-field>
 
                                     <mat-checkbox formControlName="paymentFields_mandatory" class="col-md-3">

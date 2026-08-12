@@ -9,9 +9,12 @@ import { GenerateQR } from './generateqr.component';
 import { GenerateQrReprocesamientoPagosComponent } from './reprocesamiento-pagos/generateqr-reprocesamiento-pagos.component';
 import { GenerateQrReportsComponent } from './reports/generateqr-reports.component';
 import { GenerateQrSftpServiciosComponent } from './sftp-servicios/generateqr-sftp-servicios.component';
+import { GenerateQrDashboardComponent } from './dashboard/dashboard.component';
 import { DigitsOnlyDirective } from './digits-only.directive';
 import { MatIconModule } from '@angular/material/icon';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 registerLocaleData(localeEs);
 
@@ -21,6 +24,7 @@ registerLocaleData(localeEs);
     GenerateQrReportsComponent,
     GenerateQrReprocesamientoPagosComponent,
     GenerateQrSftpServiciosComponent,
+    GenerateQrDashboardComponent,
     DigitsOnlyDirective
   ],
   imports: [
@@ -30,6 +34,8 @@ registerLocaleData(localeEs);
     LibraryModule,
     ReactiveFormsModule,
     MatIconModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
     FormsModule
   ],
   providers: [

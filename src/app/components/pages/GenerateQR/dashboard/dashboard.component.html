@@ -1,0 +1,142 @@
+<div class="content bg-gray-3">
+  <div class="container-fluid px-2 px-md-5 pb-2 pt-4 py-md-4">
+    <uni-image-card
+      title="Resumen de QR generados pagados."
+      externImage="https://360degreecloud.com/wp-content/uploads/2021/11/banner-01-1.png"
+      size="10%">
+    </uni-image-card>
+
+    <mat-card class="custom-border-radius-1-25">
+      <mat-card-content>
+        <h2 class="mt-4 ml-3 text-default">Datos de reporte</h2>
+
+        <form [formGroup]="reportForm" class="d-flex flex-wrap">
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Fecha de pago</mat-label>
+            <mat-date-range-input [rangePicker]="paymentPicker">
+              <input matStartDate formControlName="paymentFrom" placeholder="Desde" />
+              <input matEndDate formControlName="paymentTo" placeholder="Hasta" />
+            </mat-date-range-input>
+            <mat-hint align="end">DD/MM/YYYY - DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="paymentPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #paymentPicker></mat-date-range-picker>
+            <mat-error *ngIf="reportForm.hasError('invalidDateRange')">
+              La fecha desde no puede ser mayor que la fecha hasta.
+            </mat-error>
+            <mat-error *ngIf="!reportForm.hasError('invalidDateRange') && (reportForm.get('paymentFrom')?.hasError('required') || reportForm.get('paymentTo')?.hasError('required'))">
+              Selecciona ambas fechas de pago.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-md-3">
+            <mat-label>Servicio</mat-label>
+            <mat-select formControlName="serviceId">
+              <mat-option disabled class="search-option">
+                <input
+                  matInput
+                  placeholder="Buscar servicio..."
+                  [(ngModel)]="serviceFilter"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="filterServices()"
+                  (click)="$event.stopPropagation()"
+                  (keydown.space)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()" />
+              </mat-option>
+              <mat-option value="">Todos los servicios</mat-option>
+              <mat-option *ngFor="let service of filteredServices" [value]="service.id">
+                {{ service.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+        <div class="row">
+          <div class="col lg-6 d-flex justify-content-end align-items-end mb-3 mr-3">
+            <button title="Limpiar" type="button" class="btn button-secondary" (click)="clearFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
+            <button type="button" class="btn button-primary" (click)="searchData()" [disabled]="isLoading">
+              <mat-icon>search</mat-icon>
+              Buscar
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <section class="summary-report" aria-labelledby="summary-report-title">
+      <div class="summary-report-header">
+        <h2 id="summary-report-title">
+          <mat-icon>qr_code_2</mat-icon>
+          QRs agrupados por servicio
+        </h2>
+      </div>
+
+      <div class="report-loading" *ngIf="isLoading">
+        <mat-spinner diameter="36"></mat-spinner>
+        <span>Cargando resumen...</span>
+      </div>
+
+      <div class="report-grid" *ngIf="!isLoading && reports.length">
+        <article class="service-report-card" *ngFor="let report of reports">
+          <header>
+            <div>
+              <h3>{{ report.serviceName }}</h3>
+              <p>{{ report.generated }} QR generados</p>
+            </div>
+            <span class="paid-percentage">{{ paymentPercentage(report) }}% pagado</span>
+          </header>
+
+          <div class="amount-row">
+            <span>Monto total</span>
+            <strong>{{ report.totalAmount | number:'1.2-2':'es-ES' }}</strong>
+          </div>
+
+          <div class="status-chart">
+            <div class="status-column paid">
+              <strong>{{ report.paid }}</strong>
+              <div class="status-bar" [style.height.px]="barHeight(report.paid, report)"></div>
+              <span>Pagados</span>
+            </div>
+            <div class="status-column pending">
+              <strong>{{ report.pending }}</strong>
+              <div class="status-bar" [style.height.px]="barHeight(report.pending, report)"></div>
+              <span>Pendientes</span>
+            </div>
+            <div class="status-column expired">
+              <strong>{{ report.expired }}</strong>
+              <div class="status-bar" [style.height.px]="barHeight(report.expired, report)"></div>
+              <span>Vencidos</span>
+            </div>
+            <div class="status-column cancelled">
+              <strong>{{ report.cancelled }}</strong>
+              <div class="status-bar" [style.height.px]="barHeight(report.cancelled, report)"></div>
+              <span>Anulados</span>
+            </div>
+          </div>
+
+          <footer>
+            Recaudado:
+            <strong>{{ report.collectedAmount | number:'1.2-2':'es-ES' }}</strong>
+          </footer>
+        </article>
+      </div>
+
+      <div class="empty-report error-report" *ngIf="!isLoading && loadError">{{ loadError }}</div>
+      <div class="empty-report" *ngIf="!isLoading && !loadError && !reports.length">
+        No se encontraron QRs para el rango de pago seleccionado.
+      </div>
+
+      <mat-paginator
+        class="summary-paginator"
+        [length]="totalReports"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[3, 6]"
+        (page)="onReportPageChange($event)"
+        aria-label="Paginación del reporte por servicio">
+      </mat-paginator>
+    </section>
+  </div>
+</div>
