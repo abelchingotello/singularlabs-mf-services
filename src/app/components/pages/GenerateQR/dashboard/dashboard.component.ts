@@ -134,8 +134,8 @@ export class GenerateQrDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const paymentFrom = this.formatDateParam(this.reportForm.get('paymentFrom')?.value);
-    const paymentTo = this.formatDateParam(this.reportForm.get('paymentTo')?.value);
+    const queryFrom = this.formatDateParam(this.reportForm.get('paymentFrom')?.value);
+    const queryTo = this.formatDateParam(this.reportForm.get('paymentTo')?.value);
     const serviceId = String(this.reportForm.get('serviceId')?.value || '');
 
     this.summaryRequest?.unsubscribe();
@@ -143,8 +143,8 @@ export class GenerateQrDashboardComponent implements OnInit, OnDestroy {
     this.loadError = '';
 
     this.summaryRequest = this.generateQrService.getQrSummaryByService(
-      paymentFrom,
-      paymentTo,
+      queryFrom,
+      queryTo,
       this.pageIndex + 1,
       this.pageSize,
       serviceId
