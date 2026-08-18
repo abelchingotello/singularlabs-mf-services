@@ -193,15 +193,17 @@ export class GenerateQrService {
   }
 
   getQrSummaryByService(
-    paymentFrom: string,
-    paymentTo: string,
+    start: string,
+    end: string,
     page: number = 1,
     pageSize: number = 6,
     serviceId?: string
   ): Observable<QrSummaryByServiceResponse> {
     let params = new HttpParams()
-      .set('paymentFrom', paymentFrom)
-      .set('paymentTo', paymentTo)
+      .set('start', start)
+      .set('end', end)
+      .set('paymentFrom', start)
+      .set('paymentTo', end)
       .set('page', page)
       .set('pageSize', pageSize);
 
