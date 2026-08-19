@@ -71,6 +71,7 @@ export class GenerateQrService {
     if (pageSize !== undefined) {
       params = params.set('pageSize', pageSize);
     }
+    params = params.set('isfront', true);
     if (filters) {
       Object.keys(filters).forEach(key => {
         const value = filters[key];
