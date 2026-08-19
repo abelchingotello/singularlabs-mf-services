@@ -106,7 +106,8 @@
           <mat-form-field appearance="outline" class="col-md-3">
             <mat-label>Estado pago</mat-label>
             <mat-select formControlName="estadoPago">
-              <mat-option *ngFor="let option of estadoPagoOptions" [value]="option.value">{{ option.label }}</mat-option>
+              <mat-option *ngFor="let option of estadoPagoOptions" [value]="option.value">{{ option.label
+                }}</mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -143,24 +144,8 @@
           <div class="totals-value">{{ totalCount || 0 }}</div>
         </div>
         <div class="totals-item">
-          <div class="totals-label"><mat-icon>paid</mat-icon>Monto total</div>
-          <div class="totals-value">{{ totalAmount | number:'1.2-2' }}</div>
-        </div>
-        <div class="totals-item">
           <div class="totals-label"><mat-icon>check_circle</mat-icon>Monto pagado</div>
           <div class="totals-value">{{ totalPaidAmount | number:'1.2-2' }}</div>
-        </div>
-        <div class="totals-item">
-          <div class="totals-label"><mat-icon>cancel</mat-icon>Registros anulados</div>
-          <div class="totals-value">{{ totalAnulados || 0 }}</div>
-        </div>
-        <div class="totals-item">
-          <div class="totals-label"><mat-icon>paid</mat-icon>Registros pagados</div>
-          <div class="totals-value">{{ totalPagados || 0 }}</div>
-        </div>
-        <div class="totals-item">
-          <div class="totals-label"><mat-icon>event_busy</mat-icon>Registros vencidos</div>
-          <div class="totals-value">{{ totalVencidos || 0 }}</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -169,14 +154,15 @@
       <mat-card-content>
         <div class="reports-table-wrap">
           <uni-dynamic-table [columns]="columns" [data]="dataService" element_id="id_qr"
-            [refreshFunction]="searchData.bind(this)" [currentPageIndex]="page - 1" [pageSizeOptions]="[5, 10, 20, 50]" (pageChange)="onPageChange($event)" [lengthTable]="count"
-            (clickButtonEvent)="clickButton($event)"  [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="true" >
+            [refreshFunction]="searchData.bind(this)" [currentPageIndex]="page - 1" [pageSizeOptions]="[5, 10, 20, 50]"
+            (pageChange)="onPageChange($event)" [lengthTable]="count" (clickButtonEvent)="clickButton($event)"
+            [customExportFunction]="exportDataViaAPI.bind(this)" [showExport]="true">
           </uni-dynamic-table>
         </div>
       </mat-card-content>
     </mat-card>
 
-    
+
     <ng-template #generateQrDialog>
       <div class="qr-dialog-header">
         <div class="qr-dialog-icon">
@@ -337,23 +323,33 @@
             </div>
             <div class="report-detail-right">
               <div class="detail-row"><span>ID QR:</span><span>{{ selectedRow?.qr_id || '-' }}</span></div>
-              <div class="detail-row"><span>Fecha generacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.qr_created_at) }}</span></div>
+              <div class="detail-row"><span>Fecha generacion:</span><span>{{
+                  formatDateTimeDisplay(selectedRow?.qr_created_at) }}</span></div>
               <div class="detail-row"><span>Servicio:</span><span>{{ selectedRow?.servicio || '-' }}</span></div>
-              <div class="detail-row"><span>Creado por:</span><span>{{ selectedRow?.generatedBy || selectedRow?.generated_by || '-' }}</span></div>
+              <div class="detail-row"><span>Creado por:</span><span>{{ selectedRow?.generatedBy ||
+                  selectedRow?.generated_by || '-' }}</span></div>
               <div class="detail-row"><span>Job Id:</span><span>{{ selectedRow?.job_id || '-' }}</span></div>
-              <div class="detail-row"><span>Referencia:</span><span>{{ selectedRow?.referencia || selectedRow?.suministro || '-' }}</span></div>
+              <div class="detail-row"><span>Referencia:</span><span>{{ selectedRow?.referencia ||
+                  selectedRow?.suministro || '-' }}</span></div>
               <div class="detail-row"><span>Monto:</span><span>{{ selectedRow?.monto || '-' }}</span></div>
               <div class="detail-row"><span>Titular:</span><span>{{ selectedRow?.titular || '-' }}</span></div>
-              <div class="detail-row"><span>Vencimiento:</span><span>{{ formatDateTimeDisplay(selectedRow?.qr_expired_at) }}</span></div>
-              <div class="detail-row"><span>Descripcion:</span><span>{{ selectedRow?.descripcion || selectedRow?.numero_recibo || '-' }}</span></div>
-              <div class="detail-row"><span>Vigencia:</span><span class="status-pill" [ngClass]="selectedRow?.estado_vigencia">{{ selectedRow?.estado_vigencia || '-' }}</span></div>
-              <div class="detail-row"><span>Estado pago:</span><span class="status-pill" [ngClass]="selectedRow?.estado_pago_text">{{ selectedRow?.estado_pago_text || '-' }}</span></div>
-              <div class="detail-row"><span>Notificacion:</span><span>{{ formatDateTimeDisplay(selectedRow?.notificacion_at) }}</span></div>
-              <div class="detail-row"><span>Fecha pago:</span><span>{{ formatDateTimeDisplay(selectedRow?.pago_at) }}</span></div>
+              <div class="detail-row"><span>Vencimiento:</span><span>{{
+                  formatDateTimeDisplay(selectedRow?.qr_expired_at) }}</span></div>
+              <div class="detail-row"><span>Descripcion:</span><span>{{ selectedRow?.descripcion ||
+                  selectedRow?.numero_recibo || '-' }}</span></div>
+              <div class="detail-row"><span>Vigencia:</span><span class="status-pill"
+                  [ngClass]="selectedRow?.estado_vigencia">{{ selectedRow?.estado_vigencia || '-' }}</span></div>
+              <div class="detail-row"><span>Estado pago:</span><span class="status-pill"
+                  [ngClass]="selectedRow?.estado_pago_text">{{ selectedRow?.estado_pago_text || '-' }}</span></div>
+              <div class="detail-row"><span>Notificacion:</span><span>{{
+                  formatDateTimeDisplay(selectedRow?.notificacion_at) }}</span></div>
+              <div class="detail-row"><span>Fecha pago:</span><span>{{ formatDateTimeDisplay(selectedRow?.pago_at)
+                  }}</span></div>
             </div>
           </div>
           <div class="qr-dialog-actions">
-            <button mat-button *ngIf="showNotificationHistoryAction" (click)="openNotificationHistory()">Ver historial</button>
+            <button mat-button *ngIf="showNotificationHistoryAction" (click)="openNotificationHistory()">Ver
+              historial</button>
             <button mat-button mat-dialog-close>Cerrar</button>
             <button mat-raised-button color="primary" (click)="downloadDetailQrImage()">Descargar PNG</button>
           </div>
@@ -426,131 +422,131 @@
   </div>
 </div>
 
-    <ng-template #cancelDialog>
-      <div class="qr-dialog-header">
-        <div class="qr-dialog-icon">
-          <mat-icon>warning</mat-icon>
-        </div>
-        <div>
-          <div class="qr-dialog-title">Anular QR</div>
-          <div class="qr-dialog-subtitle">Esta acción no se puede revertir.</div>
-        </div>
+<ng-template #cancelDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>warning</mat-icon>
+    </div>
+    <div>
+      <div class="qr-dialog-title">Anular QR</div>
+      <div class="qr-dialog-subtitle">Esta acción no se puede revertir.</div>
+    </div>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <p>¿Deseas anular el QR <strong>{{ cancelRow?.qr_id || '-' }}</strong>?</p>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close [disabled]="isCancelling">Cancelar</button>
+        <button mat-raised-button color="warn" (click)="confirmCancel()" [disabled]="isCancelling">
+          {{ isCancelling ? 'Anulando...' : 'Anular' }}
+        </button>
       </div>
-      <div class="qr-dialog-content">
-        <mat-card class="qr-dialog-card">
-          <p>¿Deseas anular el QR <strong>{{ cancelRow?.qr_id || '-' }}</strong>?</p>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close [disabled]="isCancelling">Cancelar</button>
-            <button mat-raised-button color="warn" (click)="confirmCancel()" [disabled]="isCancelling">
-              {{ isCancelling ? 'Anulando...' : 'Anular' }}
-            </button>
-          </div>
-        </mat-card>
-      </div>
-    </ng-template>
+    </mat-card>
+  </div>
+</ng-template>
 
-    <ng-template #cancelBlockedDialog>
-      <div class="qr-dialog-header">
-        <div class="qr-dialog-icon">
-          <mat-icon>info</mat-icon>
-        </div>
-        <div>
-          <div class="qr-dialog-title">No se puede anular</div>
-          <div class="qr-dialog-subtitle" >{{ headSubTitleAnulado }}</div>
-        </div>
-      </div>
-      <div class="qr-dialog-content">
-        <mat-card class="qr-dialog-card">
-          <p>{{ contentSubTitleAnulado }}</p>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close>Entendido</button>
-          </div>
-        </mat-card>
-      </div>
-    </ng-template>
-    
-    <ng-template #markReturnedDialog>
-      <div class="qr-dialog-header">
-        <div class="qr-dialog-icon">
-          <mat-icon>undo</mat-icon>
-        </div>
-        <div>
-          <div class="qr-dialog-title">Marcar devuelto</div>
-          <div class="qr-result">{{ headSubTitleReturned }}</div>
-        </div>
-      </div>
-      <div class="qr-dialog-content">
-        <mat-card class="qr-dialog-card">
-          <p>{{ contentSubTitleReturned }}</p>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close [disabled]="isMarkingReturned">Cancelar</button>
-            <button mat-raised-button color="accent" (click)="confirmMarkReturned()" [disabled]="isMarkingReturned">
-              {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
-            </button>
-          </div>
-        </mat-card>
-      </div>
-    </ng-template>
-    
-  <ng-template #markReturnedBlockedDialog>
-    <div class="qr-dialog-header">
-      <div class="qr-dialog-icon">
-        <mat-icon>report_problem</mat-icon>
-      </div>
-      <div>
-        <div class="qr-dialog-title">No se puede marcar como devuelto</div>
-        <div class="qr-dialog-subtitle">{{ headSubTitleReturned }}</div>
-      </div>
+<ng-template #cancelBlockedDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>info</mat-icon>
     </div>
-    <div class="qr-dialog-content">
-      <mat-card class="qr-dialog-card">
-        <div class="qr-result">{{ contentSubTitleReturned }}</div>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close>Entendido</button>
-          </div>
-      </mat-card>
+    <div>
+      <div class="qr-dialog-title">No se puede anular</div>
+      <div class="qr-dialog-subtitle">{{ headSubTitleAnulado }}</div>
     </div>
-  </ng-template>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <p>{{ contentSubTitleAnulado }}</p>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close>Entendido</button>
+      </div>
+    </mat-card>
+  </div>
+</ng-template>
 
-    <ng-template #reNotifyDialog>
-      <div class="qr-dialog-header">
-        <div class="qr-dialog-icon">
-          <mat-icon>content_paste_go</mat-icon>
-        </div>
-        <div>
-          <div class="qr-dialog-title">Re notificar pago al webhook del cliente</div>
-          <div class="qr-result">{{ headSubTitleReNotify }}</div>
-        </div>
-      </div>
-      <div class="qr-dialog-content">
-        <mat-card class="qr-dialog-card">
-          <p>{{ contentSubTitleReNotify }}</p>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close [disabled]="isReNotified">Cancelar</button>
-            <button mat-raised-button color="accent" (click)="confirmReNotify()" [disabled]="isReNotified">
-              {{ isReNotified ? 'Re notificando...' : 'Re notificar' }}
-            </button>
-          </div>
-        </mat-card>
-      </div>
-    </ng-template>
-    
-  <ng-template #reNotifyBlockedDialog>
-    <div class="qr-dialog-header">
-      <div class="qr-dialog-icon">
-        <mat-icon>report_problem</mat-icon>
-      </div>
-      <div>
-        <div class="qr-dialog-title">No se puede re notificar el pago al webhook del cliente</div>
-        <div class="qr-dialog-subtitle">{{ headSubTitleReNotify }}</div>
-      </div>
+<ng-template #markReturnedDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>undo</mat-icon>
     </div>
-    <div class="qr-dialog-content">
-      <mat-card class="qr-dialog-card">
-        <div class="qr-result">{{ contentSubTitleReNotify }}</div>
-          <div class="qr-dialog-actions">
-            <button mat-button mat-dialog-close>Entendido</button>
-          </div>
-      </mat-card>
+    <div>
+      <div class="qr-dialog-title">Marcar devuelto</div>
+      <div class="qr-result">{{ headSubTitleReturned }}</div>
     </div>
-  </ng-template>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <p>{{ contentSubTitleReturned }}</p>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close [disabled]="isMarkingReturned">Cancelar</button>
+        <button mat-raised-button color="accent" (click)="confirmMarkReturned()" [disabled]="isMarkingReturned">
+          {{ isMarkingReturned ? 'Actualizando...' : 'Marcar devuelto' }}
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</ng-template>
+
+<ng-template #markReturnedBlockedDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>report_problem</mat-icon>
+    </div>
+    <div>
+      <div class="qr-dialog-title">No se puede marcar como devuelto</div>
+      <div class="qr-dialog-subtitle">{{ headSubTitleReturned }}</div>
+    </div>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <div class="qr-result">{{ contentSubTitleReturned }}</div>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close>Entendido</button>
+      </div>
+    </mat-card>
+  </div>
+</ng-template>
+
+<ng-template #reNotifyDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>content_paste_go</mat-icon>
+    </div>
+    <div>
+      <div class="qr-dialog-title">Re notificar pago al webhook del cliente</div>
+      <div class="qr-result">{{ headSubTitleReNotify }}</div>
+    </div>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <p>{{ contentSubTitleReNotify }}</p>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close [disabled]="isReNotified">Cancelar</button>
+        <button mat-raised-button color="accent" (click)="confirmReNotify()" [disabled]="isReNotified">
+          {{ isReNotified ? 'Re notificando...' : 'Re notificar' }}
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</ng-template>
+
+<ng-template #reNotifyBlockedDialog>
+  <div class="qr-dialog-header">
+    <div class="qr-dialog-icon">
+      <mat-icon>report_problem</mat-icon>
+    </div>
+    <div>
+      <div class="qr-dialog-title">No se puede re notificar el pago al webhook del cliente</div>
+      <div class="qr-dialog-subtitle">{{ headSubTitleReNotify }}</div>
+    </div>
+  </div>
+  <div class="qr-dialog-content">
+    <mat-card class="qr-dialog-card">
+      <div class="qr-result">{{ contentSubTitleReNotify }}</div>
+      <div class="qr-dialog-actions">
+        <button mat-button mat-dialog-close>Entendido</button>
+      </div>
+    </mat-card>
+  </div>
+</ng-template>
