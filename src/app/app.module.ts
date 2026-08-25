@@ -18,6 +18,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { DialogServiceConfigComponent } from './dialogs/dialog-service-config/dialog-service-config.component';
 import { DialogServiceAssignProviderStatusComponent } from './dialogs/dialog-service-assign-provider-status/dialog-service-assign-provider-status.component';
 import { DialogTemplateAssignServiceComponent } from './dialogs/dialog-template-assign-services/dialog-template-assign-services.component';
+import { DialogServiceCreationAssignmentComponent } from './dialogs/dialog-service-creation-assignment/dialog-service-creation-assignment.component';
+import { DialogTemplateCreateServicesComponent } from './dialogs/dialog-template-create-services/dialog-template-create-services.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { DialogTemplateAssignServiceComponent } from './dialogs/dialog-template-
     DialogServiceAssignProviderStatusComponent,
     DialogCommissionAssingServiceComponent,
     DialogServiceConfigComponent,
-    DialogTemplateAssignServiceComponent
+    DialogTemplateAssignServiceComponent,
+    DialogServiceCreationAssignmentComponent,
+    DialogTemplateCreateServicesComponent
   ],
   imports: [
     BrowserModule,

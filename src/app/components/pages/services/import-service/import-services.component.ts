@@ -7,6 +7,9 @@ import { ServicesService } from 'src/app/services/services.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as XLSX from 'xlsx';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogTemplateCreateServicesComponent } from 'src/app/dialogs/dialog-template-create-services/dialog-template-create-services.component';
+
 
 @Component({
   selector: 'uni-update-services',
@@ -41,6 +44,8 @@ export class ImportServicesComponent implements OnInit {
     private serviceServ: ServicesService,
     private spinner: SpinnerService,
     private mytoastr: MytoastrService,
+    private dialog: MatDialog,
+    
   ) { }
 
   ngOnInit(): void {
@@ -110,15 +115,15 @@ export class ImportServicesComponent implements OnInit {
     const data: any[] = [];
 
     for (let i = 1; i <= 3; i++) {
-      const refKey = `Referencia ${i}`;
-      const typeKey = `Tipo de campo de referencia ${i}`;
-      const lengthKey = `Longitud de campo referencia ${i}`;
+      const refKey = `REFERENCIA ${i}`;
+      const typeKey = `TIPO DE CAMPO DE REFERENCIA ${i}`;
+      const lengthKey = `LONGITUD DE CAMPO REFERENCIA ${i}`;
       if (value[refKey] !== 0) {
         if (value[refKey]?.trim()) {
           const fieldType = value[typeKey]?.trim() === 'N' ? 'NUMERICO' : 'ALFANUMERICO';
 
           const isFirstRef = i === 1;
-          const modalidad = value['Modalidad de Recaudo'];
+          const modalidad = value['MODALIDAD DE RECAUDO'];
           const isMandatory = (modalidad === 'DATA ENTRY') ||
             (modalidad === 'BASE DE DATOS' && isFirstRef) ||
             (modalidad === 'INTERCONECTADA' && isFirstRef);
@@ -139,7 +144,7 @@ export class ImportServicesComponent implements OnInit {
       }
     }
 
-    if (value['Modalidad de Recaudo'] === 'DATA ENTRY') {
+    if (value['MODALIDAD DE RECAUDO'] === 'DATA ENTRY') {
       data.push({
         id: 'IMPOR',
         name: 'IMPORTE DE LA DEUDA',
@@ -159,11 +164,11 @@ export class ImportServicesComponent implements OnInit {
 
   //Metodo para generar los indicadores
   generateIndicators(value: any): any[] {
-    const modalidad = value['Modalidad de Recaudo'];
+    const modalidad = value['MODALIDAD DE RECAUDO'];
     const bd = modalidad === 'BASE DE DATOS' || modalidad === 'INTERCONECTADA';
     const inter = modalidad === 'INTERCONECTADA';
-    const pago = value['Pago Parcial'] !== 'NO';
-    const deuda = value['Deuda más antigua primero T'] !== 'No';
+    const pago = value['PAGO PARCIAL'] !== 'NO';
+    const deuda = value['DEUDA MÁS ANTIGUA PRIMERO T'] !== 'NO';
 
     return [
       { id: 'PAY_BILL', name: 'BASE DE DATOS', isActive: bd },
@@ -185,10 +190,10 @@ export class ImportServicesComponent implements OnInit {
 
   // Método para transformar los datos del Excel a la estructura requerida
   transformExcelData(jsonData: any[]): any[] {
-    const REQUIRED_COLUMNS = ["ITEM", "ID SERVICIO", "ID CATEGORIA", "CATEGORIA AGENTE CASH", "Descripción del convenio",
-      "Estado del convenio T", "Modalidad de Recaudo", "Pago Parcial", "Deuda más antigua primero T", "Referencia 1",
-      "Tipo de campo de referencia 1", "Longitud de campo referencia 1", "Referencia 2", "Tipo de campo de referencia 2",
-      "Longitud de campo referencia 2", "Referencia 3", "Tipo de campo de referencia 3", "Longitud de campo referencia 3",
+    const REQUIRED_COLUMNS = ["ITEM", "ID SERVICIO", "ID CATEGORIA", "CATEGORIA AGENTE CASH", "DESCRIPCIÓN DEL CONVENIO",
+      "ESTADO DEL CONVENIO T", "MODALIDAD DE RECAUDO", "PAGO PARCIAL", "DEUDA MÁS ANTIGUA PRIMERO T", "REFERENCIA 1",
+      "TIPO DE CAMPO DE REFERENCIA 1", "LONGITUD DE CAMPO REFERENCIA 1", "REFERENCIA 2", "TIPO DE CAMPO DE REFERENCIA 2",
+      "LONGITUD DE CAMPO REFERENCIA 2", "REFERENCIA 3", "TIPO DE CAMPO DE REFERENCIA 3", "LONGITUD DE CAMPO REFERENCIA 3",
     ];
 
     // Validar que haya datos
@@ -197,7 +202,7 @@ export class ImportServicesComponent implements OnInit {
       return [];
     }
 
-    // Validar que todas las columnas requeridas estén presentes
+    // Validar que todas las columnas requeridas estén presentes 
     const headers = Object.keys(jsonData[0]);
     const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
     if (missingColumns.length > 0) {
@@ -206,13 +211,13 @@ export class ImportServicesComponent implements OnInit {
     }
 
     // Filtrar registros que estén Activos
-    //const filteredData = jsonData.filter(value => value['Estado del convenio T'] == 'Activo');
+    //const filteredData = jsonData.filter(value => value['ESTADO DEL CONVENIO T'] == 'Activo');
     const filteredData = jsonData;
     // Transformar los registros filtrados
     return filteredData.map(value => {
       const pk = uuidv4();
       const sk = `SERVICE#${pk}`;
-      const status = value['Estado del convenio T'] === 'Activo'
+      const status = value['ESTADO DEL CONVENIO T'] === 'Activo'
         ? 'HABILITADO'
         : 'BLOQUEADO';
 
@@ -220,12 +225,12 @@ export class ImportServicesComponent implements OnInit {
       let comissionFixed = "";
       let comissionPct = "";
 
-      if (value['Tipo Comisión'] === 'Comisión fija') {
+      if (value['TIPO COMISIÓN'] === 'COMISIÓN FIJA') {
         comission = 'FIJO';
-        comissionFixed = value['Comisión  a pagar B2CASH  sin IGV'];
-      } else if (value['Tipo Comisión'] === 'Comsión porcentual sobre el monto') {
+        comissionFixed = value['COMISIÓN A PAGAR B2CASH SIN IGV'];
+      } else if (value['TIPO COMISIÓN'] === 'COMISIÓN PORCENTUAL') {
         comission = 'PORCENTUAL';
-        comissionPct = value['Comisión  a pagar B2CASH  sin IGV'];
+        comissionPct = value['COMISIÓN A PAGAR B2CASH SIN IGV'];
       }
 
       // const comissionType = ['FIJO', 'PORCENTUAL', 'MULTIPLE'][commissions.type - 1];
@@ -234,7 +239,7 @@ export class ImportServicesComponent implements OnInit {
         PK: pk,
         SK: sk,
         ADDITIONAL_PAYMENT_FIELDS: JSON.stringify(this.generateAdditionalPayment(value)),
-        BUSINESS: value['Descripción del convenio'].trim(),
+        BUSINESS: value['DESCRIPCIÓN DEL CONVENIO'].trim(),
         DATE: new Date(),
         ID_CLIENT: '00000100',
         ID_PROVIDER: this.requiredIdClient,
@@ -244,7 +249,7 @@ export class ImportServicesComponent implements OnInit {
         INDICATORS: JSON.stringify(this.generateIndicators(value)),
         PREFIX: 'SERVICE',
         SERVICE_CATEGORY: value['CATEGORIA AGENTE CASH'],
-        SERVICE_NAME: value['Descripción del convenio'].trim(),
+        SERVICE_NAME: value['DESCRIPCIÓN DEL CONVENIO'].trim(),
         STATUS: status,
         TYPE_COMISSION: comission,
         TYPE_SERVICE: value['CATEGORIA AGENTE CASH'],
@@ -400,4 +405,15 @@ export class ImportServicesComponent implements OnInit {
     this.showExcelUpload = false;
   }
 
+  downloadTemplate() {
+    const dialogRef = this.dialog.open(DialogTemplateCreateServicesComponent
+      , {
+        width: '900px',
+        maxHeight: '80vh'
+      });
+
+    dialogRef.afterClosed().subscribe(result => {
+
+    });
+  }
 }

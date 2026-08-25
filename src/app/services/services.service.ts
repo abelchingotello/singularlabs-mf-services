@@ -179,6 +179,10 @@ export class ServicesService {
     return this.httpClient.patch(`${this.url}/services`, data);
   }
 
+  serviceAdvancedDataUpdate(data: any, id: any): Observable<any> {
+    return this.httpClient.patch(`${this.url}/services/${id}`, data);
+  }
+
   updateServiceEntity(data: any): Observable<any> {
     return this.httpClient.patch(`${this.url}/services/status/entity`, data);
   }
