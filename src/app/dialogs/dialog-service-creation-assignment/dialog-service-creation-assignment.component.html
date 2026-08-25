@@ -1,0 +1,63 @@
+<div class="bg-dialog p-3">
+    <h3 class="m-0 text-dialog">ACTUALIZACION AVANZADA DE SERVICIO {{data.serviceName }}</h3>
+</div>
+
+<form [formGroup]="formCommissionClient" class="p-3">
+
+    <p>Permite modificar información avanzada de la creación y asignación del servicio en una sola acción.</p>
+
+    <mat-form-field appearance="outline" class="col-md-4 ">
+        <mat-label>ID de Servicio</mat-label>
+        <input formControlName="serviceId" type="text" matInput >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-4 ">
+        <mat-label>Nombre de Servicio</mat-label>
+        <input formControlName="serviceName" type="text" matInput>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline" fxFlex="25%" class="col-md-4">
+        <mat-label>Convenio</mat-label>
+        <input formControlName="service_convenio" type="text" matInput />
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" fxFlex="75%" class="col-md-4">
+        <mat-label>Modalidad de Recaudo </mat-label>
+        <mat-select formControlName="service_collection_type"
+            (selectionChange)="applyIndicatorRulesByServiceType($event)">
+            <mat-option *ngFor="let modalidad of modalidadRecaudo"
+                [value]="modalidad.master_value">{{modalidad.master_name}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-md-4">
+        <mat-label>Indicadores</mat-label>
+        <mat-select formControlName="service_indicators"
+            (selectionChange)="selectIndicat($event)" multiple>
+            <mat-option *ngFor="let indicator of indicatrs" [value]="indicator.id"
+                [disabled]="indicator.id === 'PAY_BILL' || indicator.id === 'PAY_ONLINE'">
+
+                {{ indicator.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+</form>
+
+<div class="d-flex justify-content-end m-2">
+    <button (click)="onNoClick()" class="btn button-secondary" >
+        <mat-icon>clear</mat-icon>Cancelar
+    </button> 
+    <button mat-button class="btn button-tertiary" cdkFocusInitial (click)="updateServic()">
+        <ng-container *ngIf="!activedSpinnerSend">
+            <mat-icon>update</mat-icon>
+            Actualizar
+        </ng-container>
+        <ng-container *ngIf="activedSpinnerSend">
+        <span class="spinner-border spinner-border-sm block"
+            aria-hidden="true"></span>
+        Actualizando...
+        </ng-container>
+    </button>
+</div>

@@ -3,7 +3,8 @@
     <uni-image-card title="Importación de servicios"
       externImage="https://static.vecteezy.com/system/resources/previews/010/186/154/non_2x/import-and-export-document-line-icon-illustration-vector.jpg"
       size="8%">
-      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" *ngIf="valueImport=='create'">
+      <button type="button" class="mb-2 mb-md-0 custom-button btn button-tertiary me-2" *ngIf="valueImport=='create'" 
+       (click)="downloadTemplate()">
         <mat-icon>download_file</mat-icon>
         <span class="custom-span-icon-responsive">Plantilla para Crear</span>
       </button>

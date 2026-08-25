@@ -12,6 +12,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { PaginationUtils } from 'src/app/utilities/PaginationUtils';
 import { expand, filter, forkJoin, EMPTY, scan, startWith, lastValueFrom, finalize, map } from 'rxjs';
 import { DialogServiceConfigComponent } from 'src/app/dialogs/dialog-service-config/dialog-service-config.component';
+import { DialogServiceCreationAssignmentComponent } from 'src/app/dialogs/dialog-service-creation-assignment/dialog-service-creation-assignment.component';
+
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -55,6 +57,13 @@ export class ServicesComponent implements OnInit {
             toolTip: 'Configurar Servicio',
             icon: 'settings_applications',
             value: 'config_service',
+            permission: "services-config"
+          },
+          {
+            bgClass: 'blue',
+            toolTip: 'Editar Campos Avanzados',
+            icon: 'build_circle',
+            value: 'config_service_plus',
             permission: "services-config"
           }
         ]
@@ -321,6 +330,9 @@ export class ServicesComponent implements OnInit {
     if (value == "config_service") {
       console.log("element: ", element)
       this.openDialogConfigService(element)
+    }else if(value == "config_service_plus") {
+      console.log("element: ", element)
+      this.openDialogCreationAssignment(element)
     }
   }
 
@@ -351,6 +363,37 @@ export class ServicesComponent implements OnInit {
 
 
   }
+
+  
+    openDialogCreationAssignment(data: any): void {
+      const typeCommission = data.fixedcomission && data.pctcomission ? "MULTIPLE" : data.fixedcomission ? "FIJO" : data.pctcomission ? "PORCENTUAL" : null;
+      const dialogRef = this.dialog.open(DialogServiceCreationAssignmentComponent, {
+        width: '900px',
+        data: {
+          serviceName: data.name,
+          serviceId: data.id,
+          serviceStatus: data.status,
+          serviceComisionFixed: data.ownFixedComission,
+          serviceComisionPrc: data.ownPctComission,
+          serviceTypeComission: data.ownTypeComission ?? typeCommission,
+          serviceType: data.serviceType.name,
+          clientName: data.nameClient ?? data.idClient,
+          clientId: data.idClient,
+          //status: this.masterStatus,
+          business: data.business,
+          serviceIdProv: data.id_serviceProv,
+          indicators: data.indicators,
+          serviceComisionCriterio: data.ownComissionCriterion,
+          serviceAmountTransactionRestriccion: data.amountTransactionRestriccion
+        }
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === "200") {
+          this.reload();
+        }
+      });
+    }
 
   editElement(id: any) {
     this.router.navigate([`/service/edit/${id}`]);
