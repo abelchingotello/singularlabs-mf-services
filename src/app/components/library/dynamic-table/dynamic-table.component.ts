@@ -21,6 +21,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, formatDate } from '@angular/common';
 import { utils, writeFile, WorkBook } from 'xlsx';
+import * as XLSX from 'xlsx';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -85,6 +86,8 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, 
   @Input() shouldExport: boolean = false;
   @Input() showExport: boolean = true;
   @Input() pageSizeOptions: number[] = [5, 10, 20, 50];
+  @Input() pageSize: number = 5;
+
   @Input() currentPageIndex: number = 0;
 
   @Output() toggleChange = new EventEmitter<any>();
@@ -93,6 +96,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, 
   @Output() selectedIdsChange = new EventEmitter<any[]>();
   @Output() selectedChange = new EventEmitter<any[]>();
   @Output() cellClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() exportRequest = new EventEmitter<'xlsx' | 'csv'>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
@@ -111,7 +115,7 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, 
   public selectedIds: any[] = [];
   public currentEventPage: PageEvent;
   public isCheckedClass: any;
-  public pageSize = 5;
+  //public pageSize = 5;
   public paginatorLength: any;
   public dataCurrent: boolean;
   public previousDataLength = 0;// 1. Agregar el import
@@ -405,8 +409,27 @@ export class DynamicTableComponent implements OnInit, AfterViewInit, OnChanges, 
   }
 
   exportExcel() {
+    console.log('entrando')
     if (this.customExportFunction) {
       this.customExportFunction('xlsx');
+    } else {
+      this.exportRequest.emit('xlsx');
+      const wb = this.createWorkbook('Users');
+      const ws = wb.Sheets['Users'];
+
+      // Ajusta el ancho de las columnas según el contenido
+      const columnWidths = this.columns.map(col => {
+        const maxWidth = Math.max(
+          col.name.length, // Longitud del encabezado
+          ...this.filterAttributes().map(item => (item[col.attribute] ? item[col.attribute].toString().length : 0)) // Longitud de los valores
+        );
+        return { wpx: maxWidth * 10 }; // Multiplica por un factor para un mejor ajuste visual
+      });
+
+      // Establece los anchos de las columnas
+      ws['!cols'] = columnWidths;
+
+      XLSX.writeFile(wb, 'Excel tabla.xlsx');
     }
   }
 
