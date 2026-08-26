@@ -28,6 +28,11 @@ export interface PaymentFieldDataType {
   fieldTypeName: string; // nombre técnico completo
   fieldMask: string;     // máscara técnica asociada
 }
+export enum ServiceMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+  ADVANCED = 'advanced'
+}
 
 @Component({
   selector: 'uni-new-service',
@@ -39,6 +44,7 @@ export class NewServiceComponent implements OnInit {
   public originalExtras: any = null;
   public originalBodyBase: any = null;
   public originalIdServiceProv: string | null = null;
+  public mode: ServiceMode;
 
   // Catálogo de tipos de dato amigables para "Datos Pagos-Adicionales".
   // Solo ALFANUMERICO y NUMERICO están confirmados contra el importador.
@@ -147,20 +153,44 @@ export class NewServiceComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.spinner.spinnerOnOff();
-    this.userName = this.authService.getUser();
     this.idService = this.activeRouter.snapshot.params['id'];
+    this.mode = this.activeRouter.snapshot.data['mode'];
 
+    this.userName = this.authService.getUser();
     this.initializeFormGroup();
     await this.listData();
 
-    if (this.idService) {
-      this.titlle = 'Editar Servicio';
-      await this.getIdService(this.idService);
-      this.takeOriginalSnapshot();
-    } else {
-      this.service_zone.setValue('MULTIDEPARTAMENTAL');
-      this.service_zone.disable();
-      this.spinner.spinnerOnOff();
+    switch (this.mode) {
+
+      case ServiceMode.CREATE:
+        this.titlle = 'Nuevo Servicio';
+        
+        this.service_zone.setValue('MULTIDEPARTAMENTAL');
+        this.service_zone.disable();
+        this.spinner.spinnerOnOff();
+        break;
+
+      case ServiceMode.EDIT:
+        this.titlle = 'Editar Servicio';
+        await this.getIdService(this.idService);
+        
+        this.service_name.disable();
+        this.service_convenio.disable();
+        this.service_type.disable();
+        this.service_type_business.disable();
+
+        this.takeOriginalSnapshot();
+        break;
+
+      case ServiceMode.ADVANCED:
+        this.titlle = 'Edición Avanzada de Servicio';
+        this.steps = [
+          'datos-servicio',
+          'datos-pagos'
+        ];
+        await this.getIdService(this.idService);
+        this.takeOriginalSnapshot();
+        break;
     }
 
     this.inputMayusName();
@@ -289,10 +319,10 @@ export class NewServiceComponent implements OnInit {
       this.currentStep = 0;
       return;
     }
-    if (!this.comissionForm.valid) {
-      this.mytoastr.showWarning('Complete los datos de comisiones', '');
-      this.currentStep = 1;
-      return;
+    if ( this.mode !== ServiceMode.ADVANCED && !this.comissionForm.valid ) {
+        this.mytoastr.showWarning('Complete los datos de comisiones', '');
+        this.currentStep = 1;
+        return;
     }
     if (this.dataPayment.length === 0) {
       this.mytoastr.showWarning('Agregue al menos un pago adicional', '');
@@ -300,8 +330,104 @@ export class NewServiceComponent implements OnInit {
       return;
     }
 
+    switch (this.mode) {
+
+      case ServiceMode.CREATE:
+        this.AddService();
+        break;
+
+      case ServiceMode.EDIT:
+        this.updateService();
+        break;
+
+      case ServiceMode.ADVANCED:
+        this.updateServiceAdvanced()
+        break;
+    }
+  }
+
+  updateServiceAdvanced(){
+    
     const serviceRaw = this.serviceForm.getRawValue();
     const comissionRaw = this.comissionForm.getRawValue();
+
+    console.log('serviceRaw',serviceRaw)
+    console.log('comissionRaw',comissionRaw)
+
+    const bodyEditAdvanced = {
+      idServiceProv: this.serviceForm.getRawValue().service_convenio || this.originalIdServiceProv || this.numConvenio(),
+      serviceName: this.serviceForm.getRawValue().service_name,
+      userRegistration: this.userName.Username,
+      idTypeService: String(this.serviceForm.getRawValue().service_type.master_idTypeService),
+      typeService: this.serviceForm.getRawValue().service_type.master_name,
+      business: this.serviceForm.getRawValue().service_type_business,
+      status: this.serviceForm.getRawValue().service_state,
+      zone: this.serviceForm.getRawValue().service_zone ?? null,
+      indicators: this.indicatrs,
+      additionalPaymentFields: this.buildAdditionalPaymentFieldsPayload()
+    }
+
+    const hasFormChanges = this.hasDiff(
+      { service: serviceRaw, comission: comissionRaw },
+      this.originalFormData
+    );
+    //analizamos que existan cambios
+    const hasExtraChanges = this.hasDiff(
+      { indicators: this.indicatrs, additionalPaymentFields: this.dataPayment },
+      this.originalExtras
+    );
+
+    console.log('this.originalFormData',this.originalFormData)
+    console.log('this.originalExtras',this.originalExtras)
+
+    if ( !hasFormChanges && !hasExtraChanges) {
+      this.mytoastr.showWarning('', 'No se identificaron cambios');
+      return;
+    }
+
+    //Obtenemos campos a actualizar
+    const changedBody = this.getBodyDiff(bodyEditAdvanced, this.originalBodyBase);
+    changedBody.userRegistration = this.userName.Username;
+
+    console.log("changedBody: ", changedBody);
+
+    const dataUpdate = {
+      updateIdServiceProv: true,//Bandera para asignación de creación y asignación
+      updates: changedBody,
+      removes: ''
+    };
+
+    this.service.serviceAdvancedDataUpdate(dataUpdate, this.idService).subscribe({
+      next: (response: any) => {
+        this.mytoastr.showSuccess('Servicio Actualizado correctamente', '');
+        this.router.navigate(['/service']);
+      },
+      error: (error: any) => {
+        console.error('ERROR: ', error);
+        this.mytoastr.showError( error.error.messages || 'Error durante la actualización', '');
+      }
+    });
+
+  }
+
+  /**
+   * Arma el arreglo de additionalPaymentFields exactamente con la misma
+   * forma que ya espera el backend (id, name, fieldType{id,name}, fieldMask,
+   * maximumLength, isMandatory, isEditable). Las propiedades dataTypeKey /
+   * dataTypeLabel son solo para uso interno del frontend (mostrar el tipo
+   * amigable en la tabla) y NO se envían al backend.
+   */
+  private buildAdditionalPaymentFieldsPayload(): any[] {
+    return this.dataPayment.map(({ dataTypeKey, dataTypeLabel, ...backendField }) => backendField);
+  }
+
+  updateService() {
+    
+    const serviceRaw = this.serviceForm.getRawValue();
+    const comissionRaw = this.comissionForm.getRawValue();
+
+    console.log('serviceRaw',serviceRaw)
+    console.log('comissionRaw',comissionRaw)
 
     const bodyBase = {
       idProvider: serviceRaw.service_prov,
@@ -329,25 +455,6 @@ export class NewServiceComponent implements OnInit {
       additionalPaymentFields: this.buildAdditionalPaymentFieldsPayload()
     };
 
-    if (!this.idService) {
-      this.AddService(bodyBase);
-    } else {
-      this.updateService(bodyBase, serviceRaw, comissionRaw);
-    }
-  }
-
-  /**
-   * Arma el arreglo de additionalPaymentFields exactamente con la misma
-   * forma que ya espera el backend (id, name, fieldType{id,name}, fieldMask,
-   * maximumLength, isMandatory, isEditable). Las propiedades dataTypeKey /
-   * dataTypeLabel son solo para uso interno del frontend (mostrar el tipo
-   * amigable en la tabla) y NO se envían al backend.
-   */
-  private buildAdditionalPaymentFieldsPayload(): any[] {
-    return this.dataPayment.map(({ dataTypeKey, dataTypeLabel, ...backendField }) => backendField);
-  }
-
-  updateService(bodyBase: any, serviceRaw: any, comissionRaw: any) {
     const hasFormChanges = this.hasDiff(
       { service: serviceRaw, comission: comissionRaw },
       this.originalFormData
@@ -439,7 +546,36 @@ export class NewServiceComponent implements OnInit {
     return diff;
   }
 
-  AddService(data: any) {
+  AddService( ) {
+    const serviceRaw = this.serviceForm.getRawValue();
+    const comissionRaw = this.comissionForm.getRawValue();
+
+    const data = {
+      idProvider: serviceRaw.service_prov,
+      idClient: '00000100',
+      idServiceProv: serviceRaw.service_convenio || this.originalIdServiceProv || this.numConvenio(),
+      serviceName: serviceRaw.service_name,
+      userRegistration: this.userName.Username,
+      idTypeService: String(serviceRaw.service_type.master_idTypeService),
+      typeService: serviceRaw.service_type.master_name,
+      business: serviceRaw.service_type_business,
+      status: serviceRaw.service_state,
+      zone: serviceRaw.service_zone ?? null,
+      collectorName: '',
+      typeComission: comissionRaw.comission_type,
+      comissionFixed: comissionRaw.comission_fixed,
+      comissionRange: comissionRaw.comission_range_lower != null
+        ? JSON.stringify({
+          lower: comissionRaw.comission_range_lower,
+          upper: comissionRaw.comission_range_upper
+        })
+        : this.originalBodyBase?.comissionRange ?? null,
+      comissionCriterion: comissionRaw.comission_criterion,
+      comissionPCT: comissionRaw.comission_percentage,
+      indicators: this.indicatrs,
+      additionalPaymentFields: this.buildAdditionalPaymentFieldsPayload()
+    };
+
     this.service.registerService(data).subscribe({
       next: (response: any) => {
         if (response.statusCode !== 200) {
@@ -547,17 +683,16 @@ export class NewServiceComponent implements OnInit {
     });
   }
 
-  private async getIdService(idService: string): Promise<void> {
+   private async getIdService(idService: string): Promise<void> {
     this.loadingExistingService = true;
     try {
       const response: any = await firstValueFrom(this.service.getIdServices(idService));
       const data = response.data;
-
+      
       this.service_name.setValue(data.name);
-      this.service_name.disable();
 
       this.service_convenio.setValue(data.id_serviceProv);
-      this.service_convenio.disable();
+
       this.originalIdServiceProv = data.id_serviceProv;
 
       this.service_prov.setValue(data.idProvider);
@@ -568,10 +703,8 @@ export class NewServiceComponent implements OnInit {
       this.service_state.setValue(data.status);
       const typeSrv = this.typeService.find((t: any) => t.master_name === data.serviceType.name);
       this.service_type.setValue(typeSrv);
-      this.service_type.disable();
 
       this.service_type_business.setValue(data.business);
-      this.service_type_business.disable();
 
       this.dataPayment = this.mapExistingPaymentFields(data['additional-payment-fields']);
       this.register = [...this.dataPayment];
@@ -586,11 +719,12 @@ export class NewServiceComponent implements OnInit {
         i => i.id === 'PAY_ONLINE' && i.isActive
       );
 
-      let modalidad = '';
+      let modalidad = '-';
 
       if (baseDatos) {
         modalidad = 'PAY_BILL';
-      } else if (interconectado) {
+      } 
+       if (interconectado) {
         modalidad += ', PAY_ONLINE';
       }
 
@@ -736,6 +870,10 @@ export class NewServiceComponent implements OnInit {
       .toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour12: false })
       .replace(/:/g, '');
     return `${anio}${dia}${mes}${timeLocal}`;
+  }
+
+  get isAdvanced(): boolean {
+    return this.mode === ServiceMode.ADVANCED;
   }
 
   // GETTERS

@@ -13,155 +13,33 @@
         Columnas requeridas
     </h4>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Columna</th>
-                <th>Descripción</th>
-                <th>Requerido</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>ITEM</code></td>
-                <td>Número de fila a evaluar</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>ID CATEGORIA</code></td>
-                <td>Identificador de la categoría de AgenteCash</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>CATEGORIA AGENTE CASH</code></td>
-                <td>Nombre de la categoría de AgenteCash</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>ID SERVICIO</code></td>
-                <td>Código del servicio asignado por el proveedor</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>TIPO COMISIÓN</code></td>
-                <td>Tipo de comisión aplicada (ver sección inferior)</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>COMISIÓN A PAGAR B2CASH SIN IGV</code></td>
-                <td>Valor numérico de la comisión principal</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>DESCRIPCIÓN DEL CONVENIO</code></td>
-                <td>Nombre descriptivo del servicio</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>MODALIDAD DE RECAUDO</code></td>
-                <td>Forma de recaudación (BASE DE DATOS, INTERCONECTADA, DATA ENTRY)</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>PAGO PARCIAL</code></td>
-                <td>Indentificador del servicio sobre pago</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>DEUDA MÁS ANTIGUA PRIMERO T</code></td>
-                <td>Indentificador del servicio sobre pago</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>REFERENCIA 1</code></td>
-                <td>Primer campo de REFERENCIA del cliente</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>LONGITUD DE CAMPO REFERENCIA 1</code></td>
-                <td>Cantidad de caracteres del campo de REFERENCIA 1</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>TIPO DE CAMPO DE REFERENCIA 1</code></td>
-                <td>Tipo de dato del campo de REFERENCIA 1 (A: Alfanumérico, N: Numérico)</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>REFERENCIA 2</code></td>
-                <td>Segundo campo de REFERENCIA del cliente</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>LONGITUD DE CAMPO REFERENCIA 2</code></td>
-                <td>Cantidad de caracteres del campo de REFERENCIA 2</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>TIPO DE CAMPO DE REFERENCIA 2</code></td>
-                <td>Tipo de dato del campo de REFERENCIA (A: Alfanumérico, N: Numérico)</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>REFERENCIA 3</code></td>
-                <td>Tercer campo de REFERENCIA del cliente</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>LONGITUD DE CAMPO REFERENCIA 3</code></td>
-                <td>Cantidad de caracteres del campo de REFERENCIA 3</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>TIPO DE CAMPO DE REFERENCIA 3</code></td>
-                <td>Tipo de dato del campo de REFERENCIA 3 (A: Alfanumérico, N: Numérico)</td>
-                <td><mat-icon>remove_circle_outline</mat-icon></td>
-            </tr>
-            <tr>
-                <td><code>ESTADO DEL CONVENIO T</code></td>
-                <td>Estado del servicio (Suspendido, Activo)</td>
-                <td><mat-icon>check_circle</mat-icon></td>
-            </tr>
-        </tbody>
-    </table>
 
-    <h4>
-        <mat-icon>monetization_on</mat-icon>
-        ¿Cómo llenar las comisiones?
+    <div>
+        <uni-dynamic-table 
+            [columns]="columns2" 
+            [data]="dataTemplateColumns"
+            [lengthTable]="dataTemplateColumns.length"
+            [pageSizeOptions]="[10, 20, dataTemplateColumns.length]"
+            [currentPageIndex]="0"
+            [paginationinFrontend]="true"
+            [showExport]="true"
+            [pageSize]="dataTemplateColumns.length">
+        </uni-dynamic-table>
+    </div>
+    
+    
+    <h4 style="padding: 10px 0 0 0;">
+        <mat-icon>category</mat-icon>
+        Lista de categorías de AgenteCash
     </h4>
+    <div>
+        <uni-dynamic-table [columns]="columns" [data]="dataCategorie" element_id="id" [pageKey]="pageKey"
+            [refreshFunction]="reload.bind(this)"  [lengthTable]="count"
+            [showExport]="true" 
+            (pageChange)="onPageChange($event, 'tabla1')">
 
-    <p>
-        El campo <strong>TIPO DE COMISION</strong> determina qué otros campos deben completarse.
-        Use exactamente los valores indicados a continuación:
-    </p>
-
-    <p><strong>Comisión fija</strong> — valor exacto: <code>Comisión fija</code></p>
-    <ul>
-        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo (ej: <code>0.6</code>)</li>
-        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> no requerido</li>
-        <li><strong>CRITERIO DE COMISION:</strong> no requerido</li>
-    </ul>
-
-    <p><strong>Comisión porcentual</strong> — valor exacto: <code>Comisión porcentual sobre el monto</code></p>
-    <ul>
-        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> porcentaje (ej: <code>0.001</code>)</li>
-        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> no requerido</li>
-        <li><strong>CRITERIO DE COMISION:</strong> no requerido</li>
-    </ul>
-
-    <p><strong>Comisión Múltiple</strong> — valor exacto: <code>Comisión Múltiple</code></p>
-    <ul>
-        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo (ej: <code>0.6</code>)</li>
-        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> porcentaje (ej: <code>0.001</code>)</li>
-        <li><strong>CRITERIO DE COMISION:</strong> criterio de aplicación (ej: <code>100</code>)</li>
-    </ul>
-
-    <p><strong>Comisión fija según monto</strong> — valor exacto: <code>Comisión fija segun monto</code></p>
-    <ul>
-        <li><strong>VALOR DE COMISION PRINCIPAL:</strong> monto fijo inferior del rango (ej: <code>1.3</code>)</li>
-        <li><strong>VALOR DE COMISION SECUNDARIA:</strong> monto fijo superior del rango (ej: <code>1.7</code>)</li>
-        <li><strong>CRITERIO DE COMISION:</strong> criterio de aplicación (ej: <code>30</code>)</li>
-    </ul>
+        </uni-dynamic-table>
+    </div>
 
     <p>
         <mat-icon>warning</mat-icon>

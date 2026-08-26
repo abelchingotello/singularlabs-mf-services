@@ -65,6 +65,7 @@ export class ServicesComponent implements OnInit {
             icon: 'build_circle',
             value: 'config_service_plus',
             permission: "services-config"
+            //permission: "services-config-advanced"
           }
         ]
       }
@@ -332,7 +333,8 @@ export class ServicesComponent implements OnInit {
       this.openDialogConfigService(element)
     }else if(value == "config_service_plus") {
       console.log("element: ", element)
-      this.openDialogCreationAssignment(element)
+      this.editAdvancedElement(element.id);
+      //this.openDialogCreationAssignment(element)
     }
   }
 
@@ -383,6 +385,7 @@ export class ServicesComponent implements OnInit {
           business: data.business,
           serviceIdProv: data.id_serviceProv,
           indicators: data.indicators,
+          additional: data.additional,
           serviceComisionCriterio: data.ownComissionCriterion,
           serviceAmountTransactionRestriccion: data.amountTransactionRestriccion
         }
@@ -397,6 +400,9 @@ export class ServicesComponent implements OnInit {
 
   editElement(id: any) {
     this.router.navigate([`/service/edit/${id}`]);
+  }
+  editAdvancedElement(id: any) {
+    this.router.navigate([`/service/advanced/${id}`]);
   }
 
   dataMaster() {

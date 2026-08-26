@@ -8,10 +8,17 @@ import { ImportServicesComponent } from './import-service/import-services.compon
 
 const routes: Routes = [
   { path: '', component: ServicesComponent },
-  { path: 'add', component: NewServiceComponent },
+  { path: 'add', component: NewServiceComponent,
+  data: { mode: 'create' } },
  // { path: 'import', component: ImportServicesComponent },
   { path: 'import/:value', component: ImportServicesComponent },
-  { path: 'edit/:id', component: NewServiceComponent },
+  { path: 'edit/:id', component: NewServiceComponent,
+  data: { mode: 'edit' } },
+  {
+    path: 'advanced/:id',
+    component: NewServiceComponent,
+    data: { mode: 'advanced' }
+  },
   { path: 'detail', component: DetailServiceComponent },
   { path: 'payment', component: PaymentServiceComponent },
 

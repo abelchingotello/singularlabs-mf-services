@@ -123,4 +123,18 @@
   background-color: transparent; /* evita el color opaco por defecto */
   opacity: 1;  /* evita que se oscurezca */
 }
-  
+  .advanced-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 16px;
+    margin: 16px 0;
+
+    border-radius: 8px;
+
+    background-color: #e3f2fd;
+    color: #1565c0;
+
+    border-left: 4px solid #1565c0;
+}

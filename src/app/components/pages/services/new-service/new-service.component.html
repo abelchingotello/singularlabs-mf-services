@@ -3,7 +3,14 @@
         <uni-image-card title={{titlle}}
             externImage="https://poincenot.com/wp-content/uploads/big_wall_-_Banca_Digital.png">
         </uni-image-card>
+        <div *ngIf="isAdvanced" class="advanced-message">
+            <mat-icon>info</mat-icon>
+            <span>
+                Permite modificar información avanzada del servicio y sus asignaciones en una sola operación.
+            </span>
+        </div>
         <mat-tab-group [selectedIndex]="currentStep" dynamicHeight>
+
             <mat-tab>
                 <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">assignment</span>Datos de Servicio
@@ -90,7 +97,9 @@
                 </mat-card>
             </mat-tab>
 
-            <mat-tab [disabled]="tab2">
+            <mat-tab
+                *ngIf="!isAdvanced"
+                [disabled]="tab2">
                 <ng-template mat-tab-label>
                     <span class="material-symbols-outlined">attach_money</span>Datos de Comisiones
                 </ng-template>

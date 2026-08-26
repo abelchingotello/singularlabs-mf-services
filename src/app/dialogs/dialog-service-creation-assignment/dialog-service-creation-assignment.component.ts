@@ -302,4 +302,5 @@ export interface DialogData {
   serviceId: String,
   serviceIdProv: String,
   indicators: any,
+  additional: any
 }
